@@ -1,0 +1,147 @@
+---
+description: Anything related to Sanity usage with Typescript & App SDK
+alwaysApply: false
+---
+
+# App SDK and TypeGen
+
+Sanity TypeGen is a tool that generates TypeScript types directly from your Sanity schemas and GROQ queries. When used with the Sanity App SDK, it provides strong type safety and autocompletion suggestions for your documents, query results, and projections.
+
+## Setup
+
+Using Typegen involves two main steps: extracting your schema(s) and then generating the types.
+
+### Extract schemas
+
+Schema extraction is performed within your Studio setup to generate the `schema.json` file:
+
+```sh
+npx sanity schema extract --workspace <workspace-name> --output-path <path/to/schema.json>
+```
+
+### Install (experimental) packages
+
+```sh
+npm install groq@typegen-experimental-2025-04-23
+npm install @sanity/cli@typegen-experimental-2025-04-23 --save-dev
+```
+
+### Configure TypeGen (optional)
+
+For multiple schemas, create a `sanity-typegen.json` at the root of your SDK app:
+
+```json
+{
+  "unstable_schemas": [
+    {
+      "schemaPath": "./schemas/products-schema.json",
+      "schemaId": "your-project-id.products"
+    },
+    {
+      "schemaPath": "./schemas/authors-schema.json",
+      "schemaId": "your-project-id.authors"
+    }
+  ],
+  "overloadClientMethods": false
+}
+```
+
+### Generate types
+
+```sh
+./node_modules/@sanity/cli/bin/sanity typegen generate
+```
+
+Add to `package.json`:
+
+```json
+{
+  "scripts": {
+    "typegen": "./node_modules/@sanity/cli/bin/sanity typegen generate"
+  }
+}
+```
+
+## Use the generated types
+
+### Handles and literal types
+
+```tsx
+import { createDocumentHandle } from '@sanity/sdk'
+
+const handle = createDocumentHandle({
+  documentId: '123',
+  documentType: 'book',
+  dataset: 'production',
+  projectId: 'abc',
+})
+```
+
+### Document projections
+
+Use `defineProjection` for type inference:
+
+```tsx
+import { defineProjection } from 'groq'
+import { useDocumentProjection, type DocumentHandle } from '@sanity/sdk-react'
+
+export const authorSummary = defineProjection(`{
+  "name": name,
+  "favoriteBookTitles": favoriteBooks[]->title,
+}`)
+
+function AuthorDetails({ doc }: { doc: DocumentHandle<'author'> }) {
+  const { data } = useDocumentProjection({
+    ...doc,
+    projection: authorSummary,
+  })
+
+  return <div>{data.name}</div>
+}
+```
+
+### GROQ queries
+
+Use `defineQuery` for type inference:
+
+```tsx
+import { defineQuery } from 'groq'
+import { useQuery } from '@sanity/sdk-react'
+
+export const allBooksQuery = defineQuery('*[_type == "book"]{ _id, title }')
+
+function BookList() {
+  const { data } = useQuery({ query: allBooksQuery })
+
+  return (
+    <ul>
+      {data.map((book) => (
+        <li key={book._id}>{book.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+### Specific document types
+
+- Use `DocumentHandle<'book'>` to constrain a document handle to documents of a specific type.
+- Use `SanityDocument<'book'>` to type the actual data structure of a document of a specific type.
+
+```tsx
+import { type DocumentHandle } from '@sanity/sdk-react'
+
+function BookComponent({ doc }: { doc: DocumentHandle<'book'> }) {
+  const { data } = useDocument(doc)
+  // data is correctly typed as Book
+}
+```
+
+## Workflow considerations
+
+### Regeneration
+
+Re-run `npm run typegen` whenever you:
+- Change your Sanity schemas
+- Add or modify queries/projections defined with `defineQuery` or `defineProjection`
+- Consider integrating this into your `dev` script or a file watcher

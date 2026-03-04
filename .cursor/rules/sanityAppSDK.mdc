@@ -1,0 +1,195 @@
+---
+description: Anything related to Sanity usage
+alwaysApply: false
+---
+# App SDK best practices
+
+If you've worked with Sanity before, your experience querying the Content Lake is likely grounded in building Server-Side Rendered (SSR) or statically generated front-end applications designed for page load time performance.
+
+Now, with the Sanity App SDK, you can build feature-rich content applications for authoring. However, this requires a different approach: swapping SSR thinking for Single-Page Application (SPA) best practices.
+
+On top of this, if you're used to writing React applications, some common patterns for building form-based user interfaces are best avoided when working with App SDK.
+
+## What makes a great content application?
+
+Content applications are defined as distinct, new experiences that give authors a focused environment to perform content operations. Instead of digging through a general-purpose CMS interface, authors work in a fit-for-purpose user interface to get the job done.
+
+Content applications developed with the Sanity App SDK should be:
+
+### Real-time
+
+Any number of documents fetched and rendered into the user interface should continue to update as mutations happen to the source documents. Content applications should avoid concepts that handle stale data like "submit," "save" or "lock" buttons.
+
+### Multiplayer
+
+Two authors looking at the same document should be able to continually make and see edits without fear of overwriting one another's work.
+
+### Fast
+
+Content rendered in the application should be locally cached, updated optimistically, and kept eventually consistent with the Content Lake.
+
+### Accurate
+
+There should never be stale data in an author's browser as they write content, nor after page load when fetched content is rendered. Updates should be written to and received directly from the Content Lake.
+
+### This is all built-in to Sanity App SDK
+
+These are the baseline expectations that Sanity's engineers have had while developing Sanity Studio since 2017, and they're now democratized for everyone to take advantage of via React Hooks in the Sanity App SDK.
+
+## Get comfortable with more fetches
+
+If you've built an SSR front end with Sanity before (such as in Next.js), you've likely created a Sanity Client and fetched all on-page content in a single query like this.
+
+```tsx
+// The SSR way: query and render "event" type documents
+
+import { client } from "../sanity/client";
+
+export async function Page() {
+  const events = await client.fetch(
+    `*[_type == "event"]`
+  );
+
+  return (
+    <ul>
+      {events.map((event) => (
+        <li key={event._id}>{event.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Prefer useDocuments over useQuery to fetch documents
+
+Your natural inclination may be to use the App SDK hooks to recreate the "fetch everything in one query" pattern.
+
+```tsx
+// Do not simply swap client.fetch for useQuery
+// It's too easy to over-fetch!
+
+import { useQuery } from "@sanity/sdk-react";
+
+export function Page() {
+  const { data: events } = useQuery(
+    `*[_type == "event"]`
+  );
+
+  if (!events) return null;
+
+  return (
+    <ul>
+      {events.map((event) => (
+        <li key={event._id}>{event.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Instead, fetch document handles first, then fetch individual documents' content within dedicated components:
+
+```tsx
+// Fetch and render event type documents the App SDK way
+
+import { Suspense } from "react";
+import {
+  useDocuments,
+  useDocumentProjection,
+  type DocumentHandle,
+} from "@sanity/sdk-react";
+
+// Parent component that queries and renders event documents
+export function EventsList() {
+  const { data: events } = useDocuments({
+    documentType: 'event',
+  });
+
+  if (!events) return null;
+
+  return (
+    <ul>
+      {events.map((event) => (
+        <Suspense key={event.documentId} fallback={<li>Loading...</li>}>
+          <Event {...event} />
+        </Suspense>
+      ))}
+    </ul>
+  );
+}
+
+// Event component now renders the <li> itself
+function Event(props: DocumentHandle) {
+  const { data } = useDocumentProjection({ ...props, projection: `{ title }` });
+
+  if (!data) return null;
+
+  return <li>{data.title}</li>;
+}
+```
+
+## Apply Suspense boundaries liberally
+
+The hooks in the App SDK use Suspense for data fetching. Wrap **every** data-fetching component in Suspense.
+
+### Components should only have one Suspenseful hook
+
+Separate individual fetchers into individual components to prevent cascading re-renders.
+
+```tsx
+// Separate fetchers into their own list components
+
+import { Suspense } from 'react'
+import { useDocuments } from '@sanity/react-sdk'
+import { List } from './List'
+
+export function EventsAndVenues() {
+  return (
+    <>
+      <Suspense fallback="Loading events...">
+        <DocumentListSection documentType="event" />
+      </Suspense>
+
+      <Suspense fallback="Loading venues...">
+        <DocumentListSection documentType="venue" />
+      </Suspense>
+    </>
+  )
+}
+
+function DocumentListSection({ documentType }: { documentType: string }) {
+  const { data: items } = useDocuments({ documentType })
+
+  if (!items) return null
+
+  return <List items={items} />
+}
+```
+
+## Read and write state from Content Lake
+
+Real-time applications require values to be up to date in **all** browsers. Always read from and write to Content Lake instead of your local state.
+
+### Correct controlled inputs the App SDK way
+
+```tsx
+// Read from and write values directly to the document
+
+import { useDocument, useEditDocument, type DocumentHandle } from '@sanity/react-sdk'
+
+export function TitleInput(props: DocumentHandle) {
+  const { data: title } = useDocument({ ...props, path: 'title' })
+  const editTitle = useEditDocument({ ...props, path: 'title' })
+
+  return (
+    <input
+      type="text"
+      value={title ?? ''}
+      onChange={e => editTitle(e.currentTarget.value)}
+      placeholder="Enter title"
+    />
+  )
+}
+```
+
+Avoid creating forms that rely on a user's local session, and always read from and write to the Content Lake.

@@ -1,0 +1,38 @@
+---
+description: Anything related to Clerk usage
+alwaysApply: false
+---
+
+# Clerk + Next.js App Router Integration Guide
+
+## Core Requirements
+
+The official integration demands installing `@clerk/nextjs` and establishing three key components:
+
+1. **Middleware Setup**: Create a `proxy.ts` file using `clerkMiddleware()` from `@clerk/nextjs/server`
+2. **Provider Wrapping**: Implement `<ClerkProvider>` in `app/layout.tsx`
+3. **Authentication UI**: Utilize Clerk components like `<SignInButton>`, `<UserButton>`, and conditional rendering with `<SignedIn>`/`<SignedOut>`
+
+## Critical Environment Configuration
+
+Store credentials exclusively in `.env.local`:
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+
+Never embed actual keys in codebase or documentation—use placeholder values only.
+
+## What to Avoid
+
+Reject these deprecated patterns:
+- `authMiddleware()` (replaced by `clerkMiddleware()`)
+- Pages-based structure (`_app.tsx`, `pages/` directory)
+- Old environment variable patterns incompatible with current docs
+
+## Verification Checklist
+
+Before implementing any Clerk solution, confirm:
+- Middleware uses `clerkMiddleware()` in `proxy.ts`
+- Layout wraps children with `<ClerkProvider>`
+- All imports reference `@clerk/nextjs` or `@clerk/nextjs/server`
+- Code follows App Router conventions (not legacy patterns)
+- Only placeholder credentials appear in examples
