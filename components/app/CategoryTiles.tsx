@@ -92,7 +92,20 @@ export function CategoryTiles({
   }, []);
 
   return (
-    <div className="relative">
+    <div>
+      {/* Heading */}
+      <div className="mx-auto max-w-2xl px-4 pt-10 pb-6 sm:px-6 text-center">
+        <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+          Shop by room
+        </h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm leading-[1.6] text-zinc-900 dark:text-zinc-100">
+          At Kozy, we make it easy for you to create your dream space. Shop
+          furniture online that is stylish, functional, and affordable.
+        </p>
+      </div>
+
+      {/* Carousel */}
+      <div className="relative">
       {/* Left arrow — always visible */}
       <button
           type="button"
@@ -132,7 +145,7 @@ export function CategoryTiles({
           return (
             <Link
               key={category._id}
-              href={`/category/${category.slug}`}
+              href={`/?category=${category.slug}`}
               draggable={false}
               className={`group relative flex-shrink-0 overflow-hidden transition-all duration-300 ${
                 isActive
@@ -166,6 +179,7 @@ export function CategoryTiles({
             </Link>
           );
         })}
+      </div>
       </div>
     </div>
   );
