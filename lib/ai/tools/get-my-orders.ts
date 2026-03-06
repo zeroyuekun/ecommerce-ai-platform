@@ -7,7 +7,7 @@ import {
   getOrderStatusEmoji,
 } from "@/lib/constants/orderStatus";
 import { formatPrice } from "@/lib/utils";
-import type { ORDERS_BY_USER_QUERY_RESULT } from "@/sanity.types";
+import type { ORDERS_BY_USER_QUERYResult } from "@/sanity.types";
 
 const getMyOrdersSchema = z.object({
   status: z
@@ -66,7 +66,7 @@ export function createGetMyOrdersTool(userId: string | null) {
         console.log("[GetMyOrders] Orders found:", orders.length);
 
         // Filter by status if provided
-        let filteredOrders = orders as ORDERS_BY_USER_QUERY_RESULT;
+        let filteredOrders = orders as ORDERS_BY_USER_QUERYResult;
         if (status) {
           filteredOrders = filteredOrders.filter(
             (order) => order.status === status

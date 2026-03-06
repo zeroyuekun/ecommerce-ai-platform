@@ -109,6 +109,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
           </p>
         </div>
 
+        {/* Status and Actions */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex items-center gap-3">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -144,6 +145,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
                   key={item._key}
                   className="flex gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4"
                 >
+                  {/* Image */}
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800 sm:h-20 sm:w-20">
                     {item.product?.image?.asset?.url ? (
                       <Image
@@ -160,6 +162,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
                     )}
                   </div>
 
+                  {/* Details */}
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
                       <div className="flex items-start gap-2">
@@ -183,6 +186,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
                     </div>
                   </div>
 
+                  {/* Price */}
                   <div className="text-right">
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 sm:text-base">
                       {formatPrice(
@@ -225,6 +229,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
 
         {/* Sidebar */}
         <div className="space-y-6 lg:col-span-2">
+          {/* Customer Info */}
           <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
             <div className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-zinc-400" />
@@ -244,6 +249,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
             </div>
           </div>
 
+          {/* Editable Shipping Address */}
           <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -269,6 +275,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
             </div>
           </div>
 
+          {/* Studio Link */}
           <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
             <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
               Advanced Editing
@@ -330,6 +337,7 @@ export default function OrderDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Back Link */}
       <Link
         href="/admin/orders"
         className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
@@ -338,6 +346,7 @@ export default function OrderDetailPage({ params }: PageProps) {
         Back to Orders
       </Link>
 
+      {/* Order Detail */}
       <Suspense fallback={<OrderDetailSkeleton />}>
         <OrderDetailContent handle={handle} />
       </Suspense>

@@ -1,4 +1,4 @@
-import { SuccessPageSkeleton } from "@/components/storefront/SuccessPageSkeleton";
+import { SuccessPageSkeleton } from "@/components/app/SuccessPageSkeleton";
 
 export default function SuccessLoading() {
   return <SuccessPageSkeleton />;

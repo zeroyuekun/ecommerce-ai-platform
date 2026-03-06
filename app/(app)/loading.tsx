@@ -1,13 +1,13 @@
-import { CategoryTilesSkeleton } from "@/components/storefront/CategoryTilesSkeleton";
-import { ProductFiltersSkeleton } from "@/components/storefront/ProductFiltersSkeleton";
-import { ProductGridSkeleton } from "@/components/storefront/ProductGridSkeleton";
+import { CategoryTilesSkeleton } from "@/components/app/CategoryTilesSkeleton";
+import { ProductFiltersSkeleton } from "@/components/app/ProductFiltersSkeleton";
+import { ProductGridSkeleton } from "@/components/app/ProductGridSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HomeLoading() {
   return (
-    <div className="min-h-screen bg-background dark:bg-zinc-900">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Page Banner */}
-      <div className="border-b border-zinc-200 bg-background dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="mt-2 h-4 w-56" />

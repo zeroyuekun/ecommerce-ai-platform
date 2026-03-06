@@ -44,7 +44,7 @@ export function SuccessClient({ session }: SuccessClientProps) {
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="text-center">
         <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-        <h1 className="mt-4 text-3xl font-medium text-zinc-900 dark:text-zinc-100">
+        <h1 className="mt-4 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
           Order Confirmed!
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
@@ -56,7 +56,7 @@ export function SuccessClient({ session }: SuccessClientProps) {
       {/* Order Details */}
       <div className="mt-10 rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
-          <h2 className="font-medium text-zinc-900 dark:text-zinc-100">
+          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
             Order Details
           </h2>
         </div>
@@ -83,7 +83,7 @@ export function SuccessClient({ session }: SuccessClientProps) {
 
           {/* Total */}
           <div className="mt-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-            <div className="flex justify-between text-base font-medium">
+            <div className="flex justify-between text-base font-semibold">
               <span className="text-zinc-900 dark:text-zinc-100">Total</span>
               <span className="text-zinc-900 dark:text-zinc-100">
                 {formatPrice((session.amountTotal ?? 0) / 100)}

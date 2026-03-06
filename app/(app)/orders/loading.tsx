@@ -1,4 +1,4 @@
-import { OrderCardSkeleton } from "@/components/storefront/OrderCardSkeleton";
+import { OrderCardSkeleton } from "@/components/app/OrderCardSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OrdersLoading() {

@@ -9,7 +9,6 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
   && ($categorySlug == "" || category->slug.current == $categorySlug)
-  && ($productType == "" || productType == $productType)
   && ($color == "" || color == $color)
   && ($material == "" || material == $material)
   && ($minPrice == 0 || price >= $minPrice)
@@ -24,7 +23,7 @@ const FILTERED_PRODUCT_PROJECTION = `{
   name,
   "slug": slug.current,
   price,
-  "images": images[defined(asset->_id)][0...4]{
+  "images": images[0...4]{
     _key,
     asset->{
       _id,
@@ -38,7 +37,6 @@ const FILTERED_PRODUCT_PROJECTION = `{
   },
   material,
   color,
-  productType,
   stock
 }`;
 
@@ -64,7 +62,7 @@ export const ALL_PRODUCTS_QUERY = defineQuery(`*[
   "slug": slug.current,
   description,
   price,
-  "images": images[defined(asset->_id)]{
+  "images": images[]{
     _key,
     asset->{
       _id,
@@ -98,7 +96,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
   "slug": slug.current,
   description,
   price,
-  "images": images[defined(asset->_id)]{
+  "images": images[]{
     _key,
     asset->{
       _id,
@@ -125,7 +123,7 @@ export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   price,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url
@@ -155,7 +153,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   "slug": slug.current,
   description,
   price,
-  "images": images[defined(asset->_id)]{
+  "images": images[]{
     _key,
     asset->{
       _id,
@@ -173,56 +171,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   dimensions,
   stock,
   featured,
-  assemblyRequired,
-  variantGroup
-}`);
-
-/**
- * Get color variants of a product (same variantGroup, different product)
- */
-export const COLOR_VARIANTS_QUERY = defineQuery(`*[
-  _type == "product"
-  && variantGroup == $variantGroup
-  && _id != $currentId
-] | order(name asc) {
-  _id,
-  name,
-  color,
-  "slug": slug.current,
-  "image": images[defined(asset->_id)][0]{
-    asset->{
-      url
-    }
-  }
-}`);
-
-/**
- * Get related products from same category
- */
-export const RELATED_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
-  && category->slug.current == $categorySlug
-  && _id != $currentId
-  && stock > 0
-] | order(featured desc, name asc) [0...4] {
-  _id,
-  name,
-  "slug": slug.current,
-  price,
-  color,
-  stock,
-  "images": images[defined(asset->_id)][0...4]{
-    _key,
-    asset->{
-      _id,
-      url
-    }
-  },
-  category->{
-    _id,
-    title,
-    "slug": slug.current
-  }
+  assemblyRequired
 }`);
 
 // ============================================
@@ -250,7 +199,7 @@ export const SEARCH_PRODUCTS_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   price,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url
@@ -301,34 +250,6 @@ export const FILTER_PRODUCTS_BY_RELEVANCE_QUERY = defineQuery(
 );
 
 /**
- * Filter products - ordered by name descending (Z-A)
- */
-export const FILTER_PRODUCTS_BY_NAME_DESC_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name desc) ${FILTERED_PRODUCT_PROJECTION}`
-);
-
-/**
- * Filter products - ordered by newest (creation date descending)
- */
-export const FILTER_PRODUCTS_BY_NEWEST_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(_createdAt desc) ${FILTERED_PRODUCT_PROJECTION}`
-);
-
-/**
- * Filter products - ordered by featured/popular first, then name
- */
-export const FILTER_PRODUCTS_BY_POPULAR_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(featured desc, stock desc, name asc) ${FILTERED_PRODUCT_PROJECTION}`
-);
-
-/**
- * Filter products - ordered by featured (highly rated proxy), then price
- */
-export const FILTER_PRODUCTS_BY_RATING_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(featured desc, price desc) ${FILTERED_PRODUCT_PROJECTION}`
-);
-
-/**
  * Get products by IDs (for cart/checkout)
  */
 export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
@@ -339,7 +260,7 @@ export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   price,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url
@@ -362,7 +283,7 @@ export const LOW_STOCK_PRODUCTS_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   stock,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url
@@ -380,7 +301,7 @@ export const OUT_OF_STOCK_PRODUCTS_QUERY = defineQuery(`*[
   _id,
   name,
   "slug": slug.current,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url
@@ -416,7 +337,7 @@ export const AI_SEARCH_PRODUCTS_QUERY = defineQuery(`*[
   "slug": slug.current,
   description,
   price,
-  "image": images[defined(asset->_id)][0]{
+  "image": images[0]{
     asset->{
       _id,
       url

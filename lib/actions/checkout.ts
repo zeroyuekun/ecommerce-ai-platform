@@ -11,7 +11,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2025-11-17.clover",
 });
 
 // Types
@@ -96,7 +96,7 @@ export async function createCheckoutSession(
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
       validatedItems.map(({ product, quantity }) => ({
         price_data: {
-          currency: "aud",
+          currency: "gbp",
           product_data: {
             name: product.name ?? "Product",
             images: product.image?.asset?.url ? [product.image.asset.url] : [],

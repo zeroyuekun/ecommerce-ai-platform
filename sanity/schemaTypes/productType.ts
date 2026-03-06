@@ -1,6 +1,6 @@
 import { PackageIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
-import { MATERIALS_SANITY_LIST, COLORS_SANITY_LIST, PRODUCT_TYPES_SANITY_LIST } from "@/lib/constants/filters";
+import { MATERIALS_SANITY_LIST, COLORS_SANITY_LIST } from "@/lib/constants/filters";
 
 export const productType = defineType({
   name: "product",
@@ -56,16 +56,6 @@ export const productType = defineType({
       validation: (rule) => [rule.required().error("Category is required")],
     }),
     defineField({
-      name: "productType",
-      type: "string",
-      group: "details",
-      description: "Furniture type for filtering (e.g., tables, chairs, beds)",
-      options: {
-        list: PRODUCT_TYPES_SANITY_LIST,
-        layout: "dropdown",
-      },
-    }),
-    defineField({
       name: "material",
       type: "string",
       group: "details",
@@ -88,13 +78,6 @@ export const productType = defineType({
       type: "string",
       group: "details",
       description: 'e.g., "120cm x 80cm x 75cm"',
-    }),
-    defineField({
-      name: "variantGroup",
-      type: "string",
-      group: "details",
-      description:
-        "Groups products that are the same item in different colors (e.g., 'osaka-buffet')",
     }),
     defineField({
       name: "images",

@@ -3,12 +3,11 @@ import { ChatStoreProvider } from "@/lib/store/chat-store-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SanityLive } from "@/sanity/lib/live";
 import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/storefront/Header";
-import { CartSheet } from "@/components/storefront/CartSheet";
-import { ChatSheet } from "@/components/storefront/ChatSheet";
-import { ChatFab } from "@/components/storefront/ChatFab";
-import { AppShell } from "@/components/storefront/AppShell";
-import { Footer } from "@/components/storefront/Footer";
+import { Header } from "@/components/app/Header";
+import { CartSheet } from "@/components/app/CartSheet";
+import { ChatSheet } from "@/components/app/ChatSheet";
+import { AppShell } from "@/components/app/AppShell";
+
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
@@ -17,11 +16,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           <AppShell>
             <Header />
             <main>{children}</main>
-            <Footer />
           </AppShell>
           <CartSheet />
           <ChatSheet />
-          <ChatFab />
           <Toaster position="bottom-center" />
           <SanityLive />
         </ChatStoreProvider>

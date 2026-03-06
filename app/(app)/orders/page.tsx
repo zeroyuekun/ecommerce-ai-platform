@@ -7,7 +7,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { ORDERS_BY_USER_QUERY } from "@/lib/sanity/queries/orders";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
-import { StackedProductImages } from "@/components/storefront/StackedProductImages";
+import { StackedProductImages } from "@/components/app/StackedProductImages";
 
 export const metadata = {
   title: "Your Orders | Furniture Shop",
@@ -39,7 +39,7 @@ export default async function OrdersPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-medium text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
           Your Orders
         </h1>
         <p className="mt-2 text-zinc-500 dark:text-zinc-400">
@@ -74,7 +74,7 @@ export default async function OrdersPage() {
                   {/* Top: Order Info + Status */}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                      <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                         Order #{formatOrderNumber(order.orderNumber)}
                       </p>
                       <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
@@ -95,7 +95,7 @@ export default async function OrdersPage() {
                       {order.itemCount}{" "}
                       {order.itemCount === 1 ? "item" : "items"}
                     </p>
-                    <p className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
+                    <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                       {formatPrice(order.total)}
                     </p>
                   </div>

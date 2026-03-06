@@ -59,7 +59,14 @@
       "Bash(vercel login:*)",
       "Bash(vercel:*)",
       "Bash(rm:*)",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "WebFetch(domain:www.westelm.com.au)",
+      "Bash(npx tsc:*)",
+      "Bash(git clone:*)",
+      "Read(//c/tmp/**)",
+      "Read(//c/Users/Admin/ecommerce-ai-platform/$TEMP/**)",
+      "Read(//c/Users/Admin/ecommerce-ai-platform/$USERPROFILE/AppData/Local/Temp/**)",
+      "Bash(cygpath:*)"
     ]
   }
 }

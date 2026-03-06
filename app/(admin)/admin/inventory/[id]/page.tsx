@@ -45,6 +45,7 @@ const COLORS = [
   { value: "natural", label: "Natural" },
 ];
 
+// Field editor components
 function NameEditor(handle: DocumentHandle) {
   const { data: name } = useDocument({ ...handle, path: "name" });
   const editName = useEditDocument({ ...handle, path: "name" });
@@ -299,7 +300,7 @@ function ProductDetailContent({ handle }: { handle: DocumentHandle }) {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
+                <Label htmlFor="price">Price (£)</Label>
                 <Suspense fallback={<Skeleton className="h-10" />}>
                   <PriceEditor {...handle} />
                 </Suspense>
@@ -453,6 +454,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Back Link */}
       <Link
         href="/admin/inventory"
         className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
@@ -461,6 +463,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         Back to Inventory
       </Link>
 
+      {/* Product Detail */}
       <Suspense fallback={<ProductDetailSkeleton />}>
         <ProductDetailContent handle={handle} />
       </Suspense>
