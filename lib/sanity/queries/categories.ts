@@ -10,12 +10,11 @@ export const ALL_CATEGORIES_QUERY = defineQuery(`*[
   _id,
   title,
   "slug": slug.current,
-  "image": image{
+  "image": *[_type == "product" && category._ref == ^._id && defined(images[0])][0].images[0]{
     asset->{
       _id,
       url
-    },
-    hotspot
+    }
   }
 }`);
 

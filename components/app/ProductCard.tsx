@@ -33,7 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasMultipleImages = images.length > 1;
 
   return (
-    <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-sm ring-1 ring-zinc-950/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-950/10 dark:bg-zinc-900 dark:ring-white/10 dark:hover:shadow-zinc-950/50">
+    <Card className="group relative flex h-full flex-col overflow-hidden rounded-none border-0 bg-white p-0 shadow-sm ring-1 ring-zinc-950/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-950/10 dark:bg-zinc-900 dark:ring-white/10 dark:hover:shadow-zinc-950/50">
       <Link href={`/products/${product.slug}`} className="block">
         <div
           className={cn(
@@ -72,13 +72,13 @@ export function ProductCard({ product }: ProductCardProps) {
           {isOutOfStock && (
             <Badge
               variant="destructive"
-              className="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-medium shadow-lg"
+              className="absolute right-3 top-3 rounded-none px-3 py-1 text-xs font-medium shadow-lg"
             >
               Out of Stock
             </Badge>
           )}
           {product.category && (
-            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-300">
+            <span className="absolute left-3 top-3 rounded-none bg-white/90 px-3 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-300">
               {product.category.title}
             </span>
           )}
@@ -93,7 +93,7 @@ export function ProductCard({ product }: ProductCardProps) {
               key={image._key ?? index}
               type="button"
               className={cn(
-                "relative h-14 flex-1 overflow-hidden rounded-lg transition-all duration-200",
+                "relative h-14 flex-1 overflow-hidden rounded-none transition-all duration-200",
                 hoveredImageIndex === index
                   ? "ring-2 ring-zinc-900 ring-offset-2 dark:ring-white dark:ring-offset-zinc-900"
                   : "opacity-50 hover:opacity-100",

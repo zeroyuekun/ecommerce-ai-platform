@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Grid2x2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
 interface CategoryTilesProps {
@@ -14,41 +16,115 @@ export function CategoryTiles({
   categories,
   activeCategory,
 }: CategoryTilesProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const scrollStartX = useRef(0);
+  const hasDragged = useRef(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.7;
+    el.scrollBy({
+      left: direction === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  };
+
+  // Drag-to-scroll handlers
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragging.current = true;
+    hasDragged.current = false;
+    dragStartX.current = e.clientX;
+    scrollStartX.current = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+    el.style.cursor = "grabbing";
+    el.style.scrollSnapType = "none";
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const dx = e.clientX - dragStartX.current;
+    if (Math.abs(dx) > 3) hasDragged.current = true;
+    el.scrollLeft = scrollStartX.current - dx;
+  }, []);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragging.current = false;
+    el.releasePointerCapture(e.pointerId);
+    el.style.cursor = "";
+    el.style.scrollSnapType = "";
+  }, []);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (hasDragged.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, []);
+
   return (
     <div className="relative">
-      {/* Horizontal scrolling container - full width with edge padding */}
-      <div className="flex gap-4 overflow-x-auto  py-4 pl-8 pr-4 sm:pl-12 sm:pr-6 lg:pl-10 lg:pr-8 scrollbar-hide">
-        {/* All Products tile */}
-        <Link
-          href="/"
-          className={`group relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 ${
-            !activeCategory
-              ? "ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-zinc-900"
-              : "hover:ring-2 hover:ring-zinc-300 hover:ring-offset-2 dark:hover:ring-zinc-600 dark:hover:ring-offset-zinc-900"
-          }`}
+      {/* Left arrow — always visible */}
+      <button
+          type="button"
+          onClick={() => scroll("left")}
+          className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
+          aria-label="Scroll left"
         >
-          <div className="relative h-32 w-56 sm:h-56 sm:w-80">
-            {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 dark:from-zinc-700 dark:to-zinc-800" />
+          <ChevronLeft className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+        </button>
 
-            {/* Icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Grid2x2 className="h-12 w-12 text-white/60 transition-transform duration-300 group-hover:scale-110" />
-            </div>
+      {/* Right arrow */}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={() => scroll("right")}
+          className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+        </button>
+      )}
 
-            {/* Dark overlay for text */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-            {/* Category name */}
-            <div className="absolute inset-x-0 bottom-0 p-4">
-              <span className="text-base font-semibold text-white drop-shadow-md">
-                All Products
-              </span>
-            </div>
-          </div>
-        </Link>
-
-        {/* Category tiles */}
+      {/* Horizontal scrolling container with drag support */}
+      <div
+        ref={scrollRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onClickCapture={handleClick}
+        className="flex cursor-grab gap-2.5 overflow-x-auto py-4 px-4 sm:px-6 lg:px-8 scrollbar-hide select-none"
+      >
         {categories.map((category) => {
           const isActive = activeCategory === category.slug;
           const imageUrl = category.image?.asset?.url;
@@ -56,37 +132,28 @@ export function CategoryTiles({
           return (
             <Link
               key={category._id}
-              href={`/?category=${category.slug}`}
-              className={`group relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 ${
+              href={`/category/${category.slug}`}
+              draggable={false}
+              className={`group relative flex-shrink-0 overflow-hidden transition-all duration-300 ${
                 isActive
                   ? "ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-zinc-900"
-                  : "hover:ring-2 hover:ring-zinc-300 hover:ring-offset-2 dark:hover:ring-zinc-600 dark:hover:ring-offset-zinc-900"
+                  : ""
               }`}
             >
-              <div className="relative h-32 w-56 sm:h-56 sm:w-80">
-                {/* Background image or gradient fallback */}
-                {imageUrl ? (
-                  <Image
-                    src={imageUrl}
-                    alt={category.title ?? "Category"}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600" />
-                )}
-
-                {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
-
-                {/* Category name */}
+              <div className="relative h-44 w-64 sm:h-64 sm:w-80">
+                <Image
+                  src={imageUrl ?? `/categories/${category.slug}.jpg`}
+                  alt={category.title ?? "Category"}
+                  fill
+                  draggable={false}
+                  className="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-4">
-                  <span className="text-base font-semibold text-white drop-shadow-md">
+                  <span className="text-sm font-semibold tracking-wide text-white drop-shadow-md">
                     {category.title}
                   </span>
                 </div>
-
-                {/* Active indicator */}
                 {isActive && (
                   <div className="absolute top-2 right-2">
                     <span className="flex h-2 w-2">

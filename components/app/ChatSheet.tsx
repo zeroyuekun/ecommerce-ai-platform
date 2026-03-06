@@ -57,30 +57,30 @@ export function ChatSheet() {
 
   return (
     <>
-      {/* Backdrop - only visible on mobile/tablet (< xl) */}
+      {/* Backdrop - only visible on mobile */}
       <div
-        className="fixed inset-0 z-40 bg-black/50 xl:hidden"
+        className="fixed inset-0 z-40 bg-black/50 sm:hidden"
         onClick={closeChat}
         aria-hidden="true"
       />
 
-      {/* Sidebar */}
-      <div className="fixed top-0 right-0 z-50 flex h-full w-full flex-col border-l border-zinc-200 bg-white overscroll-contain dark:border-zinc-800 dark:bg-zinc-950 sm:w-[448px] animate-in slide-in-from-right duration-300">
+      {/* Messenger-style chat popup */}
+      <div className="fixed z-50 flex flex-col border border-zinc-200 bg-white overscroll-contain dark:border-zinc-800 dark:bg-zinc-950 animate-in slide-in-from-bottom-4 fade-in duration-300 inset-0 sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[520px] sm:w-[380px] sm:shadow-2xl">
         {/* Header */}
-        <header className="shrink-0 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-2 font-semibold">
-              <Sparkles className="h-5 w-5 text-amber-500" />
+        <header className="shrink-0 border-b border-zinc-200 dark:border-zinc-800 ">
+          <div className="flex h-14 items-center justify-between px-4">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-amber-500" />
               Shopping Assistant
             </div>
-            <Button variant="ghost" size="icon" onClick={closeChat}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={closeChat}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3">
           {messages.length === 0 ? (
             <WelcomeScreen
               onSuggestionClick={sendMessage}
@@ -143,7 +143,7 @@ export function ChatSheet() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-zinc-200 px-4 py-4 dark:border-zinc-800">
+        <div className="border-t border-zinc-200 px-3 py-3 dark:border-zinc-800 ">
           <form onSubmit={handleSubmit} className="flex gap-2">
             <Input
               value={input}

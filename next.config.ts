@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.listonce.com.au",
+      },
+      {
+        protocol: "https",
+        hostname: "content.api.news",
+      },
     ],
   },
 };
