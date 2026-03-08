@@ -5,7 +5,8 @@ import { customerType } from './customerType'
 import { orderType } from './orderType'
 import { productType } from './productType'
 import { searchQueryType } from './searchQueryType'
+import { newsletterSignupType } from './newsletterSignupType'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [categoryType, customerType, productType, orderType, searchQueryType],
+  types: [categoryType, customerType, productType, orderType, searchQueryType, newsletterSignupType],
 }

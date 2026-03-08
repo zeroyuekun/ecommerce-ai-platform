@@ -21,6 +21,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "content.api.news",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.decorilla.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.decorilla.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn-bnokp.nitrocdn.com",
+      },
     ],
   },
 };

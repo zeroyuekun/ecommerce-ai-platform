@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, MapPin, Package, Search, ShoppingCart, User } from "lucide-react";
@@ -116,9 +116,12 @@ export function Header({ categories }: HeaderProps) {
   const { openCart } = useCartActions();
   const totalItems = useTotalItems();
   const router = useRouter();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [solid, setSolid] = useState(!isHome);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [popularSearches, setPopularSearches] = useState(defaultSuggestions);
   const lastScrollY = useRef(0);
@@ -167,20 +170,45 @@ export function Header({ categories }: HeaderProps) {
     };
   }, []);
 
-  // Hide header on scroll down, show on scroll up
+  // Reset state on route change
+  useEffect(() => {
+    if (!isHome) {
+      setSolid(true);
+    } else {
+      setSolid(false);
+    }
+    setHidden(false);
+  }, [isHome]);
+
+  // Scroll behavior: both homepage and other pages hide on scroll down, show on scroll up
+  // Homepage: transparent at top + while hiding, solid when reappearing
+  // Other pages: always solid
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
-      if (currentY > lastScrollY.current && currentY > 80) {
+      const delta = currentY - lastScrollY.current;
+
+      if (delta > 5 && currentY > 10) {
+        // Scrolling down — hide header
         setHidden(true);
-      } else {
+        if (isHome) setSolid(false);
+      } else if (delta < -5) {
+        // Scrolling up — show header
         setHidden(false);
+        if (isHome) setSolid(currentY > 100);
       }
+
+      // Homepage: always transparent at the very top
+      if (isHome && currentY < 10) {
+        setHidden(false);
+        setSolid(false);
+      }
+
       lastScrollY.current = currentY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -202,7 +230,7 @@ export function Header({ categories }: HeaderProps) {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     const trimmed = searchQuery.trim();
-    router.push(`/?q=${encodeURIComponent(trimmed)}`);
+    router.push(`/shop?q=${encodeURIComponent(trimmed)}`);
     recordSearch(trimmed);
     inputRef.current?.blur();
     setIsFocused(false);
@@ -211,17 +239,17 @@ export function Header({ categories }: HeaderProps) {
   const handleSuggestionClick = (query: string) => {
     setSearchQuery(query);
     setIsFocused(false);
-    router.push(`/?q=${encodeURIComponent(query)}`);
+    router.push(`/shop?q=${encodeURIComponent(query)}`);
     recordSearch(query);
   };
 
   return (
-    <header className={`sticky top-0 z-50 border-b border-zinc-200 bg-white transition-transform duration-300 dark:border-zinc-800 dark:bg-zinc-950 ${hidden ? "-translate-y-full" : "translate-y-0"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${hidden ? "-translate-y-full" : "translate-y-0"} ${!solid ? "bg-transparent" : "bg-white/95 backdrop-blur-md shadow-sm dark:bg-zinc-950/95"}`}>
       {/* Main header row */}
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-10">
         {/* Left: Logo */}
         <a href="/" className="flex shrink-0 items-center">
-          <span className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className={`text-3xl font-bold tracking-tight transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}>
             Kozy.
           </span>
         </a>
@@ -229,7 +257,7 @@ export function Header({ categories }: HeaderProps) {
         {/* Center: Search bar */}
         <form onSubmit={handleSearch} className="absolute left-1/2 z-50 hidden -translate-x-1/2 sm:block w-[40%] lg:w-[35%]">
           <div className="relative">
-            <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-900 dark:text-zinc-100" />
+            <Search className={`absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`} />
             <input
               ref={inputRef}
               type="text"
@@ -237,7 +265,7 @@ export function Header({ categories }: HeaderProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               placeholder="Search"
-              className="w-full border-0 border-b-2 border-zinc-900 bg-transparent py-2.5 pl-6 pr-4 text-sm text-zinc-900 transition-colors focus:border-black focus:outline-none dark:border-zinc-100 dark:text-zinc-100 dark:focus:border-white"
+              className={`w-full border-0 border-b-2 bg-transparent py-2.5 pl-6 pr-4 text-sm transition-colors focus:outline-none ${!solid ? "border-white/60 text-white placeholder:text-white/60 focus:border-white" : "border-zinc-900 text-zinc-900 placeholder:text-zinc-400 focus:border-black dark:border-zinc-100 dark:text-zinc-100 dark:focus:border-white"}`}
             />
 
             {/* Search suggestions dropdown */}
@@ -266,7 +294,7 @@ export function Header({ categories }: HeaderProps) {
         </form>
 
         {/* Right: Icons */}
-        <div className="flex shrink-0 items-center gap-1">
+        <div className={`flex shrink-0 items-center gap-1 transition-colors duration-500 ${!solid ? "[&_svg]:text-white [&_button]:text-white" : ""}`}>
           {/* Location */}
           <Button variant="ghost" size="icon" className="hover:bg-transparent dark:hover:bg-transparent" asChild>
             <Link href="/store-locations" title="Store Location">
@@ -295,7 +323,7 @@ export function Header({ categories }: HeaderProps) {
           >
             <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-zinc-900 text-[10px] font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+              <span className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-medium ${!solid ? "bg-white text-zinc-900" : "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"}`}>
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
@@ -338,7 +366,7 @@ export function Header({ categories }: HeaderProps) {
 
       {/* Category navigation with mega dropdown */}
       <nav
-        className="relative border-b border-zinc-200 dark:border-zinc-800"
+        className={`relative transition-colors duration-500 ${!solid ? "" : "border-b border-zinc-200 dark:border-zinc-800"}`}
         onMouseLeave={handleCategoryLeave}
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
@@ -349,17 +377,17 @@ export function Header({ categories }: HeaderProps) {
               onMouseEnter={() => handleCategoryHover(cat.slug)}
             >
               <Link
-                href={`/category/${cat.slug}`}
+                href={`/shop?category=${cat.slug}`}
                 onClick={() => setActiveCategory(null)}
                 className={`group relative whitespace-nowrap text-[13px] font-medium tracking-wide transition-colors ${
-                  activeCategory === cat.slug
-                    ? "text-zinc-900 dark:text-zinc-100"
-                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+                  !solid
+                    ? activeCategory === cat.slug ? "text-white" : "text-white/80 hover:text-white"
+                    : activeCategory === cat.slug ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
                 }`}
               >
                 {cat.label}
                 <span
-                  className={`absolute -bottom-2.5 left-1/2 h-[2px] -translate-x-1/2 bg-zinc-900 transition-all duration-300 dark:bg-zinc-100 ${
+                  className={`absolute -bottom-2.5 left-1/2 h-[2px] -translate-x-1/2 transition-all duration-300 ${!solid ? "bg-white" : "bg-zinc-900 dark:bg-zinc-100"} ${
                     activeCategory === cat.slug ? "w-full" : "w-0 group-hover:w-full"
                   }`}
                 />
@@ -385,7 +413,7 @@ export function Header({ categories }: HeaderProps) {
                   {activeCategoryData.subcategories.map((sub) => (
                     <Link
                       key={sub.query}
-                      href={`/category/${activeCategoryData.slug}?q=${encodeURIComponent(sub.query)}`}
+                      href={`/shop?category=${activeCategoryData.slug}&q=${encodeURIComponent(sub.query)}`}
                       onClick={() => setActiveCategory(null)}
                       className="block py-2 text-[13px] text-zinc-600 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
                     >
@@ -395,7 +423,7 @@ export function Header({ categories }: HeaderProps) {
                 </div>
                 <div className="mt-6 pt-5">
                   <Link
-                    href={`/category/${activeCategoryData.slug}`}
+                    href={`/shop?category=${activeCategoryData.slug}`}
                     onClick={() => setActiveCategory(null)}
                     className="inline-flex items-center gap-1.5 text-sm font-bold text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
                   >
@@ -408,7 +436,7 @@ export function Header({ categories }: HeaderProps) {
               {/* Right: featured category image */}
               <div className="hidden shrink-0 md:block">
                 <Link
-                  href={`/category/${activeCategoryData.slug}`}
+                  href={`/shop?category=${activeCategoryData.slug}`}
                   onClick={() => setActiveCategory(null)}
                   className="group relative block h-[260px] w-[260px] overflow-hidden bg-zinc-100 dark:bg-zinc-800"
                 >

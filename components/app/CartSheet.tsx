@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Loader2, ShoppingBag } from "lucide-react";
+import { AlertTriangle, Loader2, ShoppingBag, ShoppingCart } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -29,7 +29,7 @@ export function CartSheet() {
       <SheetContent className="flex w-full flex-col sm:max-w-lg gap-0">
         <SheetHeader className="border-b border-zinc-200 dark:border-zinc-800">
           <SheetTitle className="flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5" />
             Shopping Cart ({totalItems})
             {isLoading && (
               <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />

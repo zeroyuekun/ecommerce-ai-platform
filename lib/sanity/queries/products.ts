@@ -113,6 +113,34 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
 }`);
 
 /**
+ * Get products for the style gallery grid (14 products with images)
+ */
+export const GALLERY_PRODUCTS_QUERY = defineQuery(`*[
+  _type == "product"
+  && defined(images)
+  && count(images) > 0
+  && stock > 0
+] | order(_createdAt desc) [0...14] {
+  _id,
+  name,
+  "slug": slug.current,
+  "image": images[0]{
+    asset->{
+      _id,
+      url
+    }
+  }
+}`);
+
+/**
+ * Get best seller products for homepage carousel (8 products)
+ */
+export const BEST_SELLERS_QUERY = defineQuery(`*[
+  _type == "product"
+  && stock > 0
+] | order(stock asc, name asc) [0...8] ${FILTERED_PRODUCT_PROJECTION}`);
+
+/**
  * Get products by category slug
  */
 export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[

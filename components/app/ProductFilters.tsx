@@ -96,7 +96,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   };
 
   const handleClearFilters = () => {
-    router.push("/", { scroll: false });
+    router.push("/shop", { scroll: false });
   };
 
   const clearSingleFilter = (key: string) => {
@@ -285,7 +285,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       {/* Price Range */}
       <div>
         <FilterLabel isActive={isPriceActive} filterKey="price">
-          Price Range: £{priceRange[0]} - £{priceRange[1]}
+          Price Range: ${priceRange[0]} - ${priceRange[1]}
         </FilterLabel>
         <Slider
           min={0}
