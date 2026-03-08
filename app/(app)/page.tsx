@@ -24,7 +24,7 @@ export default async function HomePage() {
         <CategoryTiles categories={categories} />
       </div>
 
-      {/* Second hero banner — The Rorie Bed */}
+      {/* Dual banners + Autumn banner */}
       <div className="mt-16">
         <SecondaryHeroBanner />
       </div>
