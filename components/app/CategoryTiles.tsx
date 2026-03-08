@@ -112,7 +112,7 @@ export function CategoryTiles({
                       />
                       <div className="absolute inset-0 bg-black/30" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-semibold tracking-wide text-white drop-shadow-md">
+                        <span className="text-xs font-medium uppercase tracking-[0.15em] text-white drop-shadow-md">
                           {category.title}
                         </span>
                       </div>

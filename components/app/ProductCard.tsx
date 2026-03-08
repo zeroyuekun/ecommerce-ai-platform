@@ -126,12 +126,12 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         compact ? "px-1 pt-3 pb-2" : "justify-between gap-2 p-5"
       )}>
         <Link href={`/products/${product.slug}`} className="block">
-          <h3 className="line-clamp-2 text-base font-semibold leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
+          <h3 className="line-clamp-2 font-sans text-sm font-medium leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
             {product.name}
           </h3>
         </Link>
         <div className="flex items-baseline justify-between gap-2">
-          <p className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+          <p className="text-base font-medium tracking-tight text-zinc-900 dark:text-white">
             {formatPrice(product.price)}
           </p>
           {!compact && <StockBadge productId={product._id} stock={stock} />}

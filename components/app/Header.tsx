@@ -248,7 +248,7 @@ export function Header({ categories }: HeaderProps) {
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-10">
         {/* Left: Logo */}
         <a href="/" className="flex shrink-0 items-center">
-          <span className={`text-3xl font-bold tracking-tight transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}>
+          <span className={`font-serif text-4xl font-medium tracking-wide transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}>
             Kozy.
           </span>
         </a>
@@ -377,7 +377,7 @@ export function Header({ categories }: HeaderProps) {
               <Link
                 href={`/shop?category=${cat.slug}`}
                 onClick={() => setActiveCategory(null)}
-                className={`group relative whitespace-nowrap text-[13px] font-medium tracking-wide transition-colors ${
+                className={`group relative whitespace-nowrap text-xs font-normal uppercase tracking-[0.15em] transition-colors ${
                   !solid
                     ? activeCategory === cat.slug ? "text-white" : "text-white/80 hover:text-white"
                     : activeCategory === cat.slug ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
