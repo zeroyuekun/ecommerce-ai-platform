@@ -72,7 +72,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 text-center">
-          <h2 className="text-[15px] font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
             {categoryTitle}
           </h2>
         </div>

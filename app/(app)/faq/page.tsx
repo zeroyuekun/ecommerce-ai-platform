@@ -72,7 +72,7 @@ export default function FaqPage() {
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+          <h1 className="text-4xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
             Frequently Asked Questions
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
@@ -86,7 +86,7 @@ export default function FaqPage() {
         <div className="space-y-16">
           {faqs.map((section) => (
             <section key={section.category}>
-              <h2 className="text-xl font-medium text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-2xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
                 {section.category}
               </h2>
               <div className="mt-6 space-y-8">

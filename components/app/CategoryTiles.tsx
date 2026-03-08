@@ -46,10 +46,10 @@ export function CategoryTiles({
     <div>
       {/* Heading */}
       <div className="mx-auto max-w-2xl px-4 pt-10 pb-6 sm:px-6 text-center">
-        <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
-          Shop by room
+        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          Shop by Room
         </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm leading-[1.6] text-zinc-500 dark:text-zinc-400">
+        <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
           At Kozy, we make it easy for you to create your dream space. Shop
           furniture online that is stylish, functional, and affordable.
         </p>

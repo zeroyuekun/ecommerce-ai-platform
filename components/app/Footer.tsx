@@ -43,10 +43,10 @@ export function Footer() {
           <div className="flex flex-col gap-10 sm:flex-row sm:gap-16 lg:gap-20">
             {Object.values(footerLinks).map((section) => (
               <div key={section.title}>
-                <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                   {section.title}
                 </h3>
-                <ul className="mt-5 space-y-3">
+                <ul className="mt-5 space-y-3.5">
                   {section.links.map((link) => (
                     <li key={link.label}>
                       <Link
@@ -64,8 +64,8 @@ export function Footer() {
 
           {/* Contact section */}
           <div className="max-w-[280px]">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-              Any questions? We can help
+            <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+              Any Questions? We Can Help
             </h3>
             <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
               Our team is available Monday to Friday, 9am to 5pm AEST.

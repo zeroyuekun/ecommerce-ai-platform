@@ -377,7 +377,7 @@ export function Header({ categories }: HeaderProps) {
               <Link
                 href={`/shop?category=${cat.slug}`}
                 onClick={() => setActiveCategory(null)}
-                className={`group relative whitespace-nowrap text-xs font-normal uppercase tracking-[0.15em] transition-colors ${
+                className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
                   !solid
                     ? activeCategory === cat.slug ? "text-white" : "text-white/80 hover:text-white"
                     : activeCategory === cat.slug ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
@@ -404,7 +404,7 @@ export function Header({ categories }: HeaderProps) {
             <div className="mx-auto flex max-w-7xl gap-10 px-8 py-9 lg:px-12">
               {/* Left: subcategory links in three columns */}
               <div className="flex-1">
-                <p className="mb-5 text-sm font-bold uppercase tracking-wide text-zinc-900 dark:text-zinc-100">
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
                   {activeCategoryData.label}
                 </p>
                 <div className="grid grid-cols-3 gap-x-10 gap-y-0">
@@ -423,7 +423,7 @@ export function Header({ categories }: HeaderProps) {
                   <Link
                     href={`/shop?category=${activeCategoryData.slug}`}
                     onClick={() => setActiveCategory(null)}
-                    className="inline-flex items-center gap-1.5 text-sm font-bold text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
                   >
                     Shop All {activeCategoryData.label}
                     <ChevronRight className="h-4 w-4" />
@@ -446,10 +446,10 @@ export function Header({ categories }: HeaderProps) {
                     sizes="260px"
                   />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5">
-                    <p className="text-sm font-bold text-white">
+                    <p className="text-sm font-medium text-white">
                       {activeCategoryData.label}
                     </p>
-                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-white/80">
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-normal text-white/80">
                       Shop Now <ChevronRight className="h-3 w-3" />
                     </p>
                   </div>

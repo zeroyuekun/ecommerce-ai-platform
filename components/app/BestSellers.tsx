@@ -41,7 +41,7 @@ export function BestSellers({ products }: BestSellersProps) {
   return (
     <div className="bg-white py-12 dark:bg-zinc-950">
       <div className="mx-auto max-w-2xl px-4 pb-8 text-center sm:px-6">
-        <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
           Best Sellers
         </h2>
       </div>

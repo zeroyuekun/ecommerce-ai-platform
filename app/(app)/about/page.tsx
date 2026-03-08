@@ -22,7 +22,7 @@ export default function AboutPage() {
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-white/80">
               About Kozy
             </p>
-            <h1 className="mt-4 text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="mt-4 text-4xl font-light leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
               The Story Behind Kozy
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/80 sm:text-base">
@@ -46,10 +46,10 @@ export default function AboutPage() {
             />
           </div>
           <div className="max-w-xl">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
               Our Story
             </p>
-            <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+            <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
               Born from a Simple Belief
             </h2>
             <p className="mt-6 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -73,10 +73,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <div className="order-2 max-w-xl lg:order-1">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+              <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
                 Design Philosophy
               </p>
-              <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+              <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
                 Where Form Meets Function
               </h2>
               <p className="mt-6 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -138,10 +138,10 @@ export default function AboutPage() {
             />
           </div>
           <div className="max-w-xl">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
               Quality & Craftsmanship
             </p>
-            <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+            <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
               Built to Last a Lifetime
             </h2>
             <p className="mt-6 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -164,10 +164,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <div className="order-2 max-w-xl lg:order-1">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+              <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
                 Sustainability
               </p>
-              <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+              <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
                 Caring for Tomorrow
               </h2>
               <p className="mt-6 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -199,10 +199,10 @@ export default function AboutPage() {
       {/* Values Grid */}
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+          <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
             Why Choose Kozy
           </p>
-          <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
             Our Promise to You
           </h2>
         </div>
@@ -252,10 +252,10 @@ export default function AboutPage() {
       <div className="bg-zinc-50 dark:bg-zinc-900/50">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
               Visit Us
             </p>
-            <h2 className="mt-4 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+            <h2 className="mt-4 text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
               Our Showrooms
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-base text-zinc-500 dark:text-zinc-400">
@@ -295,7 +295,7 @@ export default function AboutPage() {
       {/* CTA Section */}
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          <h2 className="text-3xl font-light leading-[1.15] tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
             Ready to Find Your Perfect Piece?
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-base text-zinc-500 dark:text-zinc-400">

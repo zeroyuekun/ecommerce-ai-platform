@@ -20,10 +20,10 @@ export function HeroBanner() {
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center px-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.25em] text-white/80">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/80">
             New Collection
           </p>
-          <h1 className="mt-1.5 text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-1.5 text-4xl font-light leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
             Made for Life&apos;s Moments
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/80 sm:text-base">
@@ -63,10 +63,10 @@ export function VideoHeroBanner() {
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center px-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.25em] text-white/80">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/80">
             New Season
           </p>
-          <h2 className="mt-1.5 text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h2 className="mt-1.5 text-4xl font-light leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
             Fresh Foundations
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/80 sm:text-base">
@@ -103,10 +103,10 @@ export function SecondaryHeroBanner() {
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center px-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.25em] text-white/80">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/80">
             Introducing
           </p>
-          <h2 className="mt-1.5 text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h2 className="mt-1.5 text-4xl font-light leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
             The Rorie Bed
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/80 sm:text-base">

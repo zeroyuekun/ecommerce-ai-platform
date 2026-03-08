@@ -113,10 +113,10 @@ export function StyleGallery() {
     <div className="bg-white pt-12 pb-8 dark:bg-zinc-950">
       {/* Original 14-image grid */}
       <div className="mx-auto max-w-2xl px-4 pb-8 text-center sm:px-6">
-        <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
           Your Style, Our Pieces
         </h2>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-3 text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
           Explore curated interiors for furniture inspiration
         </p>
       </div>
@@ -145,7 +145,7 @@ export function StyleGallery() {
 
       {/* Tradition of Craftmanship section */}
       <div className="mx-auto max-w-2xl px-4 pt-20 pb-14 text-center sm:px-6">
-        <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
           The Tradition of Craftmanship
         </h2>
       </div>
@@ -185,10 +185,10 @@ export function StyleGallery() {
       {/* Why Choose Kozy */}
       <div className="mx-auto max-w-4xl px-4 pt-6 pb-8 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-xl font-semibold uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+          <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
             Why Choose Kozy
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
             Furniture that feels like home. We put quality materials and thoughtful design into every piece, so you can create spaces you actually want to spend time in.
           </p>
         </div>
@@ -202,8 +202,8 @@ export function StyleGallery() {
           ].map((item) => (
             <div key={item.title} className="flex flex-col items-center text-center">
               <item.icon className="h-6 w-6 text-zinc-900 dark:text-zinc-100" strokeWidth={1.5} />
-              <p className="mt-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">{item.title}</p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+              <p className="mt-3 text-[13px] font-medium uppercase tracking-wide text-zinc-900 dark:text-zinc-100">{item.title}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
             </div>
           ))}
         </div>

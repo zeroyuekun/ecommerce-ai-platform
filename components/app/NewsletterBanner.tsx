@@ -27,7 +27,7 @@ export function NewsletterBanner() {
       <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <div className="text-center sm:text-left sm:shrink-0">
-            <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+            <h2 className="text-lg font-medium tracking-tight text-white sm:text-xl">
               Get 15% Off Your First Order
             </h2>
             <p className="mt-1 text-sm text-zinc-400">
@@ -55,7 +55,7 @@ export function NewsletterBanner() {
               <button
                 type="submit"
                 disabled={loading}
-                className="h-11 whitespace-nowrap bg-zinc-900 px-6 text-sm font-semibold uppercase tracking-wider text-white border border-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                className="h-11 whitespace-nowrap bg-zinc-900 px-6 text-sm font-medium uppercase tracking-wider text-white border border-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
               >
                 {loading ? "Signing up..." : "Claim Offer"}
               </button>
