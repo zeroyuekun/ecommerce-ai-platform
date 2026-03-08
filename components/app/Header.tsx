@@ -339,8 +339,7 @@ export function Header({ categories }: HeaderProps) {
               afterSwitchSessionUrl="/"
               appearance={{
                 elements: {
-                  avatarBox: "h-8 w-8 rounded-full",
-                  avatarImage: "rounded-full",
+                  avatarBox: "h-8 w-8",
                 },
               }}
             >

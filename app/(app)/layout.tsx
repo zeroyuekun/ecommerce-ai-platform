@@ -19,7 +19,13 @@ async function AppLayout({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          borderRadius: "0px",
+        },
+      }}
+    >
       <CartStoreProvider>
         <ChatStoreProvider>
           <AppShell>
