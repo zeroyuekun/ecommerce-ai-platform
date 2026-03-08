@@ -125,6 +125,7 @@ export function Header({ categories }: HeaderProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [popularSearches, setPopularSearches] = useState(defaultSuggestions);
   const lastScrollY = useRef(0);
+  const scrollAccumulator = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -188,13 +189,22 @@ export function Header({ categories }: HeaderProps) {
       const currentY = window.scrollY;
       const delta = currentY - lastScrollY.current;
 
-      if (delta > 5 && currentY > 10) {
-        // Scrolling down — hide header (keep current solid state)
+      // Accumulate scroll distance in the current direction
+      // Reset accumulator when direction changes
+      if ((delta > 0 && scrollAccumulator.current < 0) || (delta < 0 && scrollAccumulator.current > 0)) {
+        scrollAccumulator.current = 0;
+      }
+      scrollAccumulator.current += delta;
+
+      if (scrollAccumulator.current > 5 && currentY > 10) {
+        // Scrolling down — hide header
         setHidden(true);
-      } else if (delta < -5) {
+        scrollAccumulator.current = 0;
+      } else if (scrollAccumulator.current < -5) {
         // Scrolling up — show header
         setHidden(false);
         if (isHome) setSolid(currentY > 100);
+        scrollAccumulator.current = 0;
       }
 
       // Homepage: transparent only at the very top
