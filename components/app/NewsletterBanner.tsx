@@ -24,7 +24,7 @@ export function NewsletterBanner() {
 
   return (
     <section className="bg-zinc-900 dark:bg-zinc-950">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <div className="text-center sm:text-left sm:shrink-0">
             <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">

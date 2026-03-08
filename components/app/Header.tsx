@@ -121,7 +121,7 @@ export function Header({ categories }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [solid, setSolid] = useState(!isHome);
+  const [solid, setSolid] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [popularSearches, setPopularSearches] = useState(defaultSuggestions);
   const lastScrollY = useRef(0);
@@ -170,35 +170,34 @@ export function Header({ categories }: HeaderProps) {
     };
   }, []);
 
-  // Reset state on route change
+  // Set solid state based on scroll position on mount and route change
   useEffect(() => {
     if (!isHome) {
       setSolid(true);
     } else {
-      setSolid(false);
+      setSolid(window.scrollY > 100);
     }
     setHidden(false);
+    lastScrollY.current = window.scrollY;
   }, [isHome]);
 
-  // Scroll behavior: both homepage and other pages hide on scroll down, show on scroll up
-  // Homepage: transparent at top + while hiding, solid when reappearing
-  // Other pages: always solid
+  // Scroll behavior: hide on scroll down, show on scroll up
+  // Homepage only: transparent when at the very top
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
       const delta = currentY - lastScrollY.current;
 
       if (delta > 5 && currentY > 10) {
-        // Scrolling down — hide header
+        // Scrolling down — hide header (keep current solid state)
         setHidden(true);
-        if (isHome) setSolid(false);
       } else if (delta < -5) {
         // Scrolling up — show header
         setHidden(false);
         if (isHome) setSolid(currentY > 100);
       }
 
-      // Homepage: always transparent at the very top
+      // Homepage: transparent only at the very top
       if (isHome && currentY < 10) {
         setHidden(false);
         setSolid(false);

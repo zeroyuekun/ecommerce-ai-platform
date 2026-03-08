@@ -80,7 +80,7 @@ export function StyleGallery() {
           shuffledOrder.forEach((imageIndex, order) => {
             setTimeout(() => {
               setVisibleImages((prev) => new Set([...prev, imageIndex]));
-            }, order * 200);
+            }, order * 150);
           });
         }
       },
@@ -255,7 +255,7 @@ function GalleryImage({ image, onClick, visible }: GalleryImageProps) {
       style={{
         transform: visible ? "scale(1)" : "scale(0)",
         opacity: visible ? 1 : 0,
-        transition: "transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease-out",
+        transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease-out",
       }}
       onMouseEnter={(e) => {
         if (visible) e.currentTarget.style.transform = "scale(1.02)";
