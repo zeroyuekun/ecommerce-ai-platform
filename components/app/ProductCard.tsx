@@ -46,7 +46,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     >
       {/* Image */}
       <Link href={`/products/${slug}`} className="relative block">
-        <div className={cn("relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50", compact ? "aspect-square" : "aspect-[3/4]")}>
+        <div className={cn("relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50", compact ? "aspect-square" : "aspect-square")}>
           {imageUrl ? (
             <Image
               src={imageUrl}

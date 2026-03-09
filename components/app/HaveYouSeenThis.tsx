@@ -41,11 +41,8 @@ export function HaveYouSeenThis({ products }: HaveYouSeenThisProps) {
   return (
     <div className="border-t border-zinc-100 bg-white py-14 dark:border-zinc-800/50 dark:bg-zinc-950">
       <div className="mx-auto max-w-2xl px-4 pb-8 text-center sm:px-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-          Trending Now
-        </p>
-        <h2 className="mt-2 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-          Have You Seen This?
+        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          You May Also Like
         </h2>
       </div>
 

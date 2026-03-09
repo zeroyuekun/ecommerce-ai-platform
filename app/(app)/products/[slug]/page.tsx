@@ -8,7 +8,7 @@ import {
   RELATED_PRODUCTS_QUERY,
 } from "@/lib/sanity/queries/products";
 import { ProductDetail } from "@/components/app/ProductDetail";
-import { ProductCard } from "@/components/app/ProductCard";
+import { RelatedProductsCarousel } from "@/components/app/RelatedProductsCarousel";
 import { RecentlyViewed } from "@/components/app/RecentlyViewed";
 
 interface ProductPageProps {
@@ -85,24 +85,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <ProductDetail product={product} variants={variants} />
 
       {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <div className="border-t border-zinc-100 dark:border-zinc-800/50">
-          <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
-            <h2 className="mb-8 text-center font-serif text-2xl font-normal tracking-[0.02em] text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-              You May Also Like
-            </h2>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {relatedProducts.map((relatedProduct) => (
-                <ProductCard
-                  key={relatedProduct._id}
-                  product={relatedProduct}
-                  compact
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <RelatedProductsCarousel products={relatedProducts} />
 
       {/* Recently Viewed */}
       <RecentlyViewed />

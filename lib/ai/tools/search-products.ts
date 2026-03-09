@@ -37,12 +37,12 @@ const productSearchSchema = z.object({
     .number()
     .optional()
     .default(0)
-    .describe("Minimum price in GBP (e.g., 100)"),
+    .describe("Minimum price in AUD (e.g., 100)"),
   maxPrice: z
     .number()
     .optional()
     .default(0)
-    .describe("Maximum price in GBP (e.g., 500). Use 0 for no maximum."),
+    .describe("Maximum price in AUD (e.g., 500). Use 0 for no maximum."),
 });
 
 export const searchProductsTool = tool({

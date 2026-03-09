@@ -209,6 +209,39 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     router.push("/shop", { scroll: false });
   };
 
+  // Build type options based on selected categories
+  const typeOptions = (() => {
+    const seen = new Set<string>();
+    const options: { value: string; label: string }[] = [];
+
+    const slugsToCheck = currentCategories.filter((s) => s !== "sale");
+
+    if (slugsToCheck.length > 0) {
+      // Show types from selected categories only
+      slugsToCheck.forEach((slug) => {
+        const subs = subcategoriesMap[slug] ?? [];
+        subs.forEach((sub) => {
+          if (sub.type && !seen.has(sub.type)) {
+            seen.add(sub.type);
+            options.push({ value: sub.type, label: sub.label });
+          }
+        });
+      });
+    } else {
+      // No category selected — show all unique types
+      Object.values(subcategoriesMap).forEach((subs) => {
+        subs.forEach((sub) => {
+          if (sub.type && !seen.has(sub.type)) {
+            seen.add(sub.type);
+            options.push({ value: sub.type, label: sub.label });
+          }
+        });
+      });
+    }
+
+    return options;
+  })();
+
   // Build active filter pills
   const activeFilters: { key: string; label: string; onRemove: () => void }[] = [];
 
@@ -289,39 +322,6 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       label: c.title ?? "",
     })),
   ];
-
-  // Build type options based on selected categories
-  const typeOptions = (() => {
-    const seen = new Set<string>();
-    const options: { value: string; label: string }[] = [];
-
-    const slugsToCheck = currentCategories.filter((s) => s !== "sale");
-
-    if (slugsToCheck.length > 0) {
-      // Show types from selected categories only
-      slugsToCheck.forEach((slug) => {
-        const subs = subcategoriesMap[slug] ?? [];
-        subs.forEach((sub) => {
-          if (sub.type && !seen.has(sub.type)) {
-            seen.add(sub.type);
-            options.push({ value: sub.type, label: sub.label });
-          }
-        });
-      });
-    } else {
-      // No category selected — show all unique types
-      Object.values(subcategoriesMap).forEach((subs) => {
-        subs.forEach((sub) => {
-          if (sub.type && !seen.has(sub.type)) {
-            seen.add(sub.type);
-            options.push({ value: sub.type, label: sub.label });
-          }
-        });
-      });
-    }
-
-    return options;
-  })();
 
   const materialOptions = MATERIALS.map((m) => ({
     value: m.value,

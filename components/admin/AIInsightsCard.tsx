@@ -222,8 +222,8 @@ export function AIInsightsCard() {
             Revenue (7d)
           </p>
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            £
-            {Number(rawMetrics.currentRevenue).toLocaleString("en-GB", {
+            $
+            {Number(rawMetrics.currentRevenue).toLocaleString("en-AU", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -256,7 +256,7 @@ export function AIInsightsCard() {
             Avg Order
           </p>
           <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            £{rawMetrics.avgOrderValue}
+            ${rawMetrics.avgOrderValue}
           </p>
           <p className="text-xs text-zinc-500">Per order</p>
         </div>

@@ -9,15 +9,15 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { useRecentlyViewedIds } from "@/lib/store/recently-viewed-store-provider";
-import { getProductsByIds } from "@/lib/actions/products";
-import type { PRODUCTS_BY_IDS_FULL_QUERY_RESULT } from "@/sanity.types";
+import type { RELATED_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
 
-export function RecentlyViewed() {
-  const productIds = useRecentlyViewedIds();
-  const [products, setProducts] =
-    useState<PRODUCTS_BY_IDS_FULL_QUERY_RESULT>([]);
-  const [loading, setLoading] = useState(true);
+interface RelatedProductsCarouselProps {
+  products: RELATED_PRODUCTS_QUERY_RESULT;
+}
+
+export function RelatedProductsCarousel({
+  products,
+}: RelatedProductsCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -38,27 +38,13 @@ export function RecentlyViewed() {
     };
   }, [api, onSelect]);
 
-  useEffect(() => {
-    if (productIds.length === 0) {
-      setProducts([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    getProductsByIds(productIds).then((data) => {
-      setProducts(data);
-      setLoading(false);
-    });
-  }, [productIds]);
-
-  if (loading || products.length === 0) return null;
+  if (products.length === 0) return null;
 
   return (
     <div className="border-t border-zinc-100 dark:border-zinc-800/50">
       <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
         <h2 className="mb-8 text-center font-serif text-2xl font-normal tracking-[0.02em] text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-          Recently Viewed
+          You May Also Like
         </h2>
 
         <div className="relative">
@@ -90,15 +76,15 @@ export function RecentlyViewed() {
             setApi={setApi}
             opts={{
               align: "start",
-              slidesToScroll: 5,
+              slidesToScroll: 4,
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-4">
+            <CarouselContent className="-ml-5">
               {products.map((product) => (
                 <CarouselItem
                   key={product._id}
-                  className="basis-1/3 pl-4 sm:basis-1/4 md:basis-1/5 lg:basis-1/6"
+                  className="basis-1/2 pl-5 sm:basis-1/3 md:basis-1/4"
                 >
                   <ProductCard product={product} compact />
                 </CarouselItem>

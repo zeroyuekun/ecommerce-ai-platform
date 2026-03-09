@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format a price amount with currency symbol
  * @param amount - The price amount (can be null/undefined)
- * @param currency - Currency symbol (default: "£")
- * @returns Formatted price string (e.g., "£599.99")
+ * @param currency - Currency symbol (default: "$")
+ * @returns Formatted price string (e.g., "$599.99")
  */
 export function formatPrice(
   amount: number | null | undefined,
