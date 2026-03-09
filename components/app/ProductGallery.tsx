@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { BlurImage } from "./BlurImage";
 import { cn } from "@/lib/utils";
 import type { PRODUCT_BY_SLUG_QUERY_RESULT } from "@/sanity.types";
 
@@ -51,10 +51,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 )}
               >
                 {image.asset?.url ? (
-                  <Image
+                  <BlurImage
                     src={image.asset.url}
                     alt={`${productName} thumbnail ${index + 1}`}
                     fill
+                    blurDataURL={(image.asset as { metadata?: { lqip?: string } })?.metadata?.lqip}
                     className="object-cover"
                     sizes="80px"
                   />
@@ -71,11 +72,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         {/* Main image */}
         <div className="relative flex-1 aspect-square overflow-hidden bg-zinc-50 dark:bg-zinc-900">
           {selectedImage?.asset?.url ? (
-            <Image
+            <BlurImage
               src={selectedImage.asset.url}
               alt={productName ?? "Product image"}
               fill
-              className="object-contain transition-opacity duration-500"
+              blurDataURL={(selectedImage.asset as { metadata?: { lqip?: string } })?.metadata?.lqip}
+              className="object-contain"
               sizes="(max-width: 1024px) 80vw, 50vw"
               priority
             />
@@ -91,10 +93,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       <div className="sm:hidden">
         <div className="relative aspect-square overflow-hidden bg-zinc-50 dark:bg-zinc-900">
           {selectedImage?.asset?.url ? (
-            <Image
+            <BlurImage
               src={selectedImage.asset.url}
               alt={productName ?? "Product image"}
               fill
+              blurDataURL={(selectedImage.asset as { metadata?: { lqip?: string } })?.metadata?.lqip}
               className="object-contain"
               sizes="100vw"
               priority
@@ -123,10 +126,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 )}
               >
                 {image.asset?.url ? (
-                  <Image
+                  <BlurImage
                     src={image.asset.url}
                     alt={`${productName} thumbnail ${index + 1}`}
                     fill
+                    blurDataURL={(image.asset as { metadata?: { lqip?: string } })?.metadata?.lqip}
                     className="object-cover"
                     sizes="64px"
                   />

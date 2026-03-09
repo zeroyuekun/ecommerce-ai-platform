@@ -9,6 +9,7 @@ export interface VariantInfo {
   slug: string;
   color: string;
   imageUrl: string | null;
+  imageLqip: string | null;
   price: number | null;
   salePrice: number | null;
   stock: number | null;
@@ -43,6 +44,7 @@ function groupVariants(products: Product[]): ProductWithVariants[] {
       slug: p.slug ?? "",
       color: p.color ?? "",
       imageUrl: p.images?.[0]?.asset?.url ?? null,
+      imageLqip: (p.images?.[0]?.asset as { metadata?: { lqip?: string } } | null)?.metadata?.lqip ?? null,
       price: p.price,
       salePrice: p.salePrice,
       stock: p.stock,

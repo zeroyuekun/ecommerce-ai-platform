@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useTransition } from "react";
 import { Plus, Minus, Check, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { COLORS, MATERIALS, COLOR_SWATCHES } from "@/lib/constants/filters";
@@ -26,14 +26,20 @@ function MultiFilterGroup({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const hasSelections = values.length > 0;
+  const [localValues, setLocalValues] = useState(values);
+
+  useEffect(() => {
+    setLocalValues(values);
+  }, [values]);
+
+  const hasSelections = localValues.length > 0;
 
   const toggle = (optionValue: string) => {
-    if (values.includes(optionValue)) {
-      onChange(values.filter((v) => v !== optionValue));
-    } else {
-      onChange([...values, optionValue]);
-    }
+    const next = localValues.includes(optionValue)
+      ? localValues.filter((v) => v !== optionValue)
+      : [...localValues, optionValue];
+    setLocalValues(next);
+    onChange(next);
   };
 
   return (
@@ -61,7 +67,7 @@ function MultiFilterGroup({
       {open && (
         <div className="flex flex-col gap-1 pb-5">
           {options.map((option) => {
-            const isSelected = values.includes(option.value);
+            const isSelected = localValues.includes(option.value);
             return (
               <button
                 key={option.value}
@@ -106,13 +112,18 @@ function ColorSwatchGroup({
   onChange: (values: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [localValues, setLocalValues] = useState(values);
+
+  useEffect(() => {
+    setLocalValues(values);
+  }, [values]);
 
   const toggle = (colorValue: string) => {
-    if (values.includes(colorValue)) {
-      onChange(values.filter((v) => v !== colorValue));
-    } else {
-      onChange([...values, colorValue]);
-    }
+    const next = localValues.includes(colorValue)
+      ? localValues.filter((v) => v !== colorValue)
+      : [...localValues, colorValue];
+    setLocalValues(next);
+    onChange(next);
   };
 
   return (
@@ -142,7 +153,7 @@ function ColorSwatchGroup({
           <div className="flex flex-wrap gap-2.5">
             {COLORS.map((color) => {
               const hex = COLOR_SWATCHES[color.value];
-              const isActive = values.includes(color.value);
+              const isActive = localValues.includes(color.value);
               const isWhite = color.value === "white";
 
               return (
@@ -172,6 +183,7 @@ function ColorSwatchGroup({
 export function ProductFilters({ categories }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
 
   const currentCategories = searchParams.get("category")?.split(",").filter(Boolean) ?? [];
   const currentSearch = searchParams.get("q") ?? "";
@@ -200,7 +212,9 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           params.set(key, String(value));
         }
       });
-      router.push(`?${params.toString()}`, { scroll: false });
+      startTransition(() => {
+        router.push(`?${params.toString()}`, { scroll: false });
+      });
     },
     [router, searchParams],
   );

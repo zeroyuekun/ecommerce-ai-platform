@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { BlurImage } from "./BlurImage";
 import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
 import { ArrowRight } from "lucide-react";
@@ -110,16 +110,18 @@ interface FeaturedSlideProps {
 
 function FeaturedSlide({ product }: FeaturedSlideProps) {
   const mainImage = product.images?.[0]?.asset?.url;
+  const mainImageLqip = (product.images?.[0]?.asset as { metadata?: { lqip?: string } } | null)?.metadata?.lqip;
 
   return (
     <div className="flex min-h-[400px] flex-col md:min-h-[450px] md:flex-row lg:min-h-[500px]">
       {/* Image Section - Left side (60% on desktop) */}
       <div className="relative h-64 w-full md:h-auto md:w-3/5">
         {mainImage ? (
-          <Image
+          <BlurImage
             src={mainImage}
             alt={product.name ?? "Featured product"}
             fill
+            blurDataURL={mainImageLqip}
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 60vw"
             priority

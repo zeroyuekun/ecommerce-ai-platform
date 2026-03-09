@@ -108,7 +108,9 @@
       "WebFetch(domain:designsystem.digital.gov)",
       "Bash(git:*)",
       "WebFetch(domain:web.archive.org)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(do head:*)",
+      "Bash(head:*)"
     ]
   }
 }
