@@ -330,10 +330,11 @@ Generate insights in the required JSON format.`,
     });
   } catch (error) {
     console.error("Failed to generate insights:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return Response.json(
       {
         success: false,
-        error: "Failed to generate insights",
+        error: `Failed to generate insights: ${message}`,
       },
       { status: 500 }
     );

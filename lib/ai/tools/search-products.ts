@@ -21,7 +21,7 @@ const productSearchSchema = z.object({
     .optional()
     .default("")
     .describe(
-      "Filter by category slug (e.g., 'sofas', 'tables', 'chairs', 'storage')"
+      "Filter by category slug (e.g., 'living-room', 'bedroom', 'dining-room', 'office-storage', 'outdoor', 'kids', 'baby', 'lighting-decor', 'youth', 'furniture-sets')"
     ),
   material: z
     .enum(["", ...MATERIAL_VALUES])

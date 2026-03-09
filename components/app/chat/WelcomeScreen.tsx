@@ -6,9 +6,9 @@ interface WelcomeScreenProps {
 }
 
 const productSuggestions = [
-  "Show me oak tables",
-  "Leather sofas under $1000",
-  "What chairs do you have?",
+  "Show me dining tables",
+  "What's on sale right now?",
+  "Bedroom furniture under $300",
 ];
 
 const orderSuggestions = [
