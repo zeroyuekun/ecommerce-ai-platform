@@ -1,5 +1,6 @@
 import { CartStoreProvider } from "@/lib/store/cart-store-provider";
 import { ChatStoreProvider } from "@/lib/store/chat-store-provider";
+import { RecentlyViewedStoreProvider } from "@/lib/store/recently-viewed-store-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SanityLive } from "@/sanity/lib/live";
 import { Toaster } from "@/components/ui/sonner";
@@ -27,6 +28,7 @@ async function AppLayout({ children }: { children: React.ReactNode }) {
       }}
     >
       <CartStoreProvider>
+        <RecentlyViewedStoreProvider>
         <ChatStoreProvider>
           <AppShell>
             <Header categories={categories} />
@@ -40,6 +42,7 @@ async function AppLayout({ children }: { children: React.ReactNode }) {
           <Toaster position="bottom-center" />
           <SanityLive />
         </ChatStoreProvider>
+        </RecentlyViewedStoreProvider>
       </CartStoreProvider>
     </ClerkProvider>
   );

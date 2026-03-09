@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { PanelLeftClose, PanelLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SlidersHorizontal, X } from "lucide-react";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
+import { SortSelect } from "./SortSelect";
 import type {
-  ALL_CATEGORIES_QUERYResult,
-  FILTER_PRODUCTS_BY_NAME_QUERYResult,
+  ALL_CATEGORIES_QUERY_RESULT,
+  FILTER_PRODUCTS_BY_NAME_QUERY_RESULT,
 } from "@/sanity.types";
 
 interface ProductSectionProps {
-  categories: ALL_CATEGORIES_QUERYResult;
-  products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
+  categories: ALL_CATEGORIES_QUERY_RESULT;
+  products: FILTER_PRODUCTS_BY_NAME_QUERY_RESULT;
   searchQuery: string;
 }
 
@@ -24,59 +24,54 @@ export function ProductSection({
   const [filtersOpen, setFiltersOpen] = useState(true);
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Header with results count and filter toggle */}
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          {products.length} {products.length === 1 ? "product" : "products"}{" "}
-          found
-          {searchQuery && (
-            <span>
-              {" "}
-              for &quot;<span className="font-medium">{searchQuery}</span>&quot;
-            </span>
-          )}
-        </p>
+    <div className="flex flex-col">
+      {/* Top toolbar */}
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+            className="flex items-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+          >
+            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
+            {filtersOpen ? "Hide Filter" : "Filter"}
+          </button>
 
-        {/* Filter toggle button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setFiltersOpen(!filtersOpen)}
-          className="flex items-center gap-2 border-zinc-300 bg-white shadow-sm transition-all hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          aria-label={filtersOpen ? "Hide filters" : "Show filters"}
-        >
-          {filtersOpen ? (
-            <>
-              <PanelLeftClose className="h-4 w-4" />
-              <span className="hidden sm:inline">Hide Filters</span>
-              <span className="sm:hidden">Hide</span>
-            </>
-          ) : (
-            <>
-              <PanelLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Show Filters</span>
-              <span className="sm:hidden">Filters</span>
-            </>
-          )}
-        </Button>
+          <span className="text-[11px] tracking-wide text-zinc-400 dark:text-zinc-500">
+            {products.length} {products.length === 1 ? "Result" : "Results"}
+            {searchQuery && (
+              <span>
+                {" "}
+                for &ldquo;
+                <span className="text-zinc-600 dark:text-zinc-300">
+                  {searchQuery}
+                </span>
+                &rdquo;
+              </span>
+            )}
+          </span>
+        </div>
+
+        <SortSelect />
       </div>
 
-      {/* Main content area */}
-      <div className="flex flex-col gap-8 lg:flex-row">
-        {/* Sidebar Filters - completely hidden when collapsed on desktop */}
-        <aside
-          className={`shrink-0 transition-all duration-300 ease-in-out ${
-            filtersOpen ? "w-full lg:w-72 lg:opacity-100" : "hidden lg:hidden"
-          }`}
-        >
-          <ProductFilters categories={categories} />
-        </aside>
+      <div className="h-px bg-zinc-200/80 dark:bg-zinc-700/50" />
 
-        {/* Product Grid - expands to full width when filters hidden */}
-        <main className="flex-1 transition-all duration-300">
+      {/* Main content: sidebar + grid */}
+      <div className="flex gap-10 pt-8">
+        {/* Left sidebar filters */}
+        {filtersOpen && (
+          <aside className="hidden w-[240px] shrink-0 lg:block">
+            <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide">
+              <ProductFilters categories={categories} />
+            </div>
+          </aside>
+        )}
+
+        {/* Product Grid */}
+        <div className="flex-1">
           <ProductGrid products={products} />
-        </main>
+        </div>
       </div>
     </div>
   );

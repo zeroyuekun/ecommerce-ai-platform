@@ -8,11 +8,12 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 /** Common filter conditions for product filtering */
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
-  && ($categorySlug == "" || category->slug.current == $categorySlug)
-  && ($color == "" || color == $color)
-  && ($material == "" || material == $material)
-  && ($minPrice == 0 || price >= $minPrice)
-  && ($maxPrice == 0 || price <= $maxPrice)
+  && (count($categorySlugs) == 0 || ("sale" in $categorySlugs && defined(salePrice)) || category->slug.current in $categorySlugs)
+  && ($productType == "" || productType == $productType)
+  && (count($colors) == 0 || color in $colors)
+  && (count($materials) == 0 || material in $materials)
+  && ($minPrice == 0 || coalesce(salePrice, price) >= $minPrice)
+  && ($maxPrice == 0 || coalesce(salePrice, price) <= $maxPrice)
   && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")
   && ($inStock == false || stock > 0)
 `;
@@ -23,6 +24,7 @@ const FILTERED_PRODUCT_PROJECTION = `{
   name,
   "slug": slug.current,
   price,
+  salePrice,
   "images": images[0...4]{
     _key,
     asset->{
@@ -181,6 +183,63 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   "slug": slug.current,
   description,
   price,
+  salePrice,
+  "images": images[]{
+    _key,
+    asset->{
+      _id,
+      url
+    },
+    hotspot
+  },
+  category->{
+    _id,
+    title,
+    "slug": slug.current
+  },
+  material,
+  color,
+  variantGroup,
+  dimensions,
+  stock,
+  featured,
+  assemblyRequired
+}`);
+
+/**
+ * Get color variant siblings for a product (minimal, for swatch display)
+ */
+export const VARIANT_SIBLINGS_QUERY = defineQuery(`*[
+  _type == "product"
+  && variantGroup == $variantGroup
+  && defined(variantGroup)
+  && variantGroup != ""
+] | order(name asc) {
+  _id,
+  "slug": slug.current,
+  color,
+  "image": images[0]{
+    asset->{
+      url
+    }
+  }
+}`);
+
+/**
+ * Get full variant siblings for client-side variant switching (no page reload)
+ */
+export const VARIANT_SIBLINGS_FULL_QUERY = defineQuery(`*[
+  _type == "product"
+  && variantGroup == $variantGroup
+  && defined(variantGroup)
+  && variantGroup != ""
+] | order(name asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  description,
+  price,
+  salePrice,
   "images": images[]{
     _key,
     asset->{
@@ -245,16 +304,28 @@ export const SEARCH_PRODUCTS_QUERY = defineQuery(`*[
 }`);
 
 /**
- * Filter products - ordered by name (A-Z)
- * Returns up to 4 images for hover preview in product cards
+ * Filter products - featured (default sort by name A-Z)
  */
 export const FILTER_PRODUCTS_BY_NAME_QUERY = defineQuery(
   `*[${PRODUCT_FILTER_CONDITIONS}] | order(name asc) ${FILTERED_PRODUCT_PROJECTION}`
 );
 
 /**
+ * Filter products - alphabetical Z-A
+ */
+export const FILTER_PRODUCTS_BY_NAME_DESC_QUERY = defineQuery(
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name desc) ${FILTERED_PRODUCT_PROJECTION}`
+);
+
+/**
+ * Filter products - newest first
+ */
+export const FILTER_PRODUCTS_BY_NEWEST_QUERY = defineQuery(
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(_createdAt desc) ${FILTERED_PRODUCT_PROJECTION}`
+);
+
+/**
  * Filter products - ordered by price ascending
- * Returns up to 4 images for hover preview in product cards
  */
 export const FILTER_PRODUCTS_BY_PRICE_ASC_QUERY = defineQuery(
   `*[${PRODUCT_FILTER_CONDITIONS}] | order(price asc) ${FILTERED_PRODUCT_PROJECTION}`
@@ -262,16 +333,20 @@ export const FILTER_PRODUCTS_BY_PRICE_ASC_QUERY = defineQuery(
 
 /**
  * Filter products - ordered by price descending
- * Returns up to 4 images for hover preview in product cards
  */
 export const FILTER_PRODUCTS_BY_PRICE_DESC_QUERY = defineQuery(
   `*[${PRODUCT_FILTER_CONDITIONS}] | order(price desc) ${FILTERED_PRODUCT_PROJECTION}`
 );
 
 /**
+ * Filter products - best selling (lowest stock = most sold)
+ */
+export const FILTER_PRODUCTS_BY_BEST_SELLING_QUERY = defineQuery(
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(stock asc, name asc) ${FILTERED_PRODUCT_PROJECTION}`
+);
+
+/**
  * Filter products - ordered by relevance (when searching)
- * Uses score() for search term matching
- * Returns up to 4 images for hover preview in product cards
  */
 export const FILTER_PRODUCTS_BY_RELEVANCE_QUERY = defineQuery(
   `*[${PRODUCT_FILTER_CONDITIONS}] | ${RELEVANCE_SCORE} | order(_score desc, name asc) ${FILTERED_PRODUCT_PROJECTION}`
@@ -288,6 +363,7 @@ export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   price,
+  salePrice,
   "image": images[0]{
     asset->{
       _id,
@@ -297,6 +373,21 @@ export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
   },
   stock
 }`);
+
+/**
+ * Get products by IDs with full card projection (for recently viewed)
+ */
+export const PRODUCTS_BY_IDS_FULL_QUERY = defineQuery(
+  `*[_type == "product" && _id in $ids] ${FILTERED_PRODUCT_PROJECTION}`
+);
+
+/**
+ * Get popular products for "Have You Seen This?" section
+ * Uses a mix of featured + best-selling, limited to 8
+ */
+export const POPULAR_PRODUCTS_QUERY = defineQuery(
+  `*[_type == "product" && stock > 0 && defined(images) && count(images) > 0] | order(featured desc, stock asc, _createdAt desc) [0...8] ${FILTERED_PRODUCT_PROJECTION}`
+);
 
 /**
  * Get low stock products (admin)
@@ -318,6 +409,18 @@ export const LOW_STOCK_PRODUCTS_QUERY = defineQuery(`*[
     }
   }
 }`);
+
+/**
+ * Get related products from the same category (excluding current product)
+ */
+export const RELATED_PRODUCTS_QUERY = defineQuery(
+  `*[
+  _type == "product"
+  && category->slug.current == $categorySlug
+  && slug.current != $currentSlug
+  && stock > 0
+] | order(name asc) [0...4] ${FILTERED_PRODUCT_PROJECTION}`,
+);
 
 /**
  * Get out of stock products (admin)

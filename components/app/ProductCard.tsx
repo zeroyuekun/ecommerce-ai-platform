@@ -3,14 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { cn, formatPrice } from "@/lib/utils";
-import { AddToCartButton } from "@/components/app/AddToCartButton";
-import { StockBadge } from "@/components/app/StockBadge";
-import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
+import { COLOR_SWATCHES } from "@/lib/constants/filters";
+import type { FILTER_PRODUCTS_BY_NAME_QUERY_RESULT } from "@/sanity.types";
 
-type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
+type Product = FILTER_PRODUCTS_BY_NAME_QUERY_RESULT[number];
 
 interface ProductCardProps {
   product: Product;
@@ -18,47 +15,39 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
-  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null,
-  );
+  const [isHovered, setIsHovered] = useState(false);
 
   const images = product.images ?? [];
   const mainImageUrl = images[0]?.asset?.url;
-  const displayedImageUrl =
-    hoveredImageIndex !== null
-      ? images[hoveredImageIndex]?.asset?.url
-      : mainImageUrl;
 
   const stock = product.stock ?? 0;
   const isOutOfStock = stock <= 0;
-  const hasMultipleImages = images.length > 1;
+  const isOnSale = product.salePrice != null && product.salePrice < (product.price ?? 0);
 
   return (
-    <Card className={cn(
-      "group relative flex h-full flex-col overflow-hidden rounded-none border-0 p-0 transition-all duration-300",
-      compact
-        ? "bg-transparent shadow-none ring-0"
-        : "bg-white shadow-sm ring-1 ring-zinc-950/5 hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-950/10 dark:bg-zinc-900 dark:ring-white/10 dark:hover:shadow-zinc-950/50"
-    )}>
-      <Link href={`/products/${product.slug}`} className="block">
-        <div
-          className={cn(
-            "relative overflow-hidden bg-linear-to-br from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900",
-            compact ? "aspect-4/5 ring-1 ring-zinc-950/5 dark:ring-white/10" : (hasMultipleImages ? "aspect-square" : "aspect-4/5"),
-          )}
-        >
-          {displayedImageUrl ? (
+    <div
+      className="group flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Image */}
+      <Link href={`/products/${product.slug}`} className="relative block">
+        <div className={cn("relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50", compact ? "aspect-square" : "aspect-[3/4]")}>
+          {mainImageUrl ? (
             <Image
-              src={displayedImageUrl}
+              src={mainImageUrl}
               alt={product.name ?? "Product image"}
               fill
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              className={cn(
+                "object-cover transition-all duration-700 ease-out",
+                isHovered && "scale-105",
+              )}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-zinc-400">
+            <div className="flex h-full items-center justify-center text-zinc-300 dark:text-zinc-600">
               <svg
-                className="h-16 w-16 opacity-30"
+                className="h-12 w-12"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -73,82 +62,57 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
               </svg>
             </div>
           )}
-          {/* Gradient overlay for text contrast */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+          {/* Out of stock overlay */}
           {isOutOfStock && (
-            <Badge
-              variant="destructive"
-              className="absolute right-3 top-3 rounded-none px-3 py-1 text-xs font-medium shadow-lg"
-            >
-              Out of Stock
-            </Badge>
+            <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-black/40">
+              <span className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                Sold Out
+              </span>
+            </div>
           )}
-          {!compact && product.category && (
-            <span className="absolute left-3 top-3 rounded-none bg-white/90 px-3 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-300">
-              {product.category.title}
-            </span>
-          )}
+
         </div>
       </Link>
 
-      {/* Thumbnail strip - only show if multiple images and not compact */}
-      {!compact && hasMultipleImages && (
-        <div className="flex gap-2 border-t border-zinc-100 bg-zinc-50/50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
-          {images.map((image, index) => (
-            <button
-              key={image._key ?? index}
-              type="button"
+      {/* Product Info */}
+      <div className={cn("flex flex-col items-center text-center", compact ? "gap-1 pt-2" : "gap-1.5 pt-4")}>
+        {/* Color swatch */}
+        {product.color && COLOR_SWATCHES[product.color] && (
+          <div className="flex items-center gap-1.5">
+            <span
               className={cn(
-                "relative h-14 flex-1 overflow-hidden rounded-none transition-all duration-200",
-                hoveredImageIndex === index
-                  ? "ring-2 ring-zinc-900 ring-offset-2 dark:ring-white dark:ring-offset-zinc-900"
-                  : "opacity-50 hover:opacity-100",
+                "inline-block h-3 w-3 rounded-full",
+                product.color === "white" && "ring-1 ring-zinc-300 dark:ring-zinc-600",
               )}
-              onMouseEnter={() => setHoveredImageIndex(index)}
-              onMouseLeave={() => setHoveredImageIndex(null)}
-            >
-              {image.asset?.url && (
-                <Image
-                  src={image.asset.url}
-                  alt={`${product.name} - view ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="100px"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+              style={{ backgroundColor: COLOR_SWATCHES[product.color] }}
+              title={product.color.charAt(0).toUpperCase() + product.color.slice(1)}
+            />
+          </div>
+        )}
 
-      <CardContent className={cn(
-        "flex grow flex-col gap-1",
-        compact ? "px-1 pt-3 pb-2" : "justify-between gap-2 p-5"
-      )}>
-        <Link href={`/products/${product.slug}`} className="block">
-          <h3 className="line-clamp-2 font-sans text-sm font-medium leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
+        <Link href={`/products/${product.slug}`} className="group/link">
+          <h3 className="line-clamp-2 font-serif text-[13px] font-normal leading-relaxed tracking-[0.04em] text-zinc-800 transition-colors group-hover/link:text-zinc-500 dark:text-zinc-200 dark:group-hover/link:text-zinc-400 sm:text-sm">
             {product.name}
           </h3>
         </Link>
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="text-base font-medium tracking-tight text-zinc-900 dark:text-white">
-            {formatPrice(product.price)}
-          </p>
-          {!compact && <StockBadge productId={product._id} stock={stock} />}
+        <div className="flex items-baseline justify-center gap-2">
+          {isOnSale ? (
+            <>
+              <p className="text-[13px] font-medium tracking-[0.02em] text-red-600 dark:text-red-400">
+                {formatPrice(product.salePrice)}
+              </p>
+              <p className="text-[11px] font-normal tracking-[0.02em] text-zinc-400 line-through dark:text-zinc-500">
+                {formatPrice(product.price)}
+              </p>
+            </>
+          ) : (
+            <p className="text-[13px] font-medium tracking-[0.02em] text-zinc-900 dark:text-zinc-100">
+              {formatPrice(product.price)}
+            </p>
+          )}
         </div>
-      </CardContent>
-
-      {!compact && (
-        <CardFooter className="mt-auto p-5 pt-0">
-          <AddToCartButton
-            productId={product._id}
-            name={product.name ?? "Unknown Product"}
-            price={product.price ?? 0}
-            image={mainImageUrl ?? undefined}
-            stock={stock}
-          />
-        </CardFooter>
-      )}
-    </Card>
+      </div>
+    </div>
   );
 }

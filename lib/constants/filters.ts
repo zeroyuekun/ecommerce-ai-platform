@@ -12,6 +12,21 @@ export const COLORS = [
   { value: "natural", label: "Natural" },
 ] as const;
 
+/** Hex color map for rendering swatches */
+export const COLOR_SWATCHES: Record<string, string> = {
+  black: "#1a1a1a",
+  white: "#f5f5f5",
+  oak: "#c4a35a",
+  walnut: "#5c3d2e",
+  grey: "#9ca3af",
+  natural: "#d4c5a9",
+  pink: "#e8a0b4",
+  cream: "#f5f0e1",
+  beige: "#c8b99a",
+  sage: "#8a9a7b",
+  green: "#6b8f5e",
+};
+
 export const MATERIALS = [
   { value: "wood", label: "Wood" },
   { value: "metal", label: "Metal" },
@@ -21,10 +36,13 @@ export const MATERIALS = [
 ] as const;
 
 export const SORT_OPTIONS = [
-  { value: "name", label: "Name (A-Z)" },
+  { value: "featured", label: "Featured" },
+  { value: "newest", label: "Newest" },
+  { value: "name_asc", label: "Alphabetical: A-Z" },
+  { value: "name_desc", label: "Alphabetical: Z-A" },
   { value: "price_asc", label: "Price: Low to High" },
   { value: "price_desc", label: "Price: High to Low" },
-  { value: "relevance", label: "Relevance" },
+  { value: "best_selling", label: "Best Selling" },
 ] as const;
 
 // Type exports

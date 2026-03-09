@@ -10,86 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import { recordSearch, getPopularSearches } from "@/lib/actions/search";
-import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
-
-const subcategoriesMap: Record<string, { label: string; query: string }[]> = {
-  "living-room": [
-    { label: "Sofas & Sectionals", query: "sofa" },
-    { label: "Coffee Tables", query: "coffee table" },
-    { label: "Accent Chairs", query: "accent chair" },
-    { label: "TV Stands & Media", query: "tv stand" },
-    { label: "Side Tables", query: "side table" },
-    { label: "Bookshelves", query: "bookshelf" },
-  ],
-  "dining-room": [
-    { label: "Dining Tables", query: "dining table" },
-    { label: "Dining Chairs", query: "dining chair" },
-    { label: "Bar Stools", query: "bar stool" },
-    { label: "Sideboards & Buffets", query: "sideboard" },
-    { label: "Dining Sets", query: "dining set" },
-    { label: "Benches", query: "bench" },
-  ],
-  "bedroom": [
-    { label: "Beds & Frames", query: "bed" },
-    { label: "Bedside Tables", query: "bedside table" },
-    { label: "Wardrobes", query: "wardrobe" },
-    { label: "Dressers", query: "dresser" },
-    { label: "Mattresses", query: "mattress" },
-    { label: "Mirrors", query: "mirror" },
-  ],
-  "baby": [
-    { label: "Cots & Cribs", query: "cot" },
-    { label: "Changing Tables", query: "changing table" },
-    { label: "Nursery Chairs", query: "nursery chair" },
-    { label: "Storage & Shelving", query: "storage" },
-    { label: "Baby Dressers", query: "dresser" },
-  ],
-  "kids": [
-    { label: "Kids Beds", query: "kids bed" },
-    { label: "Desks & Chairs", query: "desk" },
-    { label: "Bunk Beds", query: "bunk bed" },
-    { label: "Toy Storage", query: "toy storage" },
-    { label: "Bookshelves", query: "bookshelf" },
-  ],
-  "youth": [
-    { label: "Teen Beds", query: "teen bed" },
-    { label: "Study Desks", query: "study desk" },
-    { label: "Lounge Seating", query: "lounge" },
-    { label: "Shelving & Storage", query: "shelving" },
-    { label: "Wardrobes", query: "wardrobe" },
-  ],
-  "outdoor": [
-    { label: "Outdoor Lounges", query: "outdoor lounge" },
-    { label: "Dining Sets", query: "outdoor dining" },
-    { label: "Garden Chairs", query: "garden chair" },
-    { label: "Patio Tables", query: "patio table" },
-    { label: "Sun Loungers", query: "sun lounger" },
-    { label: "Parasols & Shade", query: "parasol" },
-  ],
-  "lighting-decor": [
-    { label: "Table Lamps", query: "table lamp" },
-    { label: "Floor Lamps", query: "floor lamp" },
-    { label: "Pendant Lights", query: "pendant" },
-    { label: "Wall Art", query: "wall art" },
-    { label: "Candles & Holders", query: "candle" },
-    { label: "Vases & Planters", query: "vase" },
-  ],
-  "office-storage": [
-    { label: "Office Desks", query: "office desk" },
-    { label: "Office Chairs", query: "office chair" },
-    { label: "Filing Cabinets", query: "filing cabinet" },
-    { label: "Shelving Units", query: "shelving" },
-    { label: "Storage Boxes", query: "storage box" },
-    { label: "Desk Accessories", query: "desk accessories" },
-  ],
-  "furniture-sets": [
-    { label: "Living Room Sets", query: "living room set" },
-    { label: "Bedroom Sets", query: "bedroom set" },
-    { label: "Dining Sets", query: "dining set" },
-    { label: "Office Sets", query: "office set" },
-    { label: "Outdoor Sets", query: "outdoor set" },
-  ],
-};
+import { subcategoriesMap } from "@/lib/constants/subcategories";
+import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
 const defaultSuggestions = [
   { label: "Bedside table", query: "bedside table" },
@@ -103,7 +25,7 @@ const defaultSuggestions = [
 ];
 
 interface HeaderProps {
-  categories: ALL_CATEGORIES_QUERYResult;
+  categories: ALL_CATEGORIES_QUERY_RESULT;
 }
 
 export function Header({ categories }: HeaderProps) {
@@ -111,7 +33,7 @@ export function Header({ categories }: HeaderProps) {
     label: cat.title ?? "",
     slug: cat.slug ?? "",
     image: cat.image?.asset?.url ?? "",
-    subcategories: subcategoriesMap[cat.slug ?? ""] ?? [],
+    subcategories: (subcategoriesMap[cat.slug ?? ""] ?? []) as { label: string; query: string; type?: string }[],
   }));
   const { openCart } = useCartActions();
   const totalItems = useTotalItems();
@@ -411,29 +333,35 @@ export function Header({ categories }: HeaderProps) {
             onMouseEnter={() => handleCategoryHover(activeCategoryData.slug)}
             onMouseLeave={handleCategoryLeave}
           >
-            <div className="mx-auto flex max-w-7xl gap-10 px-8 py-9 lg:px-12">
+            <div className="mx-auto flex max-w-7xl gap-8 px-8 py-6 lg:px-12">
               {/* Left: subcategory links in three columns */}
               <div className="flex-1">
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
                   {activeCategoryData.label}
                 </p>
-                <div className="grid grid-cols-3 gap-x-10 gap-y-0">
-                  {activeCategoryData.subcategories.map((sub) => (
-                    <Link
-                      key={sub.query}
-                      href={`/shop?category=${activeCategoryData.slug}&q=${encodeURIComponent(sub.query)}`}
-                      onClick={() => setActiveCategory(null)}
-                      className="block py-2 text-[13px] text-zinc-600 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
-                    >
-                      {sub.label}
-                    </Link>
-                  ))}
+                <div className="grid grid-cols-3 gap-x-6 gap-y-0">
+                  {activeCategoryData.subcategories.map((sub) => {
+                    const params = new URLSearchParams();
+                    params.set("category", activeCategoryData.slug);
+                    if (sub.type) params.set("type", sub.type);
+                    if (sub.query) params.set("q", sub.query);
+                    return (
+                      <Link
+                        key={sub.type ?? sub.query}
+                        href={`/shop?${params.toString()}`}
+                        onClick={() => setActiveCategory(null)}
+                        className="block py-1 text-[13px] uppercase text-zinc-600 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
+                      >
+                        {sub.label}
+                      </Link>
+                    );
+                  })}
                 </div>
-                <div className="mt-6 pt-5">
+                <div className="mt-4 pt-3">
                   <Link
                     href={`/shop?category=${activeCategoryData.slug}`}
                     onClick={() => setActiveCategory(null)}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
                   >
                     Shop All {activeCategoryData.label}
                     <ChevronRight className="h-4 w-4" />
@@ -456,10 +384,10 @@ export function Header({ categories }: HeaderProps) {
                     sizes="260px"
                   />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5">
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium uppercase text-white">
                       {activeCategoryData.label}
                     </p>
-                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-normal text-white/80">
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-normal uppercase text-white/80">
                       Shop Now <ChevronRight className="h-3 w-3" />
                     </p>
                   </div>

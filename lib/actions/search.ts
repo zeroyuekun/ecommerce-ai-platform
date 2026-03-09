@@ -42,7 +42,7 @@ export async function getPopularSearches(): Promise<
 > {
   try {
     const results = await client.fetch(POPULAR_SEARCHES_QUERY);
-    return results ?? [];
+    return (results ?? []).map((r) => ({ query: r.query, count: r.count ?? 0 }));
   } catch (error) {
     console.error("Failed to fetch popular searches:", error);
     return [];

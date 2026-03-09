@@ -11,10 +11,10 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
-import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
+import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
 interface CategoryTilesProps {
-  categories: ALL_CATEGORIES_QUERYResult;
+  categories: ALL_CATEGORIES_QUERY_RESULT;
   activeCategory?: string;
 }
 

@@ -2,79 +2,196 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useEffect } from "react";
-import { X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Plus, Minus, Check, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { COLORS, MATERIALS, SORT_OPTIONS } from "@/lib/constants/filters";
-import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
+import { COLORS, MATERIALS, COLOR_SWATCHES } from "@/lib/constants/filters";
+import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
 interface ProductFiltersProps {
-  categories: ALL_CATEGORIES_QUERYResult;
+  categories: ALL_CATEGORIES_QUERY_RESULT;
+}
+
+function MultiFilterGroup({
+  label,
+  values,
+  onChange,
+  options,
+  defaultOpen = false,
+}: {
+  label: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  options: { value: string; label: string; className?: string }[];
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const hasSelections = values.length > 0;
+
+  const toggle = (optionValue: string) => {
+    if (values.includes(optionValue)) {
+      onChange(values.filter((v) => v !== optionValue));
+    } else {
+      onChange([...values, optionValue]);
+    }
+  };
+
+  return (
+    <div className="border-t border-zinc-200 dark:border-zinc-700/60">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-5 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
+      >
+        <span className="flex items-center gap-2">
+          {label}
+          {hasSelections && (
+            <span className="text-[10px] font-normal text-zinc-400 dark:text-zinc-500">
+              ({values.length})
+            </span>
+          )}
+        </span>
+        {open ? (
+          <Minus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+        ) : (
+          <Plus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+        )}
+      </button>
+
+      {open && (
+        <div className="flex flex-col gap-1 pb-5">
+          {options.map((option) => {
+            const isSelected = values.includes(option.value);
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => toggle(option.value)}
+                className="flex items-center gap-2.5 py-1 text-left"
+              >
+                <span
+                  className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center border transition-colors ${
+                    isSelected
+                      ? "border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100"
+                      : "border-zinc-300 bg-transparent dark:border-zinc-600"
+                  }`}
+                >
+                  {isSelected && (
+                    <Check className="h-2.5 w-2.5 text-white dark:text-zinc-900" strokeWidth={2.5} />
+                  )}
+                </span>
+                <span
+                  className={`text-[11px] tracking-[0.05em] transition-colors ${option.className ?? ""} ${
+                    isSelected
+                      ? "font-medium text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  }`}
+                >
+                  {option.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ColorSwatchGroup({
+  values,
+  onChange,
+}: {
+  values: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const toggle = (colorValue: string) => {
+    if (values.includes(colorValue)) {
+      onChange(values.filter((v) => v !== colorValue));
+    } else {
+      onChange([...values, colorValue]);
+    }
+  };
+
+  return (
+    <div className="border-t border-zinc-200 dark:border-zinc-700/60">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-5 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
+      >
+        <span className="flex items-center gap-2">
+          Colour
+          {values.length > 0 && (
+            <span className="text-[10px] font-normal text-zinc-400 dark:text-zinc-500">
+              ({values.length})
+            </span>
+          )}
+        </span>
+        {open ? (
+          <Minus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+        ) : (
+          <Plus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+        )}
+      </button>
+
+      {open && (
+        <div className="pb-5">
+          <div className="flex flex-wrap gap-2.5">
+            {COLORS.map((color) => {
+              const hex = COLOR_SWATCHES[color.value];
+              const isActive = values.includes(color.value);
+              const isWhite = color.value === "white";
+
+              return (
+                <button
+                  key={color.value}
+                  type="button"
+                  onClick={() => toggle(color.value)}
+                  title={color.label}
+                  className={`group/swatch relative h-6 w-6 rounded-full transition-all ${
+                    isActive
+                      ? "ring-2 ring-zinc-900 ring-offset-2 dark:ring-zinc-100 dark:ring-offset-zinc-950"
+                      : isWhite
+                        ? "ring-1 ring-zinc-300 hover:ring-zinc-400 dark:ring-zinc-600"
+                        : "hover:ring-2 hover:ring-zinc-300 hover:ring-offset-1 dark:hover:ring-zinc-600"
+                  }`}
+                  style={{ backgroundColor: hex }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function ProductFilters({ categories }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const currentCategories = searchParams.get("category")?.split(",").filter(Boolean) ?? [];
   const currentSearch = searchParams.get("q") ?? "";
-  const currentCategory = searchParams.get("category") ?? "";
-  const currentColor = searchParams.get("color") ?? "";
-  const currentMaterial = searchParams.get("material") ?? "";
-  const currentSort = searchParams.get("sort") ?? "name";
+  const currentType = searchParams.get("type") ?? "";
+  const currentColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
+  const currentMaterials = searchParams.get("material")?.split(",").filter(Boolean) ?? [];
   const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
   const urlMaxPrice = Number(searchParams.get("maxPrice")) || 5000;
   const currentInStock = searchParams.get("inStock") === "true";
 
-  // Local state for price range (for smooth slider dragging)
   const [priceRange, setPriceRange] = useState<[number, number]>([
     urlMinPrice,
     urlMaxPrice,
   ]);
-
-  // Sync local state when URL changes
   useEffect(() => {
     setPriceRange([urlMinPrice, urlMaxPrice]);
   }, [urlMinPrice, urlMaxPrice]);
 
-  // Check which filters are active
-  const isSearchActive = !!currentSearch;
-  const isCategoryActive = !!currentCategory;
-  const isColorActive = !!currentColor;
-  const isMaterialActive = !!currentMaterial;
-  const isPriceActive = urlMinPrice > 0 || urlMaxPrice < 5000;
-  const isInStockActive = currentInStock;
-
-  const hasActiveFilters =
-    isSearchActive ||
-    isCategoryActive ||
-    isColorActive ||
-    isMaterialActive ||
-    isPriceActive ||
-    isInStockActive;
-
-  // Count active filters
-  const activeFilterCount = [
-    isSearchActive,
-    isCategoryActive,
-    isColorActive,
-    isMaterialActive,
-    isPriceActive,
-    isInStockActive,
-  ].filter(Boolean).length;
-
   const updateParams = useCallback(
     (updates: Record<string, string | number | null>) => {
       const params = new URLSearchParams(searchParams.toString());
-
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === "" || value === 0) {
           params.delete(key);
@@ -82,275 +199,186 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           params.set(key, String(value));
         }
       });
-
       router.push(`?${params.toString()}`, { scroll: false });
     },
     [router, searchParams],
   );
 
-  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const searchQuery = formData.get("search") as string;
-    updateParams({ q: searchQuery || null });
-  };
-
   const handleClearFilters = () => {
     router.push("/shop", { scroll: false });
   };
 
-  const clearSingleFilter = (key: string) => {
-    if (key === "price") {
-      updateParams({ minPrice: null, maxPrice: null });
-    } else {
-      updateParams({ [key]: null });
-    }
-  };
+  // Build active filter pills
+  const activeFilters: { key: string; label: string; onRemove: () => void }[] = [];
 
-  // Helper for filter label with active indicator
-  const FilterLabel = ({
-    children,
-    isActive,
-    filterKey,
-  }: {
-    children: React.ReactNode;
-    isActive: boolean;
-    filterKey: string;
-  }) => (
-    <div className="mb-2 flex items-center justify-between">
-      <span
-        className={`block text-sm font-medium ${
-          isActive
-            ? "text-zinc-900 dark:text-zinc-100"
-            : "text-zinc-700 dark:text-zinc-300"
-        }`}
-      >
-        {children}
-        {isActive && (
-          <Badge className="ml-2 h-5 bg-amber-500 px-1.5 text-xs text-white hover:bg-amber-500">
-            Active
-          </Badge>
-        )}
-      </span>
-      {isActive && (
-        <button
-          type="button"
-          onClick={() => clearSingleFilter(filterKey)}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          aria-label={`Clear ${filterKey} filter`}
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
-    </div>
+  const categoryLookup = Object.fromEntries(
+    categories.map((c) => [c.slug ?? "", c.title ?? ""])
   );
 
+  currentCategories.forEach((slug) => {
+    activeFilters.push({
+      key: `cat-${slug}`,
+      label: slug === "sale" ? "Sale" : categoryLookup[slug] ?? slug,
+      onRemove: () => {
+        const remaining = currentCategories.filter((s) => s !== slug);
+        updateParams({
+          category: remaining.length > 0 ? remaining.join(",") : null,
+          type: null,
+          q: null,
+        });
+      },
+    });
+  });
+
+  currentColors.forEach((color) => {
+    const colorLabel = COLORS.find((c) => c.value === color)?.label ?? color;
+    activeFilters.push({
+      key: `color-${color}`,
+      label: colorLabel,
+      onRemove: () => {
+        const remaining = currentColors.filter((c) => c !== color);
+        updateParams({ color: remaining.length > 0 ? remaining.join(",") : null });
+      },
+    });
+  });
+
+  currentMaterials.forEach((mat) => {
+    const matLabel = MATERIALS.find((m) => m.value === mat)?.label ?? mat;
+    activeFilters.push({
+      key: `mat-${mat}`,
+      label: matLabel,
+      onRemove: () => {
+        const remaining = currentMaterials.filter((m) => m !== mat);
+        updateParams({ material: remaining.length > 0 ? remaining.join(",") : null });
+      },
+    });
+  });
+
+  if (urlMinPrice > 0 || urlMaxPrice < 5000) {
+    activeFilters.push({
+      key: "price",
+      label: `$${urlMinPrice.toLocaleString()} – $${urlMaxPrice.toLocaleString()}`,
+      onRemove: () => updateParams({ minPrice: null, maxPrice: null }),
+    });
+  }
+
+  if (currentSearch) {
+    activeFilters.push({
+      key: "search",
+      label: `"${currentSearch}"`,
+      onRemove: () => updateParams({ q: null }),
+    });
+  }
+
+  const hasActiveFilters = activeFilters.length > 0;
+
+  const categoryOptions = [
+    { value: "sale", label: "Sale", className: "text-red-600 dark:text-red-400" },
+    ...categories.map((c) => ({
+      value: c.slug ?? "",
+      label: c.title ?? "",
+    })),
+  ];
+
+  const materialOptions = MATERIALS.map((m) => ({
+    value: m.value,
+    label: m.label,
+  }));
+
   return (
-    <div className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-      {/* Clear Filters - Show at top when active */}
+    <div className="flex h-full flex-col">
+      {/* Current Filters */}
       {hasActiveFilters && (
-        <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-950">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
-              {activeFilterCount}{" "}
-              {activeFilterCount === 1 ? "filter" : "filters"} applied
-            </span>
+        <div className="pb-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
+              Current Filters
+            </p>
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition-colors hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100"
+            >
+              Clear All
+            </button>
           </div>
-          <Button
-            size="sm"
-            onClick={handleClearFilters}
-            className="w-full bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
-          >
-            <X className="mr-2 h-4 w-4" />
-            Clear All Filters
-          </Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {activeFilters.map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                onClick={filter.onRemove}
+                className="group/pill flex items-center gap-1 border border-zinc-200 px-2 py-1 text-[9px] tracking-[0.05em] text-zinc-700 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+              >
+                {filter.label}
+                <X
+                  className="h-2.5 w-2.5 text-zinc-400 transition-colors group-hover/pill:text-zinc-900 dark:text-zinc-500 dark:group-hover/pill:text-zinc-100"
+                  strokeWidth={1.5}
+                />
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Search */}
-      <div>
-        <FilterLabel isActive={isSearchActive} filterKey="q">
-          Search
-        </FilterLabel>
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
-          <Input
-            name="search"
-            placeholder="Search products..."
-            defaultValue={currentSearch}
-            className={`flex-1 ${
-              isSearchActive
-                ? "border-amber-500 ring-1 ring-amber-500 dark:border-amber-400 dark:ring-amber-400"
-                : ""
-            }`}
-          />
-          <Button type="submit" size="sm">
-            Search
-          </Button>
-        </form>
-      </div>
-
-      {/* Category */}
-      <div>
-        <FilterLabel isActive={isCategoryActive} filterKey="category">
-          Category
-        </FilterLabel>
-        <Select
-          value={currentCategory || "all"}
-          onValueChange={(value) =>
-            updateParams({ category: value === "all" ? null : value })
-          }
-        >
-          <SelectTrigger
-            className={
-              isCategoryActive
-                ? "border-amber-500 ring-1 ring-amber-500 dark:border-amber-400 dark:ring-amber-400"
-                : ""
+      {/* Scrollable filters area */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Category */}
+        <MultiFilterGroup
+          label="Category"
+          values={currentCategories}
+          onChange={(vals) => {
+            if (vals.length === 0) {
+              updateParams({ category: null, type: null, q: null });
+            } else {
+              updateParams({ category: vals.join(","), type: null, q: null });
             }
-          >
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category._id} value={category.slug ?? ""}>
-                {category.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Color */}
-      <div>
-        <FilterLabel isActive={isColorActive} filterKey="color">
-          Color
-        </FilterLabel>
-        <Select
-          value={currentColor || "all"}
-          onValueChange={(value) =>
-            updateParams({ color: value === "all" ? null : value })
-          }
-        >
-          <SelectTrigger
-            className={
-              isColorActive
-                ? "border-amber-500 ring-1 ring-amber-500 dark:border-amber-400 dark:ring-amber-400"
-                : ""
-            }
-          >
-            <SelectValue placeholder="All Colors" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Colors</SelectItem>
-            {COLORS.map((color) => (
-              <SelectItem key={color.value} value={color.value}>
-                {color.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Material */}
-      <div>
-        <FilterLabel isActive={isMaterialActive} filterKey="material">
-          Material
-        </FilterLabel>
-        <Select
-          value={currentMaterial || "all"}
-          onValueChange={(value) =>
-            updateParams({ material: value === "all" ? null : value })
-          }
-        >
-          <SelectTrigger
-            className={
-              isMaterialActive
-                ? "border-amber-500 ring-1 ring-amber-500 dark:border-amber-400 dark:ring-amber-400"
-                : ""
-            }
-          >
-            <SelectValue placeholder="All Materials" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Materials</SelectItem>
-            {MATERIALS.map((material) => (
-              <SelectItem key={material.value} value={material.value}>
-                {material.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Price Range */}
-      <div>
-        <FilterLabel isActive={isPriceActive} filterKey="price">
-          Price Range: ${priceRange[0]} - ${priceRange[1]}
-        </FilterLabel>
-        <Slider
-          min={0}
-          max={5000}
-          step={100}
-          value={priceRange}
-          onValueChange={(value) => setPriceRange(value as [number, number])}
-          onValueCommit={([min, max]) =>
-            updateParams({
-              minPrice: min > 0 ? min : null,
-              maxPrice: max < 5000 ? max : null,
-            })
-          }
-          className={`mt-4 ${isPriceActive ? "[&_[role=slider]]:border-amber-500 [&_[role=slider]]:ring-amber-500" : ""}`}
+          }}
+          options={categoryOptions}
+          defaultOpen
         />
-      </div>
 
-      {/* In Stock Only */}
-      <div>
-        <label className="flex cursor-pointer items-center gap-3">
-          <input
-            type="checkbox"
-            checked={currentInStock}
-            onChange={(e) =>
-              updateParams({ inStock: e.target.checked ? "true" : null })
-            }
-            className="h-5 w-5 rounded border-zinc-300 text-amber-500 focus:ring-amber-500 dark:border-zinc-600 dark:bg-zinc-800"
-          />
-          <span
-            className={`text-sm font-medium ${
-              isInStockActive
-                ? "text-zinc-900 dark:text-zinc-100"
-                : "text-zinc-700 dark:text-zinc-300"
-            }`}
-          >
-            Show only in-stock
-            {isInStockActive && (
-              <Badge className="ml-2 h-5 bg-amber-500 px-1.5 text-xs text-white hover:bg-amber-500">
-                Active
-              </Badge>
-            )}
-          </span>
-        </label>
-      </div>
+        {/* Color - swatches */}
+        <ColorSwatchGroup
+          values={currentColors}
+          onChange={(vals) => updateParams({ color: vals.length > 0 ? vals.join(",") : null })}
+        />
 
-      {/* Sort */}
-      <div>
-        <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Sort By
-        </span>
-        <Select
-          value={currentSort}
-          onValueChange={(value) => updateParams({ sort: value })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Material */}
+        <MultiFilterGroup
+          label="Material"
+          values={currentMaterials}
+          onChange={(vals) => updateParams({ material: vals.length > 0 ? vals.join(",") : null })}
+          options={materialOptions}
+        />
+
+        {/* Price Range */}
+        <div className="border-t border-zinc-200 dark:border-zinc-700/60">
+          <p className="py-5 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
+            Price Range
+          </p>
+          <div className="pb-2">
+            <Slider
+              min={0}
+              max={5000}
+              step={100}
+              value={priceRange}
+              onValueChange={(value) =>
+                setPriceRange(value as [number, number])
+              }
+              onValueCommit={([min, max]) =>
+                updateParams({
+                  minPrice: min > 0 ? min : null,
+                  maxPrice: max < 5000 ? max : null,
+                })
+              }
+            />
+          </div>
+          <div className="flex justify-between pb-5 text-[11px] tabular-nums tracking-wide text-zinc-500 dark:text-zinc-400">
+            <span>${priceRange[0].toLocaleString()}</span>
+            <span>${priceRange[1].toLocaleString()}</span>
+          </div>
+        </div>
       </div>
     </div>
   );

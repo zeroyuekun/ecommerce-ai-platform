@@ -16,12 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatPrice } from "@/lib/utils";
-import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
+import type { FEATURED_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
 
-type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
+type FeaturedProduct = FEATURED_PRODUCTS_QUERY_RESULT[number];
 
 interface FeaturedCarouselProps {
-  products: FEATURED_PRODUCTS_QUERYResult;
+  products: FEATURED_PRODUCTS_QUERY_RESULT;
 }
 
 export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
@@ -156,7 +156,7 @@ function FeaturedSlide({ product }: FeaturedSlideProps) {
           </p>
         )}
 
-        <p className="mt-6 text-3xl font-bold text-white lg:text-4xl">
+        <p className="mt-6 font-serif text-4xl font-bold tracking-wide text-white lg:text-5xl">
           {formatPrice(product.price)}
         </p>
 

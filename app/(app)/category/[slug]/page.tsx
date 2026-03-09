@@ -1,17 +1,22 @@
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   FILTER_PRODUCTS_BY_NAME_QUERY,
+  FILTER_PRODUCTS_BY_NAME_DESC_QUERY,
+  FILTER_PRODUCTS_BY_NEWEST_QUERY,
   FILTER_PRODUCTS_BY_PRICE_ASC_QUERY,
   FILTER_PRODUCTS_BY_PRICE_DESC_QUERY,
+  FILTER_PRODUCTS_BY_BEST_SELLING_QUERY,
   FILTER_PRODUCTS_BY_RELEVANCE_QUERY,
 } from "@/lib/sanity/queries/products";
 import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
 import { ProductSection } from "@/components/app/ProductSection";
+import Link from "next/link";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{
     q?: string;
+    type?: string;
     color?: string;
     material?: string;
     minPrice?: string;
@@ -26,24 +31,31 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const sp = await searchParams;
 
   const searchQuery = sp.q ?? "";
-  const color = sp.color ?? "";
-  const material = sp.material ?? "";
+  const productType = sp.type ?? "";
+  const colors = sp.color ? sp.color.split(",") : [];
+  const materials = sp.material ? sp.material.split(",") : [];
   const minPrice = Number(sp.minPrice) || 0;
   const maxPrice = Number(sp.maxPrice) || 0;
-  const sort = sp.sort ?? "name";
+  const sort = sp.sort ?? "featured";
   const inStock = sp.inStock === "true";
 
   const getQuery = () => {
-    if (searchQuery && sort === "relevance") {
+    if (searchQuery && sort === "featured") {
       return FILTER_PRODUCTS_BY_RELEVANCE_QUERY;
     }
     switch (sort) {
+      case "name_asc":
+        return FILTER_PRODUCTS_BY_NAME_QUERY;
+      case "name_desc":
+        return FILTER_PRODUCTS_BY_NAME_DESC_QUERY;
+      case "newest":
+        return FILTER_PRODUCTS_BY_NEWEST_QUERY;
       case "price_asc":
         return FILTER_PRODUCTS_BY_PRICE_ASC_QUERY;
       case "price_desc":
         return FILTER_PRODUCTS_BY_PRICE_DESC_QUERY;
-      case "relevance":
-        return FILTER_PRODUCTS_BY_RELEVANCE_QUERY;
+      case "best_selling":
+        return FILTER_PRODUCTS_BY_BEST_SELLING_QUERY;
       default:
         return FILTER_PRODUCTS_BY_NAME_QUERY;
     }
@@ -53,9 +65,10 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     query: getQuery(),
     params: {
       searchQuery,
-      categorySlug: slug,
-      color,
-      material,
+      categorySlugs: [slug],
+      productType,
+      colors,
+      materials,
       minPrice,
       maxPrice,
       inStock,
@@ -69,16 +82,43 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const categoryTitle = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 text-center">
-          <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-            {categoryTitle}
-          </h2>
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
+      {/* Breadcrumb */}
+      <div className="border-b border-zinc-100 dark:border-zinc-800/50">
+        <div className="mx-auto max-w-[1400px] px-4 py-3 sm:px-6 lg:px-10">
+          <nav className="flex items-center gap-2 text-xs tracking-wide text-zinc-400 dark:text-zinc-500">
+            <Link
+              href="/"
+              className="transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+            >
+              Home
+            </Link>
+            <span>/</span>
+            <Link
+              href="/shop"
+              className="transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+            >
+              Shop
+            </Link>
+            <span>/</span>
+            <span className="text-zinc-700 dark:text-zinc-300">
+              {categoryTitle}
+            </span>
+          </nav>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Category Header */}
+      <div className="border-b border-zinc-100 dark:border-zinc-800/50">
+        <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
+          <h1 className="text-center text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-5xl">
+            {categoryTitle}
+          </h1>
+        </div>
+      </div>
+
+      {/* Products Section */}
+      <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-10">
         <ProductSection
           categories={categories}
           products={products}

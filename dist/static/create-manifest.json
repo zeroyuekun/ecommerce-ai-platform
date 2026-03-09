@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "createdAt": "2026-03-09T00:32:22.155Z",
+  "workspaces": [
+    {
+      "name": "default",
+      "title": "Default",
+      "basePath": "/studio",
+      "projectId": "8oups9cq",
+      "dataset": "production",
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"2\" fill=\"#04b97a\"></rect><text x=\"50%\" y=\"50%\" text-anchor=\"middle\" alignment-baseline=\"middle\" fill=\"hsla(159, 96%, 0%, 1)\" class=\"sc-gzpDuk cLsLzf\">D</text></svg>",
+      "mediaLibrary": {
+        "enabled": false
+      },
+      "schema": "b36dcb3a.create-schema.json",
+      "tools": "fdb482ef.create-tools.json"
+    }
+  ],
+  "studioVersion": "4.20.3"
+}

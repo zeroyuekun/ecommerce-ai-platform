@@ -49,6 +49,15 @@ export const productType = defineType({
       ],
     }),
     defineField({
+      name: "salePrice",
+      type: "number",
+      group: "details",
+      description: "Discounted sale price (leave empty if not on sale)",
+      validation: (rule) => [
+        rule.positive().error("Sale price must be a positive number"),
+      ],
+    }),
+    defineField({
       name: "category",
       type: "reference",
       to: [{ type: "category" }],
@@ -72,6 +81,18 @@ export const productType = defineType({
         list: COLORS_SANITY_LIST,
         layout: "radio",
       },
+    }),
+    defineField({
+      name: "productType",
+      type: "string",
+      group: "details",
+      description: "Product type for subcategory filtering (e.g., 'beds', 'bedside-tables')",
+    }),
+    defineField({
+      name: "variantGroup",
+      type: "string",
+      group: "details",
+      description: "Group ID to link color variants together (e.g., 'osaka-buffet')",
     }),
     defineField({
       name: "dimensions",
@@ -127,11 +148,15 @@ export const productType = defineType({
       subtitle: "category.title",
       media: "images.0",
       price: "price",
+      salePrice: "salePrice",
     },
-    prepare({ title, subtitle, media, price }) {
+    prepare({ title, subtitle, media, price, salePrice }) {
+      const priceDisplay = salePrice
+        ? `£${salePrice} (was £${price ?? 0})`
+        : `£${price ?? 0}`;
       return {
         title,
-        subtitle: `${subtitle ? subtitle + " • " : ""}£${price ?? 0}`,
+        subtitle: `${subtitle ? subtitle + " • " : ""}${priceDisplay}`,
         media,
       };
     },

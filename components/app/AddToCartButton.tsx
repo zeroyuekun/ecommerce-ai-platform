@@ -1,8 +1,7 @@
 "use client";
 
-import { Minus, Plus, ShoppingBag } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { useCartActions, useCartItem } from "@/lib/store/cart-store-provider";
 import { cn } from "@/lib/utils";
 
@@ -46,23 +45,31 @@ export function AddToCartButton({
   // Out of stock
   if (isOutOfStock) {
     return (
-      <Button
+      <button
         disabled
-        variant="secondary"
-        className={cn("h-11 w-full", className)}
+        className={cn(
+          "flex h-11 w-full items-center justify-center bg-zinc-200 text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500",
+          className,
+        )}
       >
         Out of Stock
-      </Button>
+      </button>
     );
   }
 
-  // Not in cart - show Add to Basket button
+  // Not in cart - show Add to Cart button
   if (quantityInCart === 0) {
     return (
-      <Button onClick={handleAdd} className={cn("h-11 w-full", className)}>
-        <ShoppingBag className="mr-2 h-4 w-4" />
-        Add to Basket
-      </Button>
+      <button
+        type="button"
+        onClick={handleAdd}
+        className={cn(
+          "flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 text-[11px] font-medium uppercase tracking-[0.15em] text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
+          className,
+        )}
+      >
+        Add to Cart
+      </button>
     );
   }
 
@@ -70,30 +77,28 @@ export function AddToCartButton({
   return (
     <div
       className={cn(
-        "flex h-11 w-full items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+        "flex h-11 w-full items-center border border-zinc-200 dark:border-zinc-700",
         className,
       )}
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-full flex-1 rounded-r-none"
+      <button
+        type="button"
+        className="flex h-full flex-1 items-center justify-center text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
         onClick={handleDecrement}
       >
-        <Minus className="h-4 w-4" />
-      </Button>
-      <span className="flex-1 text-center text-sm font-semibold tabular-nums">
+        <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
+      </button>
+      <span className="flex flex-1 items-center justify-center text-sm font-medium tabular-nums text-zinc-900 dark:text-zinc-100">
         {quantityInCart}
       </span>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-full flex-1 rounded-l-none disabled:opacity-20"
+      <button
+        type="button"
+        className="flex h-full flex-1 items-center justify-center text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
         onClick={handleAdd}
         disabled={isAtMax}
       >
-        <Plus className="h-4 w-4" />
-      </Button>
+        <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+      </button>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { AI_SEARCH_PRODUCTS_QUERY } from "@/lib/sanity/queries/products";
 import { formatPrice } from "@/lib/utils";
 import { getStockStatus, getStockMessage } from "@/lib/constants/stock";
 import { MATERIAL_VALUES, COLOR_VALUES } from "@/lib/constants/filters";
-import type { AI_SEARCH_PRODUCTS_QUERYResult } from "@/sanity.types";
+import type { AI_SEARCH_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
 import type { SearchProduct } from "@/lib/ai/types";
 
 const productSearchSchema = z.object({
@@ -93,7 +93,7 @@ export const searchProductsTool = tool({
 
       // Format the results with stock status for the AI to communicate
       const formattedProducts: SearchProduct[] = (
-        products as AI_SEARCH_PRODUCTS_QUERYResult
+        products as AI_SEARCH_PRODUCTS_QUERY_RESULT
       ).map((product) => ({
         id: product._id,
         name: product.name ?? null,

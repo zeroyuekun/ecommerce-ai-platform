@@ -9,13 +9,13 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import type { BEST_SELLERS_QUERY_RESULT } from "@/sanity.types";
+import type { POPULAR_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
 
-interface BestSellersProps {
-  products: BEST_SELLERS_QUERY_RESULT;
+interface HaveYouSeenThisProps {
+  products: POPULAR_PRODUCTS_QUERY_RESULT;
 }
 
-export function BestSellers({ products }: BestSellersProps) {
+export function HaveYouSeenThis({ products }: HaveYouSeenThisProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -39,10 +39,13 @@ export function BestSellers({ products }: BestSellersProps) {
   if (products.length === 0) return null;
 
   return (
-    <div className="bg-white py-12 dark:bg-zinc-950">
+    <div className="border-t border-zinc-100 bg-white py-14 dark:border-zinc-800/50 dark:bg-zinc-950">
       <div className="mx-auto max-w-2xl px-4 pb-8 text-center sm:px-6">
-        <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-          Best Sellers
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+          Trending Now
+        </p>
+        <h2 className="mt-2 text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          Have You Seen This?
         </h2>
       </div>
 
@@ -78,7 +81,7 @@ export function BestSellers({ products }: BestSellersProps) {
               {products.map((product) => (
                 <CarouselItem
                   key={product._id}
-                  className="pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                  className="pl-6 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/4"
                 >
                   <ProductCard product={product} compact />
                 </CarouselItem>

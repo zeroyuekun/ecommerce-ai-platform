@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { Package, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Package, ChevronRight } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ORDERS_BY_USER_QUERY } from "@/lib/sanity/queries/orders";
@@ -20,19 +19,40 @@ export default async function OrdersPage() {
   const { userId } = await auth();
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-          Your Orders
-        </h1>
-        <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-          Track and manage your orders
-        </p>
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
+      {/* Breadcrumb */}
+      <div className="border-b border-zinc-100 dark:border-zinc-800/50">
+        <div className="mx-auto max-w-[1400px] px-4 py-3 sm:px-6 lg:px-10">
+          <nav className="flex items-center gap-2 text-xs tracking-wide text-zinc-400 dark:text-zinc-500">
+            <Link
+              href="/"
+              className="transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+            >
+              Home
+            </Link>
+            <span>/</span>
+            <span className="text-zinc-700 dark:text-zinc-300">Orders</span>
+          </nav>
+        </div>
       </div>
 
-      <Suspense fallback={<OrderCardSkeleton count={4} />}>
-        <OrderList clerkUserId={userId ?? ""} />
-      </Suspense>
+      {/* Page Header */}
+      <div className="border-b border-zinc-100 dark:border-zinc-800/50">
+        <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
+          <h1 className="text-center font-serif text-3xl font-normal tracking-[0.02em] text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+            Your Orders
+          </h1>
+          <p className="mt-3 text-center text-[11px] uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+            Track and manage your purchases
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-10">
+        <Suspense fallback={<OrderCardSkeleton count={4} />}>
+          <OrderList clerkUserId={userId ?? ""} />
+        </Suspense>
+      </div>
     </div>
   );
 }
@@ -56,7 +76,7 @@ async function OrderList({ clerkUserId }: { clerkUserId: string }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
       {orders.map((order) => {
         const status = getOrderStatus(order.status);
         const StatusIcon = status.icon;
@@ -68,54 +88,52 @@ async function OrderList({ clerkUserId }: { clerkUserId: string }) {
           <Link
             key={order._id}
             href={`/orders/${order._id}`}
-            className="group block rounded-xl border border-zinc-200 bg-white transition-all hover:border-zinc-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+            className="group flex items-center gap-5 py-6 transition-colors first:pt-0 last:pb-0 sm:gap-6"
           >
-            <div className="flex gap-5 p-5">
-              <StackedProductImages
-                images={images}
-                totalCount={order.itemCount ?? 0}
-                size="lg"
-              />
+            {/* Product Images */}
+            <StackedProductImages
+              images={images}
+              totalCount={order.itemCount ?? 0}
+              size="lg"
+            />
 
-              <div className="flex min-w-0 flex-1 flex-col justify-between">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
-                      Order #{formatOrderNumber(order.orderNumber)}
-                    </p>
-                    <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-                      {formatDate(order.createdAt)}
-                    </p>
-                  </div>
-                  <Badge
-                    className={`${status.color} shrink-0 flex items-center gap-1`}
-                  >
-                    <StatusIcon className="h-3 w-3" />
-                    {status.label}
-                  </Badge>
+            {/* Order Info */}
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-900 dark:text-zinc-100">
+                    Order #{formatOrderNumber(order.orderNumber)}
+                  </p>
+                  <p className="mt-1 text-[11px] tracking-[0.05em] text-zinc-400 dark:text-zinc-500">
+                    {formatDate(order.createdAt)}
+                  </p>
                 </div>
+                <span
+                  className={`flex shrink-0 items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.1em] ${status.iconColor}`}
+                >
+                  <StatusIcon className="h-3 w-3" />
+                  {status.label}
+                </span>
+              </div>
 
-                <div className="mt-2 flex items-end justify-between">
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {order.itemCount}{" "}
-                    {order.itemCount === 1 ? "item" : "items"}
-                  </p>
-                  <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <div className="flex items-end justify-between">
+                <p className="truncate text-[12px] tracking-[0.03em] text-zinc-500 dark:text-zinc-400">
+                  {order.itemCount}{" "}
+                  {order.itemCount === 1 ? "item" : "items"}
+                  {order.itemNames && order.itemNames.length > 0 && (
+                    <span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
+                      — {order.itemNames.slice(0, 2).filter(Boolean).join(", ")}
+                      {(order.itemNames.length) > 2 && "..."}
+                    </span>
+                  )}
+                </p>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="font-serif text-base font-normal tracking-wide text-zinc-900 dark:text-zinc-100">
                     {formatPrice(order.total)}
-                  </p>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-zinc-300 transition-transform group-hover:translate-x-0.5 dark:text-zinc-600" />
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-zinc-100 px-5 py-3 dark:border-zinc-800">
-              <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">
-                {order.itemNames?.slice(0, 2).filter(Boolean).join(", ")}
-                {(order.itemNames?.length ?? 0) > 2 && "..."}
-              </p>
-              <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-zinc-500 transition-colors group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-zinc-100">
-                View order
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
             </div>
           </Link>
         );

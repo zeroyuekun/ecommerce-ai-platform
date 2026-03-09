@@ -92,7 +92,22 @@
       "WebFetch(domain:companieslogo.com)",
       "WebFetch(domain:simpleicons.org)",
       "WebFetch(domain:www.theparisphotographer.com)",
-      "WebFetch(domain:www.vancleefarpels.com)"
+      "WebFetch(domain:www.vancleefarpels.com)",
+      "WebFetch(domain:fontsinuse.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:www.aesop.com)",
+      "WebFetch(domain:www.restorationhardware.com)",
+      "WebFetch(domain:www.poliform.it)",
+      "WebFetch(domain:rh.com)",
+      "WebFetch(domain:shop.aesop.com)",
+      "WebFetch(domain:www.muji.com)",
+      "WebFetch(domain:www.brosa.com.au)",
+      "WebFetch(domain:typescale.com)",
+      "WebFetch(domain:designsystem.digital.gov)",
+      "Bash(git:*)",
+      "WebFetch(domain:web.archive.org)"
     ]
   }
 }
