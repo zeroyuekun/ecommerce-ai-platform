@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BlurImage } from "./BlurImage";
+import Image from "next/image";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
 import { COLOR_SWATCHES } from "@/lib/constants/filters";
@@ -28,7 +28,6 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const activeVariant = hasVariants ? variants[activeVariantIndex] : null;
 
   const imageUrl = activeVariant?.imageUrl ?? product.images?.[0]?.asset?.url;
-  const imageLqip = activeVariant?.imageLqip ?? (product.images?.[0]?.asset as { metadata?: { lqip?: string } } | null)?.metadata?.lqip;
   const slug = activeVariant?.slug ?? product.slug;
   const color = activeVariant?.color ?? product.color;
   const price = activeVariant?.price ?? product.price;
@@ -49,11 +48,10 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       <Link href={`/products/${slug}`} className="relative block">
         <div className={cn("relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50", compact ? "aspect-square" : "aspect-square")}>
           {imageUrl ? (
-            <BlurImage
+            <Image
               src={imageUrl}
               alt={product.name ?? "Product image"}
               fill
-              blurDataURL={imageLqip}
               className={cn(
                 "object-cover transition-all duration-700 ease-out",
                 isHovered && "scale-105",

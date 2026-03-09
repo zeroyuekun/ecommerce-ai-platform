@@ -29,8 +29,7 @@ const FILTERED_PRODUCT_PROJECTION = `{
     _key,
     asset->{
       _id,
-      url,
-      metadata { lqip }
+      url
     }
   },
   category->{
@@ -105,8 +104,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
     _key,
     asset->{
       _id,
-      url,
-      metadata { lqip }
+      url
     },
     hotspot
   },
@@ -133,8 +131,7 @@ export const GALLERY_PRODUCTS_QUERY = defineQuery(`*[
   "image": images[0]{
     asset->{
       _id,
-      url,
-      metadata { lqip }
+      url
     }
   }
 }`);
@@ -193,8 +190,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
     _key,
     asset->{
       _id,
-      url,
-      metadata { lqip }
+      url
     },
     hotspot
   },
@@ -250,8 +246,7 @@ export const VARIANT_SIBLINGS_FULL_QUERY = defineQuery(`*[
     _key,
     asset->{
       _id,
-      url,
-      metadata { lqip }
+      url
     },
     hotspot
   },
