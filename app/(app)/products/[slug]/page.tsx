@@ -9,6 +9,7 @@ import {
 } from "@/lib/sanity/queries/products";
 import { ProductDetail } from "@/components/app/ProductDetail";
 import { ProductCard } from "@/components/app/ProductCard";
+import { RecentlyViewed } from "@/components/app/RecentlyViewed";
 
 interface ProductPageProps {
   params: Promise<{
@@ -102,6 +103,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </div>
       )}
+
+      {/* Recently Viewed */}
+      <RecentlyViewed />
     </div>
   );
 }

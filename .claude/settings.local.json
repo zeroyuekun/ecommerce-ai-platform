@@ -107,7 +107,8 @@
       "WebFetch(domain:typescale.com)",
       "WebFetch(domain:designsystem.digital.gov)",
       "Bash(git:*)",
-      "WebFetch(domain:web.archive.org)"
+      "WebFetch(domain:web.archive.org)",
+      "Bash(echo:*)"
     ]
   }
 }

@@ -8,7 +8,7 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 /** Common filter conditions for product filtering */
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
-  && (count($categorySlugs) == 0 || ("sale" in $categorySlugs && defined(salePrice)) || category->slug.current in $categorySlugs)
+  && (count($categorySlugs) == 0 || ("sale" in $categorySlugs && defined(salePrice)) || ("new" in $categorySlugs && isNew == true) || category->slug.current in $categorySlugs)
   && ($productType == "" || productType == $productType)
   && (count($colors) == 0 || color in $colors)
   && (count($materials) == 0 || material in $materials)
@@ -39,7 +39,9 @@ const FILTERED_PRODUCT_PROJECTION = `{
   },
   material,
   color,
-  stock
+  stock,
+  isNew,
+  variantGroup
 }`;
 
 /** Scoring for relevance-based search */

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
 import { SortSelect } from "./SortSelect";
@@ -58,17 +58,15 @@ export function ProductSection({
       <div className="h-px bg-zinc-200/80 dark:bg-zinc-700/50" />
 
       {/* Main content: sidebar + grid */}
-      <div className="flex gap-10 pt-8">
-        {/* Left sidebar filters */}
+      <div className="flex items-start gap-10 pt-8">
+        {/* Left sidebar filters — stays fixed while products scroll */}
         {filtersOpen && (
-          <aside className="hidden w-[240px] shrink-0 lg:block">
-            <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide">
-              <ProductFilters categories={categories} />
-            </div>
+          <aside className="hidden w-[240px] shrink-0 lg:sticky lg:top-24 lg:self-start lg:block">
+            <ProductFilters categories={categories} />
           </aside>
         )}
 
-        {/* Product Grid */}
+        {/* Product Grid — scrolls naturally */}
         <div className="flex-1">
           <ProductGrid products={products} />
         </div>

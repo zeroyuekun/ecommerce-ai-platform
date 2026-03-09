@@ -114,6 +114,38 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Minimal scrollbar – no arrows, thin track, subtle thumb */
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-minimal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 9999px;
+}
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+.scrollbar-minimal::-webkit-scrollbar-button {
+  display: none;
+}
+.dark .scrollbar-minimal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+.dark .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+/* Firefox */
+.scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+.dark .scrollbar-minimal {
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

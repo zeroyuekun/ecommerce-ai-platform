@@ -135,6 +135,13 @@ export const productType = defineType({
       description: "Show on homepage and promotions",
     }),
     defineField({
+      name: "isNew",
+      type: "boolean",
+      group: "inventory",
+      initialValue: false,
+      description: "Mark as a new arrival",
+    }),
+    defineField({
       name: "assemblyRequired",
       type: "boolean",
       group: "inventory",

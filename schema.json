@@ -634,6 +634,13 @@
         },
         "optional": true
       },
+      "isNew": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "assemblyRequired": {
         "type": "objectAttribute",
         "value": {

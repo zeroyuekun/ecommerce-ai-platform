@@ -300,6 +300,24 @@ export function Header({ categories }: HeaderProps) {
         onMouseLeave={handleCategoryLeave}
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
+          {/* New — far left */}
+          <div className="relative">
+            <Link
+              href="/shop?category=new"
+              onClick={() => setActiveCategory(null)}
+              className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
+                !solid
+                  ? "text-white/80 hover:text-white"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+              }`}
+            >
+              New
+              <span
+                className={`absolute -bottom-2.5 left-1/2 h-[2px] -translate-x-1/2 transition-all duration-300 ${!solid ? "bg-white" : "bg-zinc-900 dark:bg-zinc-100"} w-0 group-hover:w-full`}
+              />
+            </Link>
+          </div>
+
           {categoryLinks.map((cat) => (
             <div
               key={cat.slug}
@@ -324,6 +342,24 @@ export function Header({ categories }: HeaderProps) {
               </Link>
             </div>
           ))}
+
+          {/* Sale — far right */}
+          <div className="relative">
+            <Link
+              href="/shop?category=sale"
+              onClick={() => setActiveCategory(null)}
+              className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
+                !solid
+                  ? "text-white/80 hover:text-white"
+                  : "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              }`}
+            >
+              Sale
+              <span
+                className={`absolute -bottom-2.5 left-1/2 h-[2px] -translate-x-1/2 transition-all duration-300 ${!solid ? "bg-white" : "bg-red-600 dark:bg-red-400"} w-0 group-hover:w-full`}
+              />
+            </Link>
+          </div>
         </div>
 
         {/* Full-width mega dropdown — Crate & Barrel style */}

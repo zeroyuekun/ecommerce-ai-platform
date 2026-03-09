@@ -5,6 +5,7 @@ import { useCallback, useState, useEffect } from "react";
 import { Plus, Minus, Check, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { COLORS, MATERIALS, COLOR_SWATCHES } from "@/lib/constants/filters";
+import { subcategoriesMap } from "@/lib/constants/subcategories";
 import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
 interface ProductFiltersProps {
@@ -230,6 +231,15 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     });
   });
 
+  if (currentType) {
+    const typeLabel = typeOptions.find((t) => t.value === currentType)?.label ?? currentType;
+    activeFilters.push({
+      key: `type-${currentType}`,
+      label: typeLabel,
+      onRemove: () => updateParams({ type: null }),
+    });
+  }
+
   currentColors.forEach((color) => {
     const colorLabel = COLORS.find((c) => c.value === color)?.label ?? color;
     activeFilters.push({
@@ -279,6 +289,39 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       label: c.title ?? "",
     })),
   ];
+
+  // Build type options based on selected categories
+  const typeOptions = (() => {
+    const seen = new Set<string>();
+    const options: { value: string; label: string }[] = [];
+
+    const slugsToCheck = currentCategories.filter((s) => s !== "sale");
+
+    if (slugsToCheck.length > 0) {
+      // Show types from selected categories only
+      slugsToCheck.forEach((slug) => {
+        const subs = subcategoriesMap[slug] ?? [];
+        subs.forEach((sub) => {
+          if (sub.type && !seen.has(sub.type)) {
+            seen.add(sub.type);
+            options.push({ value: sub.type, label: sub.label });
+          }
+        });
+      });
+    } else {
+      // No category selected — show all unique types
+      Object.values(subcategoriesMap).forEach((subs) => {
+        subs.forEach((sub) => {
+          if (sub.type && !seen.has(sub.type)) {
+            seen.add(sub.type);
+            options.push({ value: sub.type, label: sub.label });
+          }
+        });
+      });
+    }
+
+    return options;
+  })();
 
   const materialOptions = MATERIALS.map((m) => ({
     value: m.value,
@@ -337,6 +380,19 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           options={categoryOptions}
           defaultOpen
         />
+
+        {/* Type — narrows based on selected category */}
+        {typeOptions.length > 0 && (
+          <MultiFilterGroup
+            label="Type"
+            values={currentType ? [currentType] : []}
+            onChange={(vals) => {
+              updateParams({ type: vals.length > 0 ? vals[vals.length - 1] : null });
+            }}
+            options={typeOptions}
+            defaultOpen={!!currentType}
+          />
+        )}
 
         {/* Color - swatches */}
         <ColorSwatchGroup

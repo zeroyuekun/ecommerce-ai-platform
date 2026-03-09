@@ -97,7 +97,7 @@ export function SecondaryHeroBanner() {
       {/* Dual banners — side by side on desktop, stacked on mobile */}
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Left: The Rorie Bed */}
-        <Link href="/shop?category=bedroom" className="group relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden">
+        <Link href="/shop?category=bedroom&type=beds" className="group relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden">
           <Image
             src="https://www.decorilla.com/online-decorating/wp-content/uploads/2026/01/Serene-boho-modern-bedroom-before-and-after-story-by-Decorilla-scaled.jpeg"
             alt="The Rorie Bed - Featuring a low-profile bedhead and curved, sheltering form"

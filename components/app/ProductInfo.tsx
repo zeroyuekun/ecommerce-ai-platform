@@ -165,15 +165,15 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
       <div className="mt-5">
         {isOnSale ? (
           <div className="flex items-baseline gap-3">
-            <p className="font-serif text-2xl font-light tracking-wide text-red-600 dark:text-red-400">
+            <p className="text-xl font-medium tracking-[0.02em] text-red-600 dark:text-red-400 sm:text-2xl">
               {formatPrice(product.salePrice)}
             </p>
-            <p className="font-serif text-lg text-zinc-400 line-through dark:text-zinc-500">
+            <p className="text-base font-normal tracking-[0.02em] text-zinc-400 line-through dark:text-zinc-500">
               {formatPrice(product.price)}
             </p>
           </div>
         ) : (
-          <p className="font-serif text-2xl font-light tracking-wide text-zinc-900 dark:text-zinc-100">
+          <p className="text-xl font-medium tracking-[0.02em] text-zinc-900 dark:text-zinc-100 sm:text-2xl">
             {formatPrice(product.price)}
           </p>
         )}
@@ -196,7 +196,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
               {product.color}
             </span>
           </span>
-          <div className="mt-2.5 flex items-center gap-2 py-1">
+          <div className="mt-2.5 flex items-center gap-2 p-1">
             {variants.map((variant) => {
               const hex = variant.color
                 ? COLOR_SWATCHES[variant.color]
@@ -293,7 +293,17 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
       <div className="mt-10">
         {product.description && (
           <DetailSection title="Description" defaultOpen>
-            <p>{product.description}</p>
+            <div className="space-y-3">
+              {product.description
+                .split(/\n\n+/)
+                .map((paragraph) => paragraph.trim())
+                .filter(Boolean)
+                .map((paragraph, i) => (
+                  <p key={i} className="whitespace-pre-line">
+                    {paragraph}
+                  </p>
+                ))}
+            </div>
           </DetailSection>
         )}
 

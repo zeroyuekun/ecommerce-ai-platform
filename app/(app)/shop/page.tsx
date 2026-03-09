@@ -139,7 +139,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                 )}
               </>
             ) : (
-              <span className="text-zinc-700 dark:text-zinc-300">Shop All</span>
+              <span className="text-zinc-700 dark:text-zinc-300">Shop</span>
             )}
           </nav>
         </div>
