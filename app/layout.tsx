@@ -20,8 +20,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "E-Commerce AI App",
-  description: "E-Commerce AI App",
+  title: {
+    default: "Kozy. | Premium Furniture & Homewares",
+    template: "%s | Kozy.",
+  },
+  description:
+    "Discover thoughtfully designed furniture and homewares. From living room essentials to bedroom collections, find pieces that bring warmth and style to every room.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://kozy.com.au"
+  ),
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    siteName: "Kozy.",
+  },
 };
 
 export default function RootLayout({

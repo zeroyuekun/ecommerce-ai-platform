@@ -6,6 +6,11 @@ export async function subscribeNewsletter(email: string) {
   const trimmed = email.toLowerCase().trim();
   if (!trimmed) return { success: false, message: "Email is required." };
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmed)) {
+    return { success: false, message: "Please enter a valid email address." };
+  }
+
   try {
     const existing = await client.fetch(
       `*[_type == "newsletterSignup" && email == $email][0]`,

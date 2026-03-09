@@ -128,7 +128,7 @@ function DetailSection({
         )}
       >
         <div className="overflow-hidden">
-          <div className="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          <div className="text-[13px] leading-relaxed text-zinc-800 dark:text-zinc-300">
             {children}
           </div>
         </div>
@@ -298,11 +298,32 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
                 .split(/\n\n+/)
                 .map((paragraph) => paragraph.trim())
                 .filter(Boolean)
-                .map((paragraph, i) => (
-                  <p key={i} className="whitespace-pre-line">
-                    {paragraph}
-                  </p>
-                ))}
+                .map((paragraph, i) => {
+                  const lines = paragraph.split("\n");
+                  const firstLine = lines[0].trim();
+                  const rest = lines.slice(1).join("\n").trim();
+                  const isHeadedBlock =
+                    lines.length >= 2 &&
+                    firstLine.length <= 50 &&
+                    rest.length > firstLine.length;
+
+                  if (isHeadedBlock) {
+                    return (
+                      <div key={i}>
+                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                          {firstLine}
+                        </p>
+                        <p className="mt-1 whitespace-pre-line">{rest}</p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <p key={i} className="whitespace-pre-line">
+                      {paragraph}
+                    </p>
+                  );
+                })}
             </div>
           </DetailSection>
         )}
@@ -311,40 +332,40 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
           <div className="space-y-2.5">
             {product.material && (
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-500">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Material
                 </span>
-                <span className="capitalize text-zinc-900 dark:text-zinc-100">
+                <span className="capitalize">
                   {product.material}
                 </span>
               </div>
             )}
             {product.color && (
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-500">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Colour
                 </span>
-                <span className="capitalize text-zinc-900 dark:text-zinc-100">
+                <span className="capitalize">
                   {product.color}
                 </span>
               </div>
             )}
             {product.dimensions && (
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-500">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Dimensions
                 </span>
-                <span className="text-zinc-900 dark:text-zinc-100">
+                <span>
                   {product.dimensions}
                 </span>
               </div>
             )}
             {product.assemblyRequired !== null && (
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-500">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Assembly
                 </span>
-                <span className="text-zinc-900 dark:text-zinc-100">
+                <span>
                   {product.assemblyRequired
                     ? "Required"
                     : "Not required"}
@@ -356,24 +377,31 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
 
         <DetailSection title="Shipping & Returns">
           <div className="space-y-3">
-            <p>
-              Free standard shipping on orders over $100.
-            </p>
-            <p>Express shipping available at checkout.</p>
-            <p>
-              Returns accepted within 30 days of purchase.
-            </p>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Free Shipping</p>
+              <p className="mt-1">Free standard shipping on orders over $100.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Express Delivery</p>
+              <p className="mt-1">Express shipping available at checkout.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Returns</p>
+              <p className="mt-1">Returns accepted within 30 days of purchase.</p>
+            </div>
           </div>
         </DetailSection>
 
         <DetailSection title="Care Instructions">
           <div className="space-y-3">
-            <p>
-              Wipe clean with a soft, damp cloth. Avoid harsh chemical cleaners.
-            </p>
-            <p>
-              Keep away from direct sunlight and heat sources to prevent discolouration.
-            </p>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Cleaning</p>
+              <p className="mt-1">Wipe clean with a soft, damp cloth. Avoid harsh chemical cleaners.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Placement</p>
+              <p className="mt-1">Keep away from direct sunlight and heat sources to prevent discolouration.</p>
+            </div>
           </div>
         </DetailSection>
 

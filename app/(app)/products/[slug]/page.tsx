@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
@@ -15,6 +16,35 @@ interface ProductPageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: product } = await sanityFetch({
+    query: PRODUCT_BY_SLUG_QUERY,
+    params: { slug },
+  });
+
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+
+  const imageUrl = product.images?.[0]?.asset?.url;
+
+  return {
+    title: product.name,
+    description:
+      product.description?.slice(0, 160) ??
+      `Shop ${product.name} at Kozy. Premium furniture and homewares.`,
+    openGraph: {
+      title: product.name ?? undefined,
+      description:
+        product.description?.slice(0, 160) ?? undefined,
+      ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
+    },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

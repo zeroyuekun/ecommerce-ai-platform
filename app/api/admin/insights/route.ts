@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { generateText, gateway } from "ai";
 import { client } from "@/sanity/lib/client";
 import {
@@ -65,6 +66,11 @@ interface RevenuePeriod {
 }
 
 export async function GET() {
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // Calculate date ranges
     const now = new Date();

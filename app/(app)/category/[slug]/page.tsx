@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   FILTER_PRODUCTS_BY_NAME_QUERY,
@@ -26,12 +27,24 @@ interface PageProps {
   }>;
 }
 
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const title =
+    slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
+  return {
+    title,
+    description: `Shop our ${title.toLowerCase()} collection. Premium furniture and homewares at Kozy.`,
+  };
+}
+
 export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const sp = await searchParams;
 
   const searchQuery = sp.q ?? "";
-  const productType = sp.type ?? "";
+  const productTypes = sp.type ? sp.type.split(",").filter(Boolean) : [];
   const colors = sp.color ? sp.color.split(",") : [];
   const materials = sp.material ? sp.material.split(",") : [];
   const minPrice = Number(sp.minPrice) || 0;
@@ -66,7 +79,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     params: {
       searchQuery,
       categorySlugs: [slug],
-      productType,
+      productTypes,
       colors,
       materials,
       minPrice,

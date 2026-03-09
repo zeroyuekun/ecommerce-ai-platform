@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
 import { BEST_SELLERS_QUERY } from "@/lib/sanity/queries/products";
+
+export const metadata: Metadata = {
+  title: "Kozy. | Premium Furniture & Homewares",
+  description:
+    "Discover thoughtfully designed furniture and homewares. From living room essentials to bedroom collections, find pieces that bring warmth and style to every room.",
+};
 import { CategoryTiles } from "@/components/app/CategoryTiles";
 import { HeroBanner, SecondaryHeroBanner, VideoHeroBanner } from "@/components/app/HeroBanner";
 import { BestSellers } from "@/components/app/BestSellers";

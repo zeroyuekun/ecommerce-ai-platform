@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   FILTER_PRODUCTS_BY_NAME_QUERY,
@@ -15,6 +16,12 @@ import { HaveYouSeenThis } from "@/components/app/HaveYouSeenThis";
 import { RecentlyViewed } from "@/components/app/RecentlyViewed";
 import { getSubcategoryLabel } from "@/lib/constants/subcategories";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Shop",
+  description:
+    "Browse our full collection of premium furniture and homewares. Filter by category, colour, material, and price.",
+};
 
 interface PageProps {
   searchParams: Promise<{
@@ -35,7 +42,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
 
   const searchQuery = sp.q ?? "";
   const categorySlugs = sp.category ? sp.category.split(",").filter(Boolean) : [];
-  const productType = sp.type ?? "";
+  const productTypes = sp.type ? sp.type.split(",").filter(Boolean) : [];
   const colors = sp.color ? sp.color.split(",") : [];
   const materials = sp.material ? sp.material.split(",") : [];
   const minPrice = Number(sp.minPrice) || 0;
@@ -70,7 +77,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
     params: {
       searchQuery,
       categorySlugs,
-      productType,
+      productTypes,
       colors,
       materials,
       minPrice,
@@ -89,7 +96,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
     ? categories.find((c) => c.slug === categorySlugs[0])
     : null;
   const subcategoryLabel = categorySlugs.length === 1
-    ? getSubcategoryLabel(categorySlugs[0], searchQuery, productType)
+    ? getSubcategoryLabel(categorySlugs[0], searchQuery, productTypes[0])
     : null;
   const heading = isSaleFilter
     ? "Sale"

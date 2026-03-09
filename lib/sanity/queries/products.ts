@@ -9,7 +9,7 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
   && (count($categorySlugs) == 0 || ("sale" in $categorySlugs && defined(salePrice)) || ("new" in $categorySlugs && isNew == true) || category->slug.current in $categorySlugs)
-  && ($productType == "" || productType == $productType)
+  && (count($productTypes) == 0 || productType in $productTypes)
   && (count($colors) == 0 || color in $colors)
   && (count($materials) == 0 || material in $materials)
   && ($minPrice == 0 || coalesce(salePrice, price) >= $minPrice)

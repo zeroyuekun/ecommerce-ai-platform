@@ -175,7 +175,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
 
   const currentCategories = searchParams.get("category")?.split(",").filter(Boolean) ?? [];
   const currentSearch = searchParams.get("q") ?? "";
-  const currentType = searchParams.get("type") ?? "";
+  const currentTypes = searchParams.get("type")?.split(",").filter(Boolean) ?? [];
   const currentColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
   const currentMaterials = searchParams.get("material")?.split(",").filter(Boolean) ?? [];
   const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
@@ -264,14 +264,17 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     });
   });
 
-  if (currentType) {
-    const typeLabel = typeOptions.find((t) => t.value === currentType)?.label ?? currentType;
+  currentTypes.forEach((type) => {
+    const typeLabel = typeOptions.find((t) => t.value === type)?.label ?? type;
     activeFilters.push({
-      key: `type-${currentType}`,
+      key: `type-${type}`,
       label: typeLabel,
-      onRemove: () => updateParams({ type: null }),
+      onRemove: () => {
+        const remaining = currentTypes.filter((t) => t !== type);
+        updateParams({ type: remaining.length > 0 ? remaining.join(",") : null });
+      },
     });
-  }
+  });
 
   currentColors.forEach((color) => {
     const colorLabel = COLORS.find((c) => c.value === color)?.label ?? color;
@@ -385,12 +388,12 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
         {typeOptions.length > 0 && (
           <MultiFilterGroup
             label="Type"
-            values={currentType ? [currentType] : []}
+            values={currentTypes}
             onChange={(vals) => {
-              updateParams({ type: vals.length > 0 ? vals[vals.length - 1] : null });
+              updateParams({ type: vals.length > 0 ? vals.join(",") : null });
             }}
             options={typeOptions}
-            defaultOpen={!!currentType}
+            defaultOpen={currentTypes.length > 0}
           />
         )}
 

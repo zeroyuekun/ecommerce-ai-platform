@@ -74,16 +74,20 @@ export function Header({ categories }: HeaderProps) {
 
   // Fetch popular searches on mount
   useEffect(() => {
-    getPopularSearches().then((results) => {
-      if (results.length > 0) {
-        setPopularSearches(
-          results.map((r) => ({
-            label: r.query.charAt(0).toUpperCase() + r.query.slice(1),
-            query: r.query,
-          }))
-        );
-      }
-    });
+    getPopularSearches()
+      .then((results) => {
+        if (results.length > 0) {
+          setPopularSearches(
+            results.map((r) => ({
+              label: r.query.charAt(0).toUpperCase() + r.query.slice(1),
+              query: r.query,
+            }))
+          );
+        }
+      })
+      .catch(() => {
+        // Silently fail — default suggestions will be shown
+      });
   }, []);
 
   // Cleanup hover timeout
