@@ -301,7 +301,7 @@ export function Header({ categories }: HeaderProps) {
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
           {/* New — far left */}
-          <div className="relative">
+          <div className="relative" onMouseEnter={() => setActiveCategory(null)}>
             <Link
               href="/shop?category=new"
               onClick={() => setActiveCategory(null)}
@@ -344,7 +344,7 @@ export function Header({ categories }: HeaderProps) {
           ))}
 
           {/* Sale — far right */}
-          <div className="relative">
+          <div className="relative" onMouseEnter={() => setActiveCategory(null)}>
             <Link
               href="/shop?category=sale"
               onClick={() => setActiveCategory(null)}

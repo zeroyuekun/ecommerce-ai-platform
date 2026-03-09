@@ -71,10 +71,7 @@ export function Footer() {
               Our team is available Monday to Friday, 9am to 5pm AEST.
             </p>
             <div className="mt-5 space-y-4">
-              <a
-                href="tel:+61290001234"
-                className="flex items-center gap-3 text-sm text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
+              <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                 <Phone className="h-5 w-5 text-zinc-400" />
                 <div>
                   <p className="font-medium text-zinc-900 dark:text-zinc-100">
@@ -84,21 +81,18 @@ export function Footer() {
                     02 9000 1234
                   </p>
                 </div>
-              </a>
-              <a
-                href="mailto:hello@kozy.com.au"
-                className="flex items-center gap-3 text-sm text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
+              </div>
+              <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                 <Mail className="h-5 w-5 text-zinc-400" />
                 <div>
                   <p className="font-medium text-zinc-900 dark:text-zinc-100">
                     Email us
                   </p>
                   <p className="text-zinc-500 dark:text-zinc-400">
-                    Send us a message
+                    support@kozy.com.au
                   </p>
                 </div>
-              </a>
+              </div>
             </div>
 
             {/* Social icons */}

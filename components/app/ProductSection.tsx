@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
@@ -16,12 +16,55 @@ interface ProductSectionProps {
   searchQuery: string;
 }
 
+/**
+ * Scroll trap — same pattern as product detail page.
+ * Filter sidebar scrolls first; products stay still.
+ * Once filters hit bottom/top, the page scrolls normally.
+ */
+function useScrollTrap(ref: React.RefObject<HTMLDivElement | null>, active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      if (window.innerWidth < 1024) return;
+
+      // Check if filter is visible in viewport
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const maxScroll = scrollHeight - clientHeight;
+
+      // No overflow — nothing to trap
+      if (maxScroll <= 0) return;
+
+      const atTop = scrollTop <= 0;
+      const atBottom = scrollTop >= maxScroll - 1;
+
+      // At boundary in scroll direction → let page scroll
+      if ((e.deltaY > 0 && atBottom) || (e.deltaY < 0 && atTop)) return;
+
+      // Filter can still scroll → consume event, scroll filter
+      e.preventDefault();
+      el.scrollTop += e.deltaY;
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [ref, active]);
+}
+
 export function ProductSection({
   categories,
   products,
   searchQuery,
 }: ProductSectionProps) {
   const [filtersOpen, setFiltersOpen] = useState(true);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useScrollTrap(filterRef, filtersOpen);
 
   return (
     <div className="flex flex-col">
@@ -59,10 +102,15 @@ export function ProductSection({
 
       {/* Main content: sidebar + grid */}
       <div className="flex items-start gap-10 pt-8">
-        {/* Left sidebar filters — stays fixed while products scroll */}
+        {/* Left sidebar filters — sticky with independent scroll */}
         {filtersOpen && (
-          <aside className="hidden w-[240px] shrink-0 lg:sticky lg:top-24 lg:self-start lg:block">
-            <ProductFilters categories={categories} />
+          <aside className="hidden w-[240px] shrink-0 lg:block">
+            <div
+              ref={filterRef}
+              className="lg:sticky lg:top-[calc(4rem+41px+1rem)] lg:self-start lg:max-h-[calc(100vh-4rem-41px-2rem)] lg:overflow-y-auto scrollbar-hide"
+            >
+              <ProductFilters categories={categories} />
+            </div>
           </aside>
         )}
 
