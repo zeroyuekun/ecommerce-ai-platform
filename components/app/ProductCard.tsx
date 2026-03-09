@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
@@ -17,7 +17,7 @@ interface ProductCardProps {
   compact?: boolean;
 }
 
-export function ProductCard({ product, compact = false }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, compact = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
 
@@ -159,4 +159,4 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       </div>
     </div>
   );
-}
+});

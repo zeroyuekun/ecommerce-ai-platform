@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { generateText, gateway } from "ai";
 import { client } from "@/sanity/lib/client";
 import {
@@ -69,6 +69,11 @@ export async function GET() {
   const { userId } = await auth();
   if (!userId) {
     return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await currentUser();
+  if (user?.publicMetadata?.role !== "admin") {
+    return Response.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
   try {
