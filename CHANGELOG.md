@@ -10,7 +10,12 @@ All notable changes to this project are documented here, in reverse chronologica
 - Added `addToCart` tool — users can add products to their cart directly from the chat
 - New `CartAddedWidget` component for inline cart confirmation in chat
 - Server-side stock validation before adding to cart
-- Updated shopping agent instructions with addToCart usage patterns
+- Redesigned welcome screen with categorized capability cards (Find Furniture, Get Recommendations, Add to Cart, Track Orders)
+- Quick prompt pills below capability cards for immediate searches
+- Refined AI voice to luxury showroom associate tone — polished, opinionated, never generic
+- AI now explains reasoning behind recommendations ("Since you mentioned a warm, natural feel, I've focused on oak and walnut pieces")
+- Product presentation uses natural descriptions instead of bullet-point specs
+- AI offers next steps after results ("Would you like me to add any of these to your cart?")
 
 ### Portfolio Cleanup
 - Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`
