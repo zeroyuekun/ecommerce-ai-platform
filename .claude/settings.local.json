@@ -110,7 +110,10 @@
       "WebFetch(domain:web.archive.org)",
       "Bash(echo:*)",
       "Bash(do head:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(pip install:*)"
     ]
   }
 }
