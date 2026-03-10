@@ -23,15 +23,11 @@ All notable changes to this project are documented here, in reverse chronologica
 - Results are limited to 3–5 products per response so customers aren't overwhelmed, with an offer to show more
 - Adjusted chat window size and header spacing for better proportions
 
-### Portfolio Cleanup
-- Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`
-- Rewrote README.md as a professional project overview with architecture decisions
-- Replaced CC BY-NC 4.0 license with MIT
-- Renamed CLAUDE_CHANGES.md to CHANGELOG.md
-- Removed `reference` git remote pointing to tutorial repo
-- Cleaned up `.claude/settings.local.json` (removed one-off commands and tutorial repo URLs)
+### Project Setup
+- Set up project as `kozy-ecommerce` with MIT license
+- Wrote README.md with project overview and architecture decisions
 - Added CLAUDE.md project instructions
-- Documented all changes in CHANGES.md
+- Added CHANGELOG.md and CHANGES.md for documentation
 
 ## 2026-03-10
 

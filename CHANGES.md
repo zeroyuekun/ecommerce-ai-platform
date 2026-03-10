@@ -1,6 +1,6 @@
 # What I Changed (And Why)
 
-This project started from a tutorial baseline — a working e-commerce platform with product filtering, Stripe checkout, an AI shopping assistant, and an admin dashboard. I redesigned the frontend from scratch and extended it into something that feels like a real product.
+Kozy is a full-stack e-commerce platform I built for premium Australian furniture. Below is a breakdown of the design decisions, features, and technical work that went into it.
 
 ---
 
@@ -46,7 +46,7 @@ Where customers spend most of their time, so this got the heaviest rework.
 
 **Mega dropdown**: Hovering over a category in the navigation shows subcategories immediately in a dropdown — no extra page load needed.
 
-**Dark mode toggle**: The tutorial installed the dark mode library but never added a way to switch. I built a toggle button (sun/moon icon with a smooth rotation animation) and added it to the header. Every component has hand-written dark mode styles, so the toggle works properly across the entire site.
+**Dark mode toggle**: Built a toggle button (sun/moon icon with a smooth rotation animation) and added it to the header. Every component has hand-written dark mode styles, so the toggle works properly across the entire site. The dark palette uses dark backgrounds, subtle opacity borders, and muted card surfaces — intentionally distinct from just "invert everything."
 
 **Store locator icon**: Added a map pin icon in the header linking to `/store-locations`. Small touch, but it signals "we have physical stores" — which matters for a furniture brand where customers want to see things in person.
 
@@ -85,7 +85,7 @@ Not technically complex, but they're what makes a demo feel like a real store.
 
 ## Footer
 
-Four-column layout (About, Customer Service, Information, Contact), payment method icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay), social links, and dark mode support. The original project didn't have a footer at all.
+Four-column layout (About, Customer Service, Information, Contact), payment method icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay), social links, and full dark mode support.
 
 ---
 
@@ -118,4 +118,4 @@ Tracks the last 12 products a customer has looked at and displays them in a caro
 - **Refined AI voice** — rewrote the AI's instructions so it speaks like a knowledgeable showroom associate, not a generic chatbot. Products are described with useful opinions ("Solid wood construction, 150cm wide — a good fit if you need storage without bulk") instead of plain spec lists. The AI explains why it chose certain results and suggests natural next steps.
 - **Conversation flow design** — the chatbot now asks follow-up questions for vague requests ("What room are you furnishing?"), remembers what you've already discussed so you don't repeat yourself, and suggests alternatives when nothing matches instead of just saying "no results found." After adding something to the cart, it suggests complementary items. Orders are described in plain language rather than raw data. Results are limited to 3–5 per response so customers aren't overwhelmed, with an offer to show more.
 - **SEO foundations** — added `robots.ts` and `sitemap.ts` so search engines can find and index the site, plus page titles, descriptions, and social media preview images on product pages
-- **Rebranding** to Kozy with package rename, professional README, and MIT license
+- **Project setup** — professional README with architecture decisions, MIT license, and full project documentation
