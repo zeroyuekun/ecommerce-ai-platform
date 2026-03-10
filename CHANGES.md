@@ -6,7 +6,7 @@ Kozy is a full-stack e-commerce platform I built for premium Australian furnitur
 
 ## Design Overhaul
 
-Rebuilt the entire look and feel around a luxury minimalist aesthetic — the kind you see on sites like Aesop, Muji, or Koala.
+Rebuilt the entire look and feel around a luxury minimalist aesthetic — inspired by sites like Van Cleef & Arpels, Crate & Barrel, West Elm, and Mocka.com.au.
 
 **Typography**: Cormorant Garamond for headings (thin weight, tight line spacing), DM Sans for body text. Navigation links, labels, and buttons use uppercase with wide letter spacing for a clean, editorial look.
 
