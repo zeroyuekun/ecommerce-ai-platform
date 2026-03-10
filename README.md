@@ -27,8 +27,10 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 
 **AI Shopping Assistant**
 - Natural language product search with structured filters (material, color, price range)
+- Image upload — customers can attach a photo and the AI will analyse it and suggest similar products
+- Add to cart directly from the chat conversation with inline confirmation
 - Order history lookup scoped to the authenticated user
-- Context-aware responses: adapts instructions based on sign-in state
+- Context-aware responses: adapts instructions and available tools based on sign-in state
 - Powered by Claude via Vercel AI Gateway (swappable to other providers)
 
 **Admin Dashboard**
