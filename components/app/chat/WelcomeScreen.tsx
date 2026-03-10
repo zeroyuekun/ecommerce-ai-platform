@@ -6,8 +6,8 @@ interface WelcomeScreenProps {
 }
 
 const productSuggestions = [
+  "What can you help me with?",
   "Show me dining tables",
-  "What's on sale right now?",
   "Bedroom furniture under $300",
 ];
 
