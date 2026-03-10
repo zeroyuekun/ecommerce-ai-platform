@@ -1,6 +1,7 @@
 import { gateway, type Tool, ToolLoopAgent } from "ai";
 import { searchProductsTool } from "./tools/search-products";
 import { createGetMyOrdersTool } from "./tools/get-my-orders";
+import { addToCartTool } from "./tools/add-to-cart";
 
 interface ShoppingAgentOptions {
   userId: string | null;
@@ -133,6 +134,28 @@ The tool returns products with these fields:
 - ⚠️ Warn clearly if a product is OUT OF STOCK or LOW STOCK
 - Suggest alternatives if something is unavailable
 
+## addToCart Tool Usage
+
+You can add products directly to the customer's cart.
+
+### When to Use
+- User says "add this to my cart", "I'll take the [product]", "buy the [product]"
+- User wants to add a product they've been shown in search results
+- After showing search results, if the user indicates they want a specific item
+
+### Parameters
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| productSlug | string | Product slug from search results (preferred — exact match) |
+| productName | string | Product name (fallback if slug not available) |
+| quantity | number | How many to add (default: 1) |
+
+### Important Rules
+- **Always use productSlug when available** — it comes from search results and gives an exact match
+- If the user asks to add a product you just showed them, use the slug from those results
+- If stock is insufficient, inform the user and suggest alternatives
+- After a successful add, confirm what was added and mention they can continue shopping or checkout
+
 ## Response Style
 - Be warm and helpful
 - Keep responses concise
@@ -194,6 +217,7 @@ export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
 
   const tools: Record<string, Tool> = {
     searchProducts: searchProductsTool,
+    addToCart: addToCartTool,
   };
 
   if (getMyOrdersTool) {

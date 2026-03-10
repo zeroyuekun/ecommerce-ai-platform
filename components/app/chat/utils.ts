@@ -27,6 +27,7 @@ export function getToolDisplayName(toolName: string): string {
   const toolNames: Record<string, string> = {
     searchProducts: "Searching products",
     getMyOrders: "Getting your orders",
+    addToCart: "Adding to cart",
   };
   return toolNames[toolName] || toolName;
 }

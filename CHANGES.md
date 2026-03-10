@@ -107,4 +107,5 @@ Zustand store with localStorage persistence tracking up to 12 products. Tracker 
 - **ProductCard memoization** with `React.memo()` for filter performance
 - **Newsletter signup** with Sanity schema and server action (stub — no email delivery yet)
 - **Search analytics** logging queries to Sanity for product demand insights
+- **Add to cart from chat** — the AI assistant can add products directly to the customer's cart. The tool runs server-side (looks up the product in Sanity, validates stock), then the client-side `ToolCallUI` component detects the result and pushes the item into the Zustand cart store. A `CartAddedWidget` confirms the action inline. This means the chatbot isn't just a search box — it can take actions.
 - **Rebranding** to Kozy with package rename, professional README, and MIT license

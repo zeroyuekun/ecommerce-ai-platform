@@ -1,10 +1,14 @@
-import { Search, Package, CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Search, Package, ShoppingCart, CheckCircle2, Loader2 } from "lucide-react";
 import type { ToolCallPart } from "./types";
 import type { SearchProductsResult } from "@/lib/ai/types";
 import type { GetMyOrdersResult } from "@/lib/ai/tools/get-my-orders";
+import type { AddToCartResult } from "@/lib/ai/tools/add-to-cart";
 import { getToolDisplayName } from "./utils";
 import { ProductCardWidget } from "./ProductCardWidget";
 import { OrderCardWidget } from "./OrderCardWidget";
+import { CartAddedWidget } from "./CartAddedWidget";
+import { useCartActions } from "@/lib/store/cart-store-provider";
 
 interface ToolCallUIProps {
   toolPart: ToolCallPart;
@@ -14,6 +18,8 @@ interface ToolCallUIProps {
 export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
   const toolName = toolPart.toolName || toolPart.type.replace("tool-", "");
   const displayName = getToolDisplayName(toolName);
+  const { addItem } = useCartActions();
+  const addedToCartRef = useRef(false);
 
   // Check for completion
   const isComplete =
@@ -35,6 +41,7 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
   const result = toolPart.result || toolPart.output;
   const productResult = result as SearchProductsResult | undefined;
   const orderResult = result as GetMyOrdersResult | undefined;
+  const cartResult = result as AddToCartResult | undefined;
 
   const hasProducts =
     toolName === "searchProducts" &&
@@ -48,8 +55,32 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
     orderResult.orders &&
     orderResult.orders.length > 0;
 
+  const hasCartAdd =
+    toolName === "addToCart" && cartResult?.success && cartResult.cartItem;
+
+  // Add item to cart store when tool completes
+  useEffect(() => {
+    if (hasCartAdd && cartResult?.cartItem && !addedToCartRef.current) {
+      addedToCartRef.current = true;
+      addItem(
+        {
+          productId: cartResult.cartItem.productId,
+          name: cartResult.cartItem.name,
+          price: cartResult.cartItem.price,
+          image: cartResult.cartItem.image,
+        },
+        cartResult.cartItem.quantity
+      );
+    }
+  }, [hasCartAdd, cartResult, addItem]);
+
   // Determine icon based on tool type
-  const ToolIcon = toolName === "getMyOrders" ? Package : Search;
+  const ToolIcon =
+    toolName === "getMyOrders"
+      ? Package
+      : toolName === "addToCart"
+        ? ShoppingCart
+        : Search;
 
   return (
     <div className="space-y-2">
@@ -116,6 +147,13 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Cart add result */}
+      {hasCartAdd && cartResult?.cartItem && (
+        <div className="mt-1">
+          <CartAddedWidget cartItem={cartResult.cartItem} />
         </div>
       )}
     </div>

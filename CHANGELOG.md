@@ -6,6 +6,12 @@ All notable changes to this project are documented here, in reverse chronologica
 
 ## 2026-03-11
 
+### AI Chatbot
+- Added `addToCart` tool — users can add products to their cart directly from the chat
+- New `CartAddedWidget` component for inline cart confirmation in chat
+- Server-side stock validation before adding to cart
+- Updated shopping agent instructions with addToCart usage patterns
+
 ### Portfolio Cleanup
 - Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`
 - Rewrote README.md as a professional project overview with architecture decisions

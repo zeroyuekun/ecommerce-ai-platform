@@ -7,3 +7,4 @@ export * from "./ProductCardWidget";
 export * from "./OrderCardWidget";
 export * from "./ToolCallUI";
 export * from "./LoadingIndicator";
+export * from "./CartAddedWidget";
