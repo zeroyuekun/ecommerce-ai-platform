@@ -6,59 +6,59 @@ This project started from a tutorial baseline — a working e-commerce platform 
 
 ## Design Overhaul
 
-Rebuilt the entire visual layer around a luxury minimalist aesthetic — the kind you see on sites like Aesop, Muji, or Koala.
+Rebuilt the entire look and feel around a luxury minimalist aesthetic — the kind you see on sites like Aesop, Muji, or Koala.
 
-**Typography**: Cormorant Garamond (weight 300, leading 1.15) for headings, DM Sans for body text. Uppercase tracking (0.12em–0.2em) on nav links, labels, and buttons.
+**Typography**: Cormorant Garamond for headings (thin weight, tight line spacing), DM Sans for body text. Navigation links, labels, and buttons use uppercase with wide letter spacing for a clean, editorial look.
 
-**Color**: Monochrome zinc scale in OKLCH. No unnecessary color — product images do the talking. Amber accents only for active states, red only for sale prices. Full dark mode with deliberate equivalents for every color.
+**Color**: A grayscale palette with no unnecessary color — product images do the talking. Amber accents only for active/selected states, red only for sale prices. Full dark mode with carefully chosen equivalents for every color (not just "invert everything").
 
-**Sharp edges**: `rounded-none` on banners, buttons, and interactive elements. Forced sharp corners on Clerk modals too. Rounded feels friendly; sharp feels architectural — matches the furniture.
+**Sharp edges**: Square corners on banners, buttons, and interactive elements — including Clerk sign-in modals. Rounded corners feel friendly; square corners feel architectural, which matches the furniture.
 
-**Whitespace**: Generous padding, breathing room between sections. Homepage leads with a full-viewport hero, not a product dump. Each section earns its space.
+**Whitespace**: Generous padding and breathing room between sections. The homepage leads with a full-screen hero image, not a wall of products.
 
-**Homepage composition**: Rebuilt the homepage from a product grid into a brand landing page — full-viewport hero banner, video hero with "Fresh Foundations" messaging, secondary dual side-by-side promotional banners, featured products carousel (auto-playing Embla with dot nav and prev/next arrows on a dark gradient background), and category tiles. Products moved to `/shop` so the homepage tells a story instead of dumping a catalog.
+**Homepage composition**: Rebuilt the homepage from a simple product grid into a brand landing page — full-screen hero banner, video section with "Fresh Foundations" messaging, side-by-side promotional banners, a featured products carousel (auto-scrolling with navigation dots and arrows), and category tiles. Products were moved to `/shop` so the homepage tells a story instead of listing a catalog.
 
-**Micro-interactions**: Product card hover scales to 1.05x over 700ms ease-out. Header hides on scroll-down, reappears on scroll-up (500ms). Nav underlines animate width on hover (300ms). Everything uses ease-out — nothing bounces.
+**Hover effects and animations**: Product cards gently scale up on hover. The header hides when you scroll down and reappears when you scroll up. Navigation links have animated underlines. All animations use smooth easing — nothing bounces or feels jarring.
 
 ---
 
 ## Product & Shop Pages
 
-Where customers spend 90% of their time, so this got the heaviest rework.
+Where customers spend most of their time, so this got the heaviest rework.
 
-**Variant grouping**: Same product in different colors collapses into one card with clickable swatches. Hovering a swatch swaps image, price, and link in-place. On the detail page, switching variants updates everything without a page load — uses `window.history.replaceState` so the URL stays shareable.
+**Variant grouping**: Products available in different colors show as one card with clickable color swatches. Hovering a swatch swaps the image, price, and link instantly. On the product detail page, switching between variants updates everything without reloading — and the URL updates so you can share a link to the exact variant.
 
-**Sticky gallery**: Image gallery pins with `lg:sticky lg:top-24` while you scroll through the info panel. Smooth opacity crossfades (500ms) on image swaps.
+**Sticky image gallery**: The product image stays pinned on screen while you scroll through the product details below it. Images crossfade smoothly when switching between them.
 
-**Accordion sections**: Description, Specifications, Shipping & Returns, Care Instructions — collapsible with CSS grid animation. Description parser auto-bolds informal headings from Sanity content.
+**Collapsible sections**: Description, Specifications, Shipping & Returns, and Care Instructions are each in expandable/collapsible panels with smooth animation.
 
-**Related products**: "You May Also Like" carousel pulling from the same category. Responsive breakpoints (2/3/4 columns).
+**Related products**: A "You May Also Like" carousel at the bottom of each product page, pulling products from the same category. Layout adjusts for different screen sizes.
 
-**Breadcrumbs**: Home → Shop → Category → Product Name on every product page.
+**Breadcrumbs**: Navigation trail (Home → Shop → Category → Product Name) on every product page so customers always know where they are.
 
 ---
 
 ## Header
 
-**Transparent-to-solid**: On the homepage, the header starts fully transparent over the hero — logo, nav, icons all in white. Scrolling past 100px transitions to solid white with backdrop blur. Every element adapts: logo color, link opacity, search bar border, cart badge colors.
+**Transparent-to-solid**: On the homepage, the header starts fully transparent over the hero image — logo, nav, and icons all in white. As you scroll down, it transitions to a solid white background with a blur effect. Every element adapts: logo color, link styles, search bar, cart badge.
 
-**Smart hide-on-scroll**: Accumulates scroll deltas instead of checking raw position — fixes false triggers on slow scrolls and middle-click auto-scrolling.
+**Smart hide-on-scroll**: The header hides when scrolling down and reappears when scrolling up. Uses accumulated scroll distance rather than raw position to avoid false triggers during slow scrolling or middle-click auto-scrolling.
 
-**Mega dropdown**: Hovering a category shows subcategories immediately without a page load.
+**Mega dropdown**: Hovering over a category in the navigation shows subcategories immediately in a dropdown — no extra page load needed.
 
-**Dark mode toggle**: The baseline installs `next-themes` but never exposes a way to switch. I built a `ThemeToggle` component — sun/moon icon with a rotate+scale CSS transition — and added it to the header bar. Every component in the app has hand-written `dark:` equivalents (not auto-generated), so the toggle actually works across the entire site. The dark palette uses zinc-950 backgrounds, `white/10%` opacity borders, and `zinc-800/50` card surfaces — intentionally distinct from just "invert everything."
+**Dark mode toggle**: The tutorial installed the dark mode library but never added a way to switch. I built a toggle button (sun/moon icon with a smooth rotation animation) and added it to the header. Every component has hand-written dark mode styles, so the toggle works properly across the entire site.
 
-**Store locator icon**: Added a MapPin icon in the header linking to `/store-locations`. Small touch, but it signals "we have physical stores" — which matters for a furniture brand where people want to sit on things before buying.
+**Store locator icon**: Added a map pin icon in the header linking to `/store-locations`. Small touch, but it signals "we have physical stores" — which matters for a furniture brand where customers want to see things in person.
 
 ---
 
 ## Navigation & Filtering
 
-**Two-click product finding**: Homepage → Category → Product. Never deeper.
+**Two-click product finding**: Homepage → Category → Product. Never deeper than that.
 
-**Extended filters**: Added subcategory/type filter with hierarchy (Living Room → Sofas, Coffee Tables, etc.), multi-select, in-stock toggle, active filter pills with individual remove, clear all.
+**Extended filters**: Added subcategory filters with hierarchy (e.g. Living Room → Sofas, Coffee Tables), ability to select multiple filters at once, an in-stock toggle, visible filter tags you can remove individually, and a "clear all" button.
 
-**Products moved to `/shop`**: Homepage is a brand landing page, not a catalog.
+**Products moved to `/shop`**: Homepage is a brand landing page, not a product catalog.
 
 ---
 
@@ -69,53 +69,53 @@ Where customers spend 90% of their time, so this got the heaviest rework.
 | `/about` | Brand story, design philosophy, sustainability |
 | `/contact` | Contact form, business hours, location |
 | `/blog` | Interior design posts, buying guides |
-| `/faq` | Collapsible FAQ in 4 categories |
+| `/faq` | Collapsible FAQ organised into 4 categories |
 | `/help` | Help centre hub with 6 topic cards |
 | `/privacy` | Privacy policy (GDPR, data practices) |
 | `/returns` | 30-day returns, warranty, damaged items |
 | `/gift-vouchers` | Digital gift cards ($50–$500) |
-| `/shipping` | Standard/Express/White Glove rates |
+| `/shipping` | Standard/Express/White Glove delivery rates |
 | `/terms` | Terms & Conditions (10 sections) |
 | `/reviews` | Customer reviews with star ratings |
-| `/store-locations` | 6 Australian locations with hours |
+| `/store-locations` | 6 Australian store locations with hours |
 
-Not technically complex, but they're what makes a demo pass as a real store.
+Not technically complex, but they're what makes a demo feel like a real store.
 
 ---
 
 ## Footer
 
-Four-column layout (About, Customer Service, Information, Contact), payment method icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay), social links, dark mode support. The baseline didn't have one.
+Four-column layout (About, Customer Service, Information, Contact), payment method icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay), social links, and dark mode support. The original project didn't have a footer at all.
 
 ---
 
 ## Recently Viewed Products
 
-Zustand store with localStorage persistence tracking up to 12 products. Tracker component records views silently, carousel displays them on product pages. Uses `skipHydration` for SSR safety.
+Tracks the last 12 products a customer has looked at and displays them in a carousel on product pages. Data persists in the browser so it survives page refreshes and tab closes.
 
 ---
 
 ## Security Hardening
 
-**Webhook silent failure**: The Stripe webhook handler returned early (200 status) when metadata was missing — Stripe never retried, so customers got charged with no order created. Changed to `throw` so it returns 500 and Stripe retries. Found this while reading the Stripe webhook retry docs — it works fine locally because the CLI listener behaves differently.
+**Webhook silent failure**: The Stripe webhook handler was returning a success response even when order data was missing — meaning Stripe thought everything was fine and never retried. Customers could get charged with no order created. Fixed it to return an error so Stripe automatically retries the payment notification.
 
-**Open chat endpoint**: `/api/chat` had no auth check. Anyone could POST to it anonymously and rack up Claude API costs. Added 401 for unauthenticated users.
+**Open chat endpoint**: The AI chatbot API had no login check. Anyone could send requests to it without an account, which would rack up AI costs. Added authentication so only logged-in users can use the chatbot.
 
-**Admin error leaking**: `/api/admin/insights` passed raw `error.message` to the client — GROQ queries, AI config, file paths. Replaced with a generic message; full error stays server-side.
+**Admin error leaking**: The admin analytics page was sending detailed internal error messages to the browser — including database queries, AI config details, and file paths. Replaced with a generic error message so sensitive information stays on the server.
 
-**Missing role check**: Admin insights endpoint checked authentication but not authorization. Any signed-in user could access store analytics. Added `publicMetadata.role === "admin"` check.
+**Missing role check**: The admin analytics endpoint checked if a user was logged in, but not whether they were actually an admin. Any logged-in customer could access store analytics. Added a proper admin role check.
 
 ---
 
 ## Other Additions
 
-- **Error boundaries** for app and admin routes
-- **ProductCard memoization** with `React.memo()` for filter performance
-- **Newsletter signup** with Sanity schema and server action (stub — no email delivery yet)
-- **Search analytics** logging queries to Sanity for product demand insights
-- **Add to cart from chat** — the AI assistant can add products directly to the customer's cart. The tool runs server-side (looks up the product in Sanity, validates stock), then the client-side `ToolCallUI` component detects the result and pushes the item into the Zustand cart store. A `CartAddedWidget` confirms the action inline. This means the chatbot isn't just a search box — it can take actions.
-- **Redesigned welcome screen** — replaced flat suggestion pills with categorized capability cards (icon + label + description). Each card triggers a relevant prompt. Quick-search pills sit below for direct queries. Signed-in users see a fourth card for order tracking. The layout follows the pattern used by Palazzo and Alhena AI — give customers a clear visual menu of what the assistant can do before they type anything.
-- **Refined AI voice** — rewrote the system prompt so the assistant speaks like a showroom associate at a high-end furniture store, not a generic chatbot. Products are presented with opinionated notes ("Solid wood construction, 150cm wide — a good fit if you need storage without bulk") instead of bullet-point specs. The AI explains its reasoning when applying filters and offers natural next steps after results.
-- **Conversation flow design** — modelled after patterns used by Palazzo AI and Burberry's chatbot. The assistant now asks follow-up questions for vague requests ("What room are you furnishing?"), maintains context across the conversation so customers don't repeat themselves, handles dead ends gracefully by suggesting pivots instead of just saying "no results", and proactively suggests complementary items after cart adds. Orders are presented conversationally rather than as data. Results are capped at 3-5 with an offer to show more. An AI transparency disclaimer sits at the bottom of the welcome screen — research shows this builds trust rather than eroding it.
-- **SEO foundations** — added `robots.ts` and `sitemap.ts` for search engine crawling, plus `generateMetadata` with Open Graph images on product pages
+- **Error boundaries** — if something crashes in the app or admin section, users see a friendly error page instead of a blank screen
+- **Product card performance** — wrapped product cards in `React.memo()` so they don't unnecessarily re-render when filters change, keeping the shop page fast
+- **Newsletter signup** — form with Sanity schema and server action (placeholder — no actual email delivery yet)
+- **Search analytics** — logs what customers search for to Sanity, useful for understanding product demand
+- **Add to cart from chat** — the AI assistant can add products directly to the customer's cart. It looks up the product, checks if it's in stock, and adds it. A confirmation card appears in the chat showing what was added. This means the chatbot isn't just a search tool — it can take real actions.
+- **Redesigned welcome screen** — when customers open the chatbot, they see clear option cards (Find Furniture, Get Recommendations, Add to Cart, Track Orders) instead of a blank text box. Each card triggers a relevant conversation. Quick-search shortcuts sit below for common queries. Signed-in users see an extra card for order tracking.
+- **Refined AI voice** — rewrote the AI's instructions so it speaks like a knowledgeable showroom associate, not a generic chatbot. Products are described with useful opinions ("Solid wood construction, 150cm wide — a good fit if you need storage without bulk") instead of plain spec lists. The AI explains why it chose certain results and suggests natural next steps.
+- **Conversation flow design** — the chatbot now asks follow-up questions for vague requests ("What room are you furnishing?"), remembers what you've already discussed so you don't repeat yourself, and suggests alternatives when nothing matches instead of just saying "no results found." After adding something to the cart, it suggests complementary items. Orders are described in plain language rather than raw data. Results are limited to 3–5 per response so customers aren't overwhelmed, with an offer to show more.
+- **SEO foundations** — added `robots.ts` and `sitemap.ts` so search engines can find and index the site, plus page titles, descriptions, and social media preview images on product pages
 - **Rebranding** to Kozy with package rename, professional README, and MIT license

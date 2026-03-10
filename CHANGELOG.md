@@ -7,22 +7,21 @@ All notable changes to this project are documented here, in reverse chronologica
 ## 2026-03-11
 
 ### AI Chatbot
-- Added `addToCart` tool — users can add products to their cart directly from the chat
-- New `CartAddedWidget` component for inline cart confirmation in chat
-- Server-side stock validation before adding to cart
-- Redesigned welcome screen with categorized capability cards (Find Furniture, Get Recommendations, Add to Cart, Track Orders)
-- Quick prompt pills below capability cards for immediate searches
-- Refined AI voice to luxury showroom associate tone — polished, opinionated, never generic
-- AI now explains reasoning behind recommendations ("Since you mentioned a warm, natural feel, I've focused on oak and walnut pieces")
-- Product presentation uses natural descriptions instead of bullet-point specs
-- AI offers next steps after results ("Would you like me to add any of these to your cart?")
-- Added conversation flow patterns: follow-up questions, context awareness, dead-end recovery, proactive complementary suggestions
-- AI asks clarifying questions for vague queries instead of guessing
-- Graceful handling when no results found — suggests pivots instead of dead-ending
-- Proactive complementary product suggestions after cart adds
-- Order status presented conversationally instead of as data dump
-- Results capped at 3-5 per response with offer to show more
-- Tuned chat window sizing and header padding for better proportions
+- Users can now add products to their cart directly from the chat conversation
+- New confirmation card appears in chat when a product is added to cart, showing the item image, name, and price
+- Stock is checked on the server before adding to cart — if an item is out of stock, the chatbot lets you know
+- Redesigned the welcome screen with clear option cards: Find Furniture, Get Recommendations, Add to Cart, and Track Orders
+- Added quick-search shortcuts below the option cards for common queries like "Oak dining tables"
+- Rewrote the AI's tone to sound like a knowledgeable furniture showroom associate — polished and helpful, not robotic
+- The AI now explains why it's showing certain results (e.g. "Since you mentioned a warm, natural feel, I've focused on oak and walnut pieces")
+- Products are described with useful context instead of plain spec lists
+- After showing results, the AI suggests next steps like "Would you like me to add any of these to your cart?"
+- The AI asks clarifying questions for vague requests instead of guessing (e.g. "What room are you furnishing?")
+- When no products match a search, the chatbot suggests alternatives instead of just saying "no results"
+- After adding an item to the cart, the chatbot suggests complementary products
+- Order updates are described in plain language instead of raw data
+- Results are limited to 3–5 products per response so customers aren't overwhelmed, with an offer to show more
+- Adjusted chat window size and header spacing for better proportions
 
 ### Portfolio Cleanup
 - Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`
@@ -37,101 +36,100 @@ All notable changes to this project are documented here, in reverse chronologica
 ## 2026-03-10
 
 ### Security Hardening
-- **Webhook silent failure fix**: Changed early `return` to `throw` in Stripe webhook handler when metadata is missing — previously returned 200 to Stripe so it never retried, meaning customer paid but no order was created
-- **Chat endpoint authentication**: Added 401 check on `/api/chat` — endpoint was previously open to anonymous users, allowing unlimited Claude API spend
-- **Admin error detail leak**: Replaced raw `error.message` in `/api/admin/insights` response with a generic message — was exposing GROQ queries, AI gateway config, and file paths
-- **Admin role authorization**: Added `publicMetadata.role === "admin"` check on insights endpoint — any signed-in user could previously access store analytics
+- **Webhook fix**: Stripe webhook was silently succeeding even when order data was missing — customers could get charged with no order created. Fixed it to return an error so Stripe retries automatically.
+- **Chat authentication**: The chatbot API had no login check, so anyone could use it without an account and run up AI costs. Added authentication so only logged-in users can chat.
+- **Admin error messages**: The admin analytics page was accidentally exposing internal details (database queries, file paths) in error messages. Replaced with a generic message — details stay on the server.
+- **Admin role check**: The admin analytics endpoint only checked if a user was logged in, not if they were an admin. Any logged-in customer could view store analytics. Added a proper admin-only check.
 
 ### Performance
-- Wrapped `ProductCard` in `React.memo()` to prevent unnecessary re-renders on filter changes
+- Wrapped product cards in `React.memo()` so they don't re-render unnecessarily when filters change
 
 ### Error Handling
-- Added `error.tsx` boundary for admin routes
-- Added `error.tsx` boundary for main app routes
+- Added error pages for admin and app routes — if something crashes, users see a friendly message instead of a blank screen
 
 ### AI Chatbot
-- Updated system prompt and branding for Kozy products
+- Updated chatbot branding and system prompt for Kozy
 - Improved error handling in chat responses
 
 ## 2026-03-09
 
 ### Bug Fixes
 - Fixed Stripe API version compatibility
-- Reverted BlurImage/LQIP experiment
-- Fixed dependencies
+- Reverted BlurImage/LQIP experiment that caused issues
+- Fixed dependency issues
 
 ### Code Audit
-- Added SEO improvements
-- Implemented multi-select on type/subcategory filter
-- Bold product details styling
+- Added SEO improvements (meta tags, page titles)
+- Added ability to select multiple subcategory filters at once
+- Improved product details styling
 - Auth improvements
 
 ### Product Display
 - Added product carousels
-- Reduced Recently Viewed section size
+- Made the Recently Viewed section more compact
 - Switched currency display to AUD
 
 ## 2026-03-08
 
 ### Product Features
-- Added product variant grouping (`variantGroup` schema field)
-- Added New/Sale navigation links with filtered views
-- Improved sticky scroll behavior
-- Added Recently Viewed products on product pages
+- Added product variant grouping — same product in different colors shows as one card with color swatches
+- Added New and Sale navigation links that filter products automatically
+- Improved sticky scroll behaviour on product pages
+- Added Recently Viewed products section on product pages
 
 ### UI Fixes
-- Fixed mega dropdown triggering on New/Sale hover
-- Set sharp button corners site-wide
-- Fixed filter panel scroll trap
+- Fixed mega dropdown accidentally triggering on New/Sale links
+- Set square button corners across the entire site
+- Fixed filter panel trapping scroll (couldn't scroll the page while cursor was over filters)
 - Footer cleanup
 
 ### Homepage
-- Added dual side-by-side promotional banners (Rorie Bed + Lighter Living)
+- Added side-by-side promotional banners (Rorie Bed + Lighter Living)
 - Added full-width Art of Autumn seasonal banner
-- Added Fresh Foundations white space section
+- Added Fresh Foundations section
 
 ### Work in Progress
-- UI enhancements across the board
+- General UI improvements across the site
 - Product filter improvements
-- Recently viewed store implementation
+- Recently viewed products implementation
 - Chat widget improvements
 
 ## 2026-03-07
 
 ### Typography
-- Implemented Cormorant Garamond for headings (light weight, tight leading)
-- Implemented DM Sans for body text
-- Added uppercase tracking on labels and buttons (0.12em-0.2em)
-- Refined typography hierarchy and spacing
+- Set up Cormorant Garamond for headings (thin weight, tight line spacing)
+- Set up DM Sans for body text
+- Added uppercase letter spacing on labels and buttons
+- Refined text sizing and spacing throughout
 
 ### Header
-- Fixed header not hiding on slow/middle-click scroll by accumulating scroll deltas
-- Fixed header transparency on non-homepage (now solid from the start)
-- Header stays solid when hiding
+- Fixed header not hiding properly during slow scrolling or middle-click auto-scroll
+- Fixed header being transparent on non-homepage pages (now starts solid)
+- Header stays solid coloured when hiding
 - Updated banner and animation timing
 
 ### Styling
-- Set sharp corners on all Clerk UI components
+- Set square corners on all Clerk sign-in/sign-up modals
 
 ## 2026-03-06
 
 ### Major UI Overhaul
-- Added footer with four-column layout, contact details, social icons, payment method icons
+- Added footer with four-column layout, contact details, social icons, and payment method icons
 - Added payment icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay)
-- Added info pages: About, Contact, Blog, FAQ, Help, Privacy, Returns, Gift Vouchers, Shipping, Terms, Reviews, Store Locations
+- Added 12 new pages: About, Contact, Blog, FAQ, Help, Privacy, Returns, Gift Vouchers, Shipping, Terms, Reviews, Store Locations
 - Added style gallery section
 - Added best sellers section
 - Updated hero banner
 
 ### Homepage Redesign
-- Moved products to `/shop` page
-- Cleaned up homepage as a brand landing page
+- Moved products to `/shop` page — homepage is now a brand landing page
+- Cleaned up homepage layout
 - Added secondary hero banner
 
 ### Storefront Foundation
 - Added Kozy storefront branding
-- Built hero banner with full-viewport design
+- Built full-screen hero banner
 - Created category pages
 - Built header mega dropdown navigation
-- Applied monochrome zinc color palette with OKLCH
+- Applied grayscale colour palette
 - Applied minimalist luxury styling throughout
