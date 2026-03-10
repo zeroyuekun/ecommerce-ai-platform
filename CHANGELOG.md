@@ -11,6 +11,7 @@ All notable changes to this project are documented here, in reverse chronologica
 - Users can now add products to their cart directly from the chat conversation
 - New confirmation card appears in chat when a product is added to cart, showing the item image, name, and price
 - Stock is checked on the server before adding to cart — if an item is out of stock, the chatbot lets you know
+- Added "Ask AI for Similar" button on product pages — opens the chatbot with a request for similar products pre-filled
 - Redesigned the welcome screen with clear option cards: Find Furniture, Get Recommendations, Add to Cart, and Track Orders
 - Added quick-search shortcuts below the option cards for common queries like "Oak dining tables"
 - Rewrote the AI's tone to sound like a knowledgeable furniture showroom associate — polished and helpful, not robotic
@@ -55,24 +56,30 @@ All notable changes to this project are documented here, in reverse chronologica
 - Reverted BlurImage/LQIP experiment that caused issues
 - Fixed dependency issues
 
-### Code Audit
-- Added SEO improvements (meta tags, page titles)
+### Shop & Filters
+- Added SEO improvements (meta tags, page titles, Open Graph images, robots.txt, sitemap)
 - Added ability to select multiple subcategory filters at once
+- Added price range slider filter
 - Improved product details styling
 - Auth improvements
 
 ### Product Display
-- Added product carousels
+- Added product carousels (featured products, related products)
 - Made the Recently Viewed section more compact
 - Switched currency display to AUD
+- Added sale price display with strikethrough for discounted products
+- Added loading skeletons for product grids, product pages, and carousels
 
 ## 2026-03-08
 
 ### Product Features
-- Added product variant grouping — same product in different colors shows as one card with color swatches
+- Added product variant grouping — same product in different colors shows as one card with clickable color swatches
 - Added New and Sale navigation links that filter products automatically
-- Improved sticky scroll behaviour on product pages
-- Added Recently Viewed products section on product pages
+- Improved sticky scroll behaviour on product pages — image gallery stays pinned while scrolling through details
+- Added Recently Viewed products section on product pages (tracks last 12 products, persists in browser)
+- Added "You May Also Like" related products carousel on product pages
+- Added breadcrumb navigation (Home → Shop → Category → Product Name) on every product page
+- Added collapsible product detail sections (Description, Specifications, Shipping & Returns, Care Instructions)
 
 ### UI Fixes
 - Fixed mega dropdown accidentally triggering on New/Sale links
@@ -83,7 +90,13 @@ All notable changes to this project are documented here, in reverse chronologica
 ### Homepage
 - Added side-by-side promotional banners (Rorie Bed + Lighter Living)
 - Added full-width Art of Autumn seasonal banner
-- Added Fresh Foundations section
+- Added Fresh Foundations video section
+- Added newsletter signup form in footer
+
+### Search & Analytics
+- Added search query tracking — logs what customers search for to Sanity
+- Popular searches appear as suggestions in the search bar
+- Search analytics stored for understanding product demand
 
 ### Work in Progress
 - General UI improvements across the site
@@ -104,9 +117,12 @@ All notable changes to this project are documented here, in reverse chronologica
 - Fixed header being transparent on non-homepage pages (now starts solid)
 - Header stays solid coloured when hiding
 - Updated banner and animation timing
+- Added dark mode toggle (sun/moon icon with rotation animation) in the header
+- Added store locator map pin icon linking to `/store-locations`
 
 ### Styling
 - Set square corners on all Clerk sign-in/sign-up modals
+- Added dark mode styles to every component across the site
 
 ## 2026-03-06
 
@@ -114,19 +130,27 @@ All notable changes to this project are documented here, in reverse chronologica
 - Added footer with four-column layout, contact details, social icons, and payment method icons
 - Added payment icons (Visa, Mastercard, Amex, PayPal, Apple Pay, Afterpay)
 - Added 12 new pages: About, Contact, Blog, FAQ, Help, Privacy, Returns, Gift Vouchers, Shipping, Terms, Reviews, Store Locations
-- Added style gallery section
+- Added style inspiration gallery section
 - Added best sellers section
 - Updated hero banner
 
 ### Homepage Redesign
 - Moved products to `/shop` page — homepage is now a brand landing page
-- Cleaned up homepage layout
-- Added secondary hero banner
+- Built full-screen hero banner with secondary and video variants
+- Added category tiles with images
+- Added featured products carousel (auto-scrolling with navigation dots and arrows)
 
 ### Storefront Foundation
 - Added Kozy storefront branding
-- Built full-screen hero banner
-- Created category pages
-- Built header mega dropdown navigation
+- Created category pages with subcategory filtering
+- Built header mega dropdown navigation showing subcategories on hover
 - Applied grayscale colour palette
 - Applied minimalist luxury styling throughout
+
+### Checkout & Orders
+- Stripe checkout with shipping address collection (44 countries)
+- Order creation via Stripe webhooks — orders only created after payment is confirmed
+- Stock validated before checkout and decremented after payment
+- Order history page for signed-in customers
+- Individual order detail pages with status tracking
+- Checkout success confirmation page
