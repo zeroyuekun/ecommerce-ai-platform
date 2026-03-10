@@ -83,8 +83,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     } = session.metadata ?? {};
 
     if (!clerkUserId || !productIdsString || !quantitiesString) {
-      console.error("Missing metadata in checkout session");
-      return;
+      throw new Error("Missing metadata in checkout session");
     }
 
     const productIds = productIdsString.split(",");

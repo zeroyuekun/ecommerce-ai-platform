@@ -5,10 +5,16 @@ import { createShoppingAgent } from "@/lib/ai/shopping-agent";
 export async function POST(request: Request) {
   const { messages }: { messages: UIMessage[] } = await request.json();
 
-  // Get the user's session - userId will be null if not authenticated
+  // Require authentication to prevent unauthenticated API cost abuse
   const { userId } = await auth();
 
-  // Create agent with user context (orders tool only available if authenticated)
+  if (!userId) {
+    return new Response(JSON.stringify({ error: "Authentication required" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const agent = createShoppingAgent({ userId });
 
   return createAgentUIStreamResponse({
