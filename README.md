@@ -2,6 +2,10 @@
 
 A full-stack e-commerce platform for a furniture brand, built with Next.js 16, Sanity CMS, and an AI shopping assistant. Customers browse products with real-time inventory, chat with an AI agent that searches the catalog and retrieves their orders, and check out through Stripe. Store owners manage everything from an admin dashboard with AI-generated sales insights.
 
+## Design
+
+The storefront design is inspired by luxury and modern furniture brands like Van Cleef & Arpels, Crate & Barrel, West Elm, and Mocka.com.au — clean layouts, generous whitespace, and letting product photography do the talking. The UI uses a grayscale palette with Cormorant Garamond for headings and DM Sans for body text, giving it an editorial feel. Full dark mode is supported across the entire site.
+
 ## Why I Built It This Way
 
 **Sanity App SDK over REST APIs** — The admin dashboard uses Sanity's App SDK for direct document mutations instead of going through API routes. This gives the admin UI real-time reactivity without building a separate WebSocket layer. Product edits, order status changes, and inventory updates appear instantly across all connected clients.
