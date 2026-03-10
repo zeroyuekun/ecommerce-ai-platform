@@ -22,7 +22,7 @@ All notable changes to this project are documented here, in reverse chronologica
 - Proactive complementary product suggestions after cart adds
 - Order status presented conversationally instead of as data dump
 - Results capped at 3-5 per response with offer to show more
-- AI transparency disclaimer on welcome screen
+- Tuned chat window sizing and header padding for better proportions
 
 ### Portfolio Cleanup
 - Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`

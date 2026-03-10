@@ -16,6 +16,8 @@ Rebuilt the entire visual layer around a luxury minimalist aesthetic — the kin
 
 **Whitespace**: Generous padding, breathing room between sections. Homepage leads with a full-viewport hero, not a product dump. Each section earns its space.
 
+**Homepage composition**: Rebuilt the homepage from a product grid into a brand landing page — full-viewport hero banner, video hero with "Fresh Foundations" messaging, secondary dual side-by-side promotional banners, featured products carousel (auto-playing Embla with dot nav and prev/next arrows on a dark gradient background), and category tiles. Products moved to `/shop` so the homepage tells a story instead of dumping a catalog.
+
 **Micro-interactions**: Product card hover scales to 1.05x over 700ms ease-out. Header hides on scroll-down, reappears on scroll-up (500ms). Nav underlines animate width on hover (300ms). Everything uses ease-out — nothing bounces.
 
 ---
@@ -43,6 +45,10 @@ Where customers spend 90% of their time, so this got the heaviest rework.
 **Smart hide-on-scroll**: Accumulates scroll deltas instead of checking raw position — fixes false triggers on slow scrolls and middle-click auto-scrolling.
 
 **Mega dropdown**: Hovering a category shows subcategories immediately without a page load.
+
+**Dark mode toggle**: The baseline installs `next-themes` but never exposes a way to switch. I built a `ThemeToggle` component — sun/moon icon with a rotate+scale CSS transition — and added it to the header bar. Every component in the app has hand-written `dark:` equivalents (not auto-generated), so the toggle actually works across the entire site. The dark palette uses zinc-950 backgrounds, `white/10%` opacity borders, and `zinc-800/50` card surfaces — intentionally distinct from just "invert everything."
+
+**Store locator icon**: Added a MapPin icon in the header linking to `/store-locations`. Small touch, but it signals "we have physical stores" — which matters for a furniture brand where people want to sit on things before buying.
 
 ---
 
@@ -111,4 +117,5 @@ Zustand store with localStorage persistence tracking up to 12 products. Tracker 
 - **Redesigned welcome screen** — replaced flat suggestion pills with categorized capability cards (icon + label + description). Each card triggers a relevant prompt. Quick-search pills sit below for direct queries. Signed-in users see a fourth card for order tracking. The layout follows the pattern used by Palazzo and Alhena AI — give customers a clear visual menu of what the assistant can do before they type anything.
 - **Refined AI voice** — rewrote the system prompt so the assistant speaks like a showroom associate at a high-end furniture store, not a generic chatbot. Products are presented with opinionated notes ("Solid wood construction, 150cm wide — a good fit if you need storage without bulk") instead of bullet-point specs. The AI explains its reasoning when applying filters and offers natural next steps after results.
 - **Conversation flow design** — modelled after patterns used by Palazzo AI and Burberry's chatbot. The assistant now asks follow-up questions for vague requests ("What room are you furnishing?"), maintains context across the conversation so customers don't repeat themselves, handles dead ends gracefully by suggesting pivots instead of just saying "no results", and proactively suggests complementary items after cart adds. Orders are presented conversationally rather than as data. Results are capped at 3-5 with an offer to show more. An AI transparency disclaimer sits at the bottom of the welcome screen — research shows this builds trust rather than eroding it.
+- **SEO foundations** — added `robots.ts` and `sitemap.ts` for search engine crawling, plus `generateMetadata` with Open Graph images on product pages
 - **Rebranding** to Kozy with package rename, professional README, and MIT license

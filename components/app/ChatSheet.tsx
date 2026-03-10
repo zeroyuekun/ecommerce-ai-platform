@@ -92,7 +92,7 @@ export function ChatSheet() {
       />
 
       {/* Chat popup */}
-      <div className="fixed z-50 flex flex-col border border-zinc-200 bg-white overscroll-contain dark:border-zinc-800 dark:bg-zinc-950 animate-in slide-in-from-bottom-4 fade-in duration-300 inset-0 sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl sm:shadow-2xl">
+      <div className="fixed z-50 flex flex-col border border-zinc-200 bg-white overscroll-contain dark:border-zinc-800 dark:bg-zinc-950 animate-in slide-in-from-bottom-4 fade-in duration-300 inset-0 sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[560px] sm:w-[390px] sm:rounded-2xl sm:shadow-2xl">
         {/* Header */}
         <header className="shrink-0 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex h-16 items-center justify-between px-5">
