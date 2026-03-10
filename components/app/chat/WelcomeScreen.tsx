@@ -89,6 +89,11 @@ export function WelcomeScreen({
           )
         )}
       </div>
+
+      {/* AI transparency note */}
+      <p className="mt-6 text-[10px] text-zinc-300 dark:text-zinc-700">
+        AI-powered assistant. Responses may not always be accurate.
+      </p>
     </div>
   );
 }

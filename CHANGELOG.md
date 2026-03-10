@@ -16,6 +16,13 @@ All notable changes to this project are documented here, in reverse chronologica
 - AI now explains reasoning behind recommendations ("Since you mentioned a warm, natural feel, I've focused on oak and walnut pieces")
 - Product presentation uses natural descriptions instead of bullet-point specs
 - AI offers next steps after results ("Would you like me to add any of these to your cart?")
+- Added conversation flow patterns: follow-up questions, context awareness, dead-end recovery, proactive complementary suggestions
+- AI asks clarifying questions for vague queries instead of guessing
+- Graceful handling when no results found — suggests pivots instead of dead-ending
+- Proactive complementary product suggestions after cart adds
+- Order status presented conversationally instead of as data dump
+- Results capped at 3-5 per response with offer to show more
+- AI transparency disclaimer on welcome screen
 
 ### Portfolio Cleanup
 - Renamed package from `ecommerce-dec-build-sanity-appsdk-clerk` to `kozy-ecommerce`
