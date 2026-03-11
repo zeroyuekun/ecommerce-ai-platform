@@ -52,7 +52,7 @@ Where customers spend most of their time, so this got the heaviest rework.
 
 **Smart hide-on-scroll**: The header hides when scrolling down and reappears when scrolling up. Uses accumulated scroll distance rather than raw position to avoid false triggers during slow scrolling or middle-click auto-scrolling.
 
-**Mega dropdown**: Hovering over a category in the navigation shows subcategories immediately in a dropdown — no extra page load needed.
+**Mega dropdown**: Hovering over a category in the navigation shows subcategories immediately in a dropdown — no extra page load needed. The dropdown width is constrained to match the span of the navigation links (New to Sale) rather than stretching the full page width, and stays consistent regardless of which category is hovered.
 
 **Search bar with popular searches**: The search bar shows trending search terms based on what other customers have been searching for. Search queries are tracked and the most popular ones appear as suggestions.
 

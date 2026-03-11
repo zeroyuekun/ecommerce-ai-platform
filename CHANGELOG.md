@@ -11,6 +11,10 @@ All notable changes to this project are documented here, in reverse chronologica
 - Added scroll-triggered entrance animation to "Best Sellers" product tiles — tiles rise up from below with a staggered delay as the section enters the viewport
 - Both animations use IntersectionObserver (fires once at 15% visibility) with 0.6s ease-out transitions and 0.1s stagger between each tile
 
+### Header
+- Condensed mega dropdown width to match the span of the navigation links (New to Sale) instead of stretching full-page width
+- Dropdown width stays consistent regardless of which category is hovered
+
 ### Testing
 - Added chatbot integration test script (`tools/test-chatbot.ts`) that exercises the AI tool pipeline without calling any AI API — zero cost, Sanity reads only
 - Tests cover searchProducts (broad, category, material, price range, text, combined filters), addToCart (by slug, by name, quantity, stock checks, nonexistent products), and getMyOrders (authenticated, unauthenticated, status filters)

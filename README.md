@@ -56,7 +56,7 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 **Header & Navigation**
 - Transparent-to-solid header transition on the homepage with backdrop blur
 - Smart hide-on-scroll (hides when scrolling down, reappears when scrolling up)
-- Mega dropdown showing subcategories on hover
+- Mega dropdown showing subcategories on hover, width matched to nav links span
 - Dark mode toggle with sun/moon animation
 - Store locator icon linking to physical locations
 

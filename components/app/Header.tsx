@@ -51,6 +51,9 @@ export function Header({ categories }: HeaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const newLinkRef = useRef<HTMLDivElement>(null);
+  const saleLinkRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   const activeCategoryData = activeCategory
     ? categoryLinks.find((c) => c.slug === activeCategory)
@@ -300,12 +303,13 @@ export function Header({ categories }: HeaderProps) {
 
       {/* Category navigation with mega dropdown */}
       <nav
+        ref={navRef}
         className={`relative transition-colors duration-500 ${!solid ? "" : "border-b border-zinc-200 dark:border-zinc-800"}`}
         onMouseLeave={handleCategoryLeave}
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
           {/* New — far left */}
-          <div className="relative" onMouseEnter={() => setActiveCategory(null)}>
+          <div ref={newLinkRef} className="relative" onMouseEnter={() => setActiveCategory(null)}>
             <Link
               href="/shop?category=new"
               onClick={() => setActiveCategory(null)}
@@ -348,7 +352,7 @@ export function Header({ categories }: HeaderProps) {
           ))}
 
           {/* Sale — far right */}
-          <div className="relative" onMouseEnter={() => setActiveCategory(null)}>
+          <div ref={saleLinkRef} className="relative" onMouseEnter={() => setActiveCategory(null)}>
             <Link
               href="/shop?category=sale"
               onClick={() => setActiveCategory(null)}
@@ -366,14 +370,26 @@ export function Header({ categories }: HeaderProps) {
           </div>
         </div>
 
-        {/* Full-width mega dropdown — Crate & Barrel style */}
-        {activeCategoryData && (
+        {/* Mega dropdown — width matches New-to-Sale span */}
+        {activeCategoryData && (() => {
+          const navRect = navRef.current?.getBoundingClientRect();
+          const newRect = newLinkRef.current?.getBoundingClientRect();
+          const saleRect = saleLinkRef.current?.getBoundingClientRect();
+          const dropdownStyle: React.CSSProperties =
+            navRect && newRect && saleRect
+              ? {
+                  left: newRect.left - navRect.left - 80,
+                  width: saleRect.right - newRect.left + 160,
+                }
+              : { left: 0, right: 0 };
+          return (
           <div
-            className="absolute left-0 right-0 top-full z-50 origin-top bg-white shadow-xl dark:bg-zinc-950 animate-in fade-in slide-in-from-top-3 duration-300 ease-out"
+            className="absolute top-full z-50 origin-top bg-white shadow-xl dark:bg-zinc-950 animate-in fade-in slide-in-from-top-3 duration-300 ease-out"
+            style={dropdownStyle}
             onMouseEnter={() => handleCategoryHover(activeCategoryData.slug)}
             onMouseLeave={handleCategoryLeave}
           >
-            <div className="mx-auto flex max-w-7xl gap-8 px-8 py-6 lg:px-12">
+            <div className="flex gap-8 px-8 py-6">
               {/* Left: subcategory links in three columns */}
               <div className="flex-1">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
@@ -435,7 +451,8 @@ export function Header({ categories }: HeaderProps) {
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
       </nav>
     </header>
   );
