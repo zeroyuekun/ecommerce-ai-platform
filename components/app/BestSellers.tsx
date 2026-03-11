@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/app/ProductCard";
 import {
@@ -19,6 +19,8 @@ export function BestSellers({ products }: BestSellersProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const onSelect = useCallback(() => {
     if (!api) return;
@@ -36,10 +38,26 @@ export function BestSellers({ products }: BestSellersProps) {
     };
   }, [api, onSelect]);
 
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   if (products.length === 0) return null;
 
   return (
-    <div className="bg-white py-12 dark:bg-zinc-950">
+    <div ref={sectionRef} className="bg-white py-12 dark:bg-zinc-950">
       <div className="mx-auto max-w-2xl px-4 pb-8 text-center sm:px-6">
         <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
           Best Sellers
@@ -75,10 +93,15 @@ export function BestSellers({ products }: BestSellersProps) {
             className="w-full"
           >
             <CarouselContent className="-ml-6">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <CarouselItem
                   key={product._id}
                   className="pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? "translateY(0)" : "translateY(60px)",
+                    transition: `opacity 0.6s ease-out ${index * 0.1}s, transform 0.6s ease-out ${index * 0.1}s`,
+                  }}
                 >
                   <ProductCard product={product} compact />
                 </CarouselItem>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -25,6 +25,8 @@ export function CategoryTiles({
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const onSelect = useCallback(() => {
     if (!api) return;
@@ -42,8 +44,24 @@ export function CategoryTiles({
     };
   }, [api, onSelect]);
 
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div>
+    <div ref={sectionRef}>
       {/* Heading */}
       <div className="mx-auto max-w-2xl px-4 pt-10 pb-6 sm:px-6 text-center">
         <h2 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
@@ -84,7 +102,7 @@ export function CategoryTiles({
           className="w-full"
         >
           <CarouselContent className="-ml-2.5">
-            {categories.map((category) => {
+            {categories.map((category, index) => {
               const isActive = activeCategory === category.slug;
               const imageUrl = category.image?.asset?.url;
 
@@ -92,6 +110,11 @@ export function CategoryTiles({
                 <CarouselItem
                   key={category._id}
                   className="pl-2.5 basis-auto"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? "translateX(0)" : "translateX(80px)",
+                    transition: `opacity 0.6s ease-out ${index * 0.1}s, transform 0.6s ease-out ${index * 0.1}s`,
+                  }}
                 >
                   <Link
                     href={`/shop?category=${category.slug}`}

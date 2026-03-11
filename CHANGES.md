@@ -20,6 +20,8 @@ Rebuilt the entire look and feel around a luxury minimalist aesthetic — inspir
 
 **Hover effects and animations**: Product cards gently scale up on hover. The header hides when you scroll down and reappears when you scroll up. Navigation links have animated underlines. All animations use smooth easing — nothing bounces or feels jarring.
 
+**Scroll-triggered entrance animations**: The "Shop by Room" category tiles slide in from the right with a staggered cascade as you scroll down to them. The "Best Sellers" product tiles rise up from below in the same staggered fashion. Both use IntersectionObserver so they only fire once when the section comes into view — 0.6s ease-out with a 0.1s delay between each tile for a polished reveal effect.
+
 **Loading states**: Added skeleton loading screens throughout the site (product grids, product pages, carousels, checkout, orders) so customers see smooth placeholder layouts instead of blank screens while content loads.
 
 ---

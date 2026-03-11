@@ -49,8 +49,8 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 - Full-screen hero banner with video section
 - Side-by-side promotional banners
 - Featured products carousel (auto-scrolling with navigation dots and arrows)
-- Category tiles and style inspiration gallery
-- Best sellers section
+- Category tiles with staggered right-to-left entrance animation
+- Best sellers section with staggered bottom-to-top entrance animation
 - Newsletter signup form
 
 **Header & Navigation**

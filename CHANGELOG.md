@@ -6,6 +6,11 @@ All notable changes to this project are documented here, in reverse chronologica
 
 ## 2026-03-11
 
+### Animations
+- Added scroll-triggered entrance animation to "Shop by Room" category tiles — tiles slide in from right to left with a staggered delay as the section enters the viewport
+- Added scroll-triggered entrance animation to "Best Sellers" product tiles — tiles rise up from below with a staggered delay as the section enters the viewport
+- Both animations use IntersectionObserver (fires once at 15% visibility) with 0.6s ease-out transitions and 0.1s stagger between each tile
+
 ### Testing
 - Added chatbot integration test script (`tools/test-chatbot.ts`) that exercises the AI tool pipeline without calling any AI API — zero cost, Sanity reads only
 - Tests cover searchProducts (broad, category, material, price range, text, combined filters), addToCart (by slug, by name, quantity, stock checks, nonexistent products), and getMyOrders (authenticated, unauthenticated, status filters)
