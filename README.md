@@ -49,14 +49,16 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 - Full-screen hero banner with video section
 - Side-by-side promotional banners
 - Featured products carousel (auto-scrolling with navigation dots and arrows)
-- Category tiles with staggered right-to-left entrance animation
-- Best sellers section with staggered bottom-to-top entrance animation
+- Category tiles with scroll-triggered right-to-left staggered entrance animation
+- Best sellers section with scroll-triggered bottom-to-top staggered entrance animation
+- Scroll animations use IntersectionObserver with 0.6s ease-out transitions and 0.1s stagger between tiles
 - Newsletter signup form
 
 **Header & Navigation**
 - Transparent-to-solid header transition on the homepage with backdrop blur
 - Smart hide-on-scroll (hides when scrolling down, reappears when scrolling up)
-- Mega dropdown showing subcategories on hover, width matched to nav links span
+- Mega dropdown showing subcategories on hover
+- Mega dropdown width dynamically matched to the navigation links span (New to Sale), consistent across all categories
 - Dark mode toggle with sun/moon animation
 - Store locator icon linking to physical locations
 
