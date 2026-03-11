@@ -6,6 +6,12 @@ All notable changes to this project are documented here, in reverse chronologica
 
 ## 2026-03-11
 
+### Testing
+- Added chatbot integration test script (`tools/test-chatbot.ts`) that exercises the AI tool pipeline without calling any AI API — zero cost, Sanity reads only
+- Tests cover searchProducts (broad, category, material, price range, text, combined filters), addToCart (by slug, by name, quantity, stock checks, nonexistent products), and getMyOrders (authenticated, unauthenticated, status filters)
+- Includes an end-to-end conversation flow simulation and API route auth checks
+- Run with `npx tsx tools/test-chatbot.ts`
+
 ### AI Chatbot
 - Customers can upload a photo in the chat (e.g. a room or a piece of furniture they like) and the AI will suggest similar products from the catalog
 - Users can now add products to their cart directly from the chat conversation

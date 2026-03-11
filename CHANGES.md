@@ -147,6 +147,20 @@ Tracks the last 12 products a customer has looked at and displays them in a caro
 
 ---
 
+## Testing
+
+Built a chatbot integration test script (`tools/test-chatbot.ts`) that validates the entire AI tool pipeline without making any AI API calls — so it costs nothing to run. It connects to real Sanity data and exercises each tool the chatbot uses:
+
+- **searchProducts** — broad queries, category/material/color filters, price ranges, text search, combined filters, and no-result scenarios
+- **addToCart** — lookup by slug and name, quantity handling, stock validation, nonexistent products, and overstock rejection
+- **getMyOrders** — authenticated and unauthenticated flows, status filtering, and order shape validation
+
+Also includes an end-to-end conversation flow simulation (search → add to cart → follow-up search → order check) and API route tests that verify the chat endpoint requires authentication.
+
+Run with `npx tsx tools/test-chatbot.ts`.
+
+---
+
 ## Other Additions
 
 - **Error boundaries** — if something crashes in the app or admin section, users see a friendly error page instead of a blank screen

@@ -113,7 +113,12 @@
       "Bash(head:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__query-docs",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(ls -la /c/Users/Admin/ecommerce-ai-platform/app/\\\\\\(app\\\\\\)/ | grep -E \"\\\\.tsx$|\\\\.ts$\")",
+      "Bash(ls -la /c/Users/Admin/ecommerce-ai-platform/app/\\\\\\(admin\\\\\\)/ | grep -E \"\\\\.tsx$|\\\\.ts$\")",
+      "Bash(ls -la /c/Users/Admin/ecommerce-ai-platform/app/\\\\\\(app\\\\\\)/*.tsx)",
+      "Bash(find ./app -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" \\\\\\) 2>/dev/null | head -50)",
+      "Bash(cd C:/Users/Admin/ecommerce-ai-platform && npx tsx tools/test-chatbot.ts 2>&1)"
     ]
   }
 }

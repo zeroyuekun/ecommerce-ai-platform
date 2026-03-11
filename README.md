@@ -115,6 +115,8 @@ lib/
   store/                # Zustand stores (cart, chat, recently viewed)
 sanity/
   schemaTypes/          # Sanity document schemas
+tools/
+  test-chatbot.ts       # Integration tests for AI chatbot tools (zero AI cost)
 ```
 
 ## Setup
