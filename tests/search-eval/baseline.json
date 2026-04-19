@@ -1,0 +1,7 @@
+{
+  "recallAt5": 0,
+  "mrr": 0,
+  "numQueries": 0,
+  "runAt": "1970-01-01T00:00:00.000Z",
+  "note": "Initial placeholder. Run `pnpm eval:search:promote` after first real run."
+}

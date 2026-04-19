@@ -48,3 +48,7 @@ next-env.d.ts
 # Sanity generated types — regenerate via `pnpm typegen`
 sanity.types.ts
 schema.json
+
+# Search eval ephemeral results (keep baseline.json tracked)
+tests/search-eval/results-*.json
+tests/search-eval/latest.json
