@@ -1,7 +1,15 @@
 /**
- * Per-key sliding-window rate limiter. In-memory only — one instance per
- * serverless container. See docs/adr/0004-in-memory-rate-limit.md for why
- * this is acceptable for v1 and the migration path to a durable store.
+ * Per-key sliding-window rate limiter with two backends:
+ *
+ * - In-memory (default). One instance per serverless container, so limits
+ *   are effectively per-container. Acceptable for low traffic / single-region.
+ * - Upstash Redis (optional). Enabled automatically when both
+ *   `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set. Gives
+ *   a durable, shared limit across all containers and regions.
+ *
+ * See docs/adr/0004-in-memory-rate-limit-tradeoff.md for the trade-off
+ * analysis. Callers always `await` — the in-memory path just wraps the
+ * sync call in `Promise.resolve` so the call site stays uniform.
  */
 
 export interface RateLimitResult {
@@ -15,12 +23,19 @@ export interface RateLimitOptions {
   evictThreshold?: number;
 }
 
+export interface RateLimiterBackend {
+  check(key: string): Promise<RateLimitResult>;
+  prune(): void;
+  readonly backend: "memory" | "upstash";
+}
+
 interface Bucket {
   count: number;
   resetAt: number;
 }
 
-export class RateLimiter {
+class InMemoryRateLimiter implements RateLimiterBackend {
+  readonly backend = "memory" as const;
   private readonly buckets = new Map<string, Bucket>();
   private readonly windowMs: number;
   private readonly max: number;
@@ -32,7 +47,7 @@ export class RateLimiter {
     this.evictThreshold = options.evictThreshold ?? 1024;
   }
 
-  check(key: string, now: number = Date.now()): RateLimitResult {
+  checkSync(key: string, now: number = Date.now()): RateLimitResult {
     const bucket = this.buckets.get(key);
     if (!bucket || bucket.resetAt <= now) {
       this.buckets.set(key, { count: 1, resetAt: now + this.windowMs });
@@ -48,7 +63,10 @@ export class RateLimiter {
     return { ok: true, retryAfter: 0 };
   }
 
-  /** Opportunistic eviction. Safe to call on every request. */
+  async check(key: string): Promise<RateLimitResult> {
+    return this.checkSync(key);
+  }
+
   prune(now: number = Date.now()): void {
     if (this.buckets.size < this.evictThreshold) return;
     for (const [key, bucket] of this.buckets) {
@@ -56,7 +74,6 @@ export class RateLimiter {
     }
   }
 
-  /** Test-only helpers — not used in production code paths. */
   get size(): number {
     return this.buckets.size;
   }
@@ -66,8 +83,93 @@ export class RateLimiter {
   }
 }
 
+/**
+ * Legacy export preserved for the unit suite and any direct callers.
+ * New code should prefer the async `check` via {@link createRateLimiter}.
+ */
+export class RateLimiter extends InMemoryRateLimiter {}
+
+/**
+ * Upstash-backed limiter. Lazy-imports `@upstash/ratelimit` so the module
+ * graph stays clean when the feature is disabled. Uses a sliding-window
+ * algorithm to match the in-memory behavior as closely as possible.
+ */
+async function createUpstashLimiter(
+  prefix: string,
+  options: RateLimitOptions,
+): Promise<RateLimiterBackend> {
+  const [{ Ratelimit }, { Redis }] = await Promise.all([
+    import("@upstash/ratelimit"),
+    import("@upstash/redis"),
+  ]);
+  const redis = Redis.fromEnv();
+  const limiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(options.max, `${options.windowMs} ms`),
+    prefix,
+    analytics: false,
+  });
+
+  return {
+    backend: "upstash",
+    async check(key: string): Promise<RateLimitResult> {
+      const { success, reset } = await limiter.limit(key);
+      const retryAfter = success
+        ? 0
+        : Math.max(0, Math.ceil((reset - Date.now()) / 1000));
+      return { ok: success, retryAfter };
+    },
+    prune() {
+      // Upstash/Redis handles TTL expiry server-side — no-op here.
+    },
+  };
+}
+
+function hasUpstashEnv(): boolean {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
+  );
+}
+
+/**
+ * Creates a rate limiter appropriate for the current environment.
+ *
+ * Resolves synchronously to an in-memory limiter; if Upstash env vars are
+ * present it kicks off an async swap to the Redis-backed limiter and
+ * returns a proxy that uses the durable backend as soon as it's ready.
+ * Any requests in the gap use the in-memory fallback, which is a safe
+ * degradation.
+ */
+export function createRateLimiter(
+  prefix: string,
+  options: RateLimitOptions,
+): RateLimiterBackend {
+  const fallback = new InMemoryRateLimiter(options);
+  if (!hasUpstashEnv()) return fallback;
+
+  let active: RateLimiterBackend = fallback;
+  createUpstashLimiter(prefix, options)
+    .then((upstash) => {
+      active = upstash;
+    })
+    .catch((err) => {
+      console.warn(
+        "[rate-limit] Upstash init failed — staying on in-memory backend:",
+        err,
+      );
+    });
+
+  return {
+    get backend() {
+      return active.backend;
+    },
+    check: (key) => active.check(key),
+    prune: () => active.prune(),
+  };
+}
+
 /** Shared chat-route limiter: 20 req/min/user. */
-export const chatRateLimiter = new RateLimiter({
+export const chatRateLimiter = createRateLimiter("ratelimit:chat", {
   windowMs: 60_000,
   max: 20,
 });

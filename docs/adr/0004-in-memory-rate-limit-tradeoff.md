@@ -1,6 +1,6 @@
-# ADR-0004: In-memory rate limiter — accepted tradeoff + migration path
+# ADR-0004: In-memory rate limiter — accepted tradeoff + Upstash swap
 
-- **Status:** Accepted
+- **Status:** Accepted (v1: in-memory). Upstash swap shipped as env-gated default in v2.
 - **Date:** 2026-04-20
 
 ## Context
@@ -10,43 +10,32 @@ The AI chat endpoint at `app/api/chat/route.ts` fans out to Claude (via Vercel A
 Options considered:
 
 1. **In-memory `Map` per serverless instance** — zero infrastructure, but each container starts with an empty map, so a user can multiply their effective quota by the number of concurrent containers handling their requests.
-2. **Durable store (Vercel KV / Upstash Redis)** — accurate global quota, adds a third-party dependency and requires an API key in CI/deploy environments.
+2. **Durable store (Upstash Redis via `@upstash/ratelimit`)** — accurate global quota, adds a third-party dependency and requires two env vars (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`).
 3. **AI Gateway provider-level rate limit** — Vercel AI Gateway exposes per-key limits, but they're coarser than per-user-scoped.
 
 ## Decision
 
-Use an in-memory `RateLimiter` (`lib/ai/rate-limit.ts`) with a per-user bucket, 20 req/min, opportunistic eviction when the map exceeds 1024 buckets.
+Ship both backends behind a factory (`createRateLimiter` in `lib/ai/rate-limit.ts`). Default to the in-memory backend; if `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are both set, swap to the Upstash sliding-window limiter at module init time.
 
-Explicitly accept the fan-out inaccuracy: on Vercel Fluid Compute, function instances are reused across concurrent requests in the same region, so in practice a single user's traffic tends to hit the same instance *most* of the time. The bucket may be reset on cold start, and the effective quota may be 20 × N where N is the number of instances handling them — but the order of magnitude stays correct, and the purpose of the limiter is *cost protection from abuse*, not precise fairness.
+Shape of the limiter is shared: `{ backend, check(key): Promise<RateLimitResult>, prune() }`. Callers always `await` — the in-memory path just wraps the sync call in `Promise.resolve`.
 
 ## Consequences
 
 **Positive:**
-- Zero external dependency for v1. No KV provisioning, no Redis URL in CI secrets, no extra network hop in the request path.
-- Bucket check is O(1) and adds < 1ms to every request.
-- The `RateLimiter` class is unit-tested (`tests/unit/rate-limit.test.ts`) against the exact semantics we ship.
+- Zero required external dependency. Deploys without Upstash credentials keep working on the in-memory backend.
+- Opt-in durability: a single env-var addition promotes the app to a distributed limiter with no code change.
+- Upstash Redis Rest API is free for low traffic (10k commands/day), so small deployments stay in free tier.
+- `RateLimiter` class is still unit-tested against the deterministic time-based semantics (`checkSync(key, now)`).
 
 **Negative:**
-- Under heavy concurrent load, a determined abuser can exceed the nominal 20/min by spraying requests to force cold-start new instances. For *this* portfolio workload, not a concern; for a real product, not acceptable long-term.
-- In-memory state is lost on deploy, which also means rate-limit counters reset on every push. Benign, but noted.
+- Module init async-resolves the Upstash client. In the tiny window before the promise settles, requests fall back to the in-memory limiter. This is a safe degradation (slightly looser limits, not looser auth).
+- Two env vars to manage across environments. Acceptable — same cost as adding any shared infra.
 
-**Migration path (explicit, so this isn't an unbounded footgun):**
+**In-memory limitations (carried from v1, relevant when Upstash is not configured):**
+- Under heavy concurrent load, a determined abuser can exceed the nominal 20/min by spraying requests to force cold-start new instances.
+- In-memory state is lost on deploy — rate-limit counters reset on every push.
 
-Swap the `RateLimiter` class for an Upstash Redis-backed limiter:
+## Alternatives rejected
 
-```ts
-// lib/ai/rate-limit.ts — drop-in replacement
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-
-export const chatRateLimiter = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(20, "60 s"),
-});
-```
-
-Call sites in `app/api/chat/route.ts` use the `RateLimiter` interface (`.check(key)` returns `{ ok, retryAfter }`), which matches Upstash's return shape closely — the migration is < 20 lines.
-
-**Alternatives rejected:**
 - *Vercel AI Gateway per-key limit*: good for budget enforcement at the provider tier, poor for per-authenticated-user fairness.
 - *Middleware-based limit using Vercel's Edge Config*: Edge Config is read-optimized; our write-heavy per-user counter workload isn't a fit.

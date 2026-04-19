@@ -196,7 +196,13 @@ This codebase is structured as a portfolio project with the hygiene of a small p
 
 **Errors have a capture point.** [`lib/monitoring/`](./lib/monitoring/) is a vendor-neutral abstraction (`captureException`, `captureMessage`, `withMonitoring`) that currently logs to stderr and redacts obvious credential fields (`token`, `secret`, `password`, `apikey`, `authorization`) from context payloads. Wire it to Sentry, Highlight, or Datadog by swapping the body of `captureException` — nothing else changes.
 
-**Rate limiting is extracted and tested.** `/api/chat` routes through [`lib/ai/rate-limit.ts`](./lib/ai/rate-limit.ts), a `RateLimiter` class with window rollover, opportunistic eviction, and a documented migration path to Upstash Redis for multi-region deployment (see [ADR-0004](./docs/adr/0004-in-memory-rate-limit-tradeoff.md)).
+**Rate limiting has two backends.** `/api/chat` routes through [`lib/ai/rate-limit.ts`](./lib/ai/rate-limit.ts), which resolves to an in-memory sliding-window limiter by default and swaps to Upstash Redis automatically when `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set. No code change required to promote to a distributed quota — see [ADR-0004](./docs/adr/0004-in-memory-rate-limit-tradeoff.md) for the trade-offs.
+
+**End-to-end tests exist.** [`tests/e2e/`](./tests/e2e/) uses Playwright to smoke-test the homepage, cart drawer wiring, static informational pages, and the security-header contract (including a guard against the Permissions-Policy double-quote regression). `pnpm test:e2e` boots Next.js on port `3101` so it doesn't collide with whatever is already on `3000`. The e2e job in CI is env-gated behind `vars.ENABLE_INTEGRATION_CI = 'true'` because the dev server needs real Sanity / Clerk / Stripe credentials to render.
+
+**Performance budgets are encoded.** [`lighthouserc.json`](./lighthouserc.json) runs Lighthouse CI against `/about` on each PR (when `ENABLE_INTEGRATION_CI` is set), asserting `performance >= 0.7`, `accessibility >= 0.9`, LCP < 3.5s, CLS < 0.1, TBT < 300ms — all as warnings so the data surfaces without blocking merges. Run locally via `pnpm lighthouse`.
+
+**Product analytics are scaffolded but opt-in.** [`components/analytics/PostHogProvider.tsx`](./components/analytics/PostHogProvider.tsx) initialises `posthog-js` only when `NEXT_PUBLIC_POSTHOG_KEY` is set, and [`lib/analytics/server.ts`](./lib/analytics/server.ts) exposes `captureServerEvent` for order / webhook tracking. Dev captures are opt-in via `NEXT_PUBLIC_POSTHOG_DEBUG=1`.
 
 **LLM output is parsed defensively.** [`lib/ai/json-extract.ts`](./lib/ai/json-extract.ts) is a balanced-brace state-machine parser that tolerates model preamble, trailing prose, and escaped quotes in string literals — a greedy `/\{[\s\S]*\}/` regex over-matches when the model wraps JSON in explanation.
 
@@ -233,18 +239,21 @@ Each major audit is pinned to a git tag so any stage can be restored in a single
 |-----|-------|
 | `pre-audit-2026-04-20` | Before any audit work (original feature set) |
 | `pre-hardening-v1` | After performance audit, before production hardening |
-| `production-hardening-v1` | After production hardening (current) |
+| `production-hardening-v1` | After production hardening (in-memory rate limit, Playwright seeded locally, unit tests) |
+| `pre-hardening-v2` | After v1 tag, before Playwright / Lighthouse / Upstash / PostHog |
+| `production-hardening-v2` | After v2 (current) — e2e in CI, Lighthouse budgets, Upstash swap, PostHog scaffold |
 
 ```bash
 # Inspect what changed between two tags
-git diff pre-hardening-v1 production-hardening-v1
+git diff pre-hardening-v2 production-hardening-v2
 
 # Roll back to any tagged state
-git reset --hard pre-hardening-v1        # undo only the production-hardening work
-git reset --hard pre-audit-2026-04-20    # undo both audits entirely
+git reset --hard pre-hardening-v2        # undo the v2 work only
+git reset --hard pre-hardening-v1        # undo both v1 and v2 hardening
+git reset --hard pre-audit-2026-04-20    # undo everything (original state)
 
 # Return to current state after a rollback
-git reset --hard production-hardening-v1
+git reset --hard production-hardening-v2
 ```
 
 Tags are local until pushed. Use `git push origin --tags` to publish them.

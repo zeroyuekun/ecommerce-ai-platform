@@ -38,7 +38,7 @@ export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) return errorResponse(401, "Authentication required");
 
-  const { ok, retryAfter } = chatRateLimiter.check(userId);
+  const { ok, retryAfter } = await chatRateLimiter.check(userId);
   if (!ok) {
     return errorResponse(429, "Rate limit exceeded. Try again shortly.", {
       "Retry-After": String(retryAfter),
