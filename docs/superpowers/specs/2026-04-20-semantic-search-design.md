@@ -98,9 +98,9 @@ User query ─▶ /api/search ─▶ AI Gateway embed ─▶ Upstash Vector topK
 - Replace `LICENSE.md` with MIT text
 - Add `sanity.types.ts` to `.gitignore`, regenerate in CI, commit removal
 - Delete `package-lock.json` (pnpm is sole lockfile)
-- Remove unused PostHog scaffolding (until there's real need — easier to re-add than maintain dead code)
-- Fix the 6 `any` types in `lib/ai/shopping-agent.ts` and related
 - Add `SECURITY.md` covering auth boundaries, rate limits, webhook verification, reporting
+
+**De-scoped after re-inspection:** the prior review flagged "6 `any` types in shopping-agent" and "unused PostHog scaffolding" — on closer read, there are no `any` types in `lib/ai/`, and PostHog is correctly env-gated (no-op when `NEXT_PUBLIC_POSTHOG_KEY` is unset). Leaving both alone.
 
 ## Data flow
 
@@ -151,7 +151,7 @@ User query ─▶ /api/search ─▶ AI Gateway embed ─▶ Upstash Vector topK
 - Published eval numbers in README with methodology
 - Published perf report in README with k6 output
 - Agent picks semantic tool for qualitative queries (verified in eval)
-- All 6 polish items landed
+- All 4 polish items landed
 - Two new env vars: `UPSTASH_VECTOR_REST_URL` + `UPSTASH_VECTOR_REST_TOKEN` (Upstash Vector is a separate product from the Redis we already use; free tier covers this project). Added to `.env.example` with comment.
 
 ## Estimated effort
