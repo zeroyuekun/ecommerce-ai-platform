@@ -83,6 +83,38 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 **Additional Pages**
 - About, Contact, Blog, FAQ, Help Centre, Privacy Policy, Returns, Gift Vouchers, Shipping, Terms & Conditions, Customer Reviews, Store Locations (6 Australian locations)
 
+## Semantic product search
+
+Vibes-first product discovery. Users describe a feeling or situation — "cozy nook for a studio apartment", "kids' room that'll last" — and the system returns products ranked by meaning, not keyword overlap.
+
+**Stack:** Vercel AI Gateway (`openai/text-embedding-3-small`, 1536-dim) → Upstash Vector (namespace `products`) → Sanity hydrate.
+
+**Architecture:** Sanity webhook fires on product publish → `/api/sanity/reindex` verifies the HMAC and re-embeds → Upstash upsert. On search, `/api/search` embeds the query, queries the index, hydrates full docs from Sanity, preserves vector ranking. See [ADR-0005](docs/adr/0005-semantic-search-with-upstash-vector.md).
+
+### Eval
+
+Hand-labeled 30 queries with ground-truth product IDs. Runs via `pnpm eval:search`; CI fails if recall@5 drops >5% from baseline.
+
+| Metric | Semantic | Keyword baseline |
+|---|---|---|
+| recall@5 | **TBD after first run** | TBD |
+| MRR | **TBD after first run** | TBD |
+
+> Baseline from `tests/search-eval/baseline.json`. Promote new baselines with `pnpm eval:search:promote`.
+
+### Load / stress testing
+
+k6 scripts under `tests/load/`. See [tests/load/README.md](tests/load/README.md) for install and usage.
+
+| Scenario | VUs | P50 | P95 | P99 | Error rate |
+|---|---|---|---|---|---|
+| search / baseline | 10 | **TBD** | **TBD** | **TBD** | **TBD** |
+| search / ramp | 0→100 | TBD | TBD | TBD | TBD |
+| search / spike | 200 | TBD | TBD | TBD | TBD |
+| catalog / steady | 20 | TBD | TBD | TBD | TBD |
+
+> Fill in from `tests/load/results/canonical-*.json` after running.
+
 ## Tech Stack
 
 | Layer | Technology |
