@@ -1,3 +1,5 @@
+import { embedText } from "./embed";
+import { buildEmbeddingText, type ProductEmbeddingInput } from "./text";
 import type { ProductEmbeddingMetadata, SearchOptions, SearchResult } from "./types";
 
 export interface IndexRecord {
@@ -141,4 +143,58 @@ export function getSearchIndex(): SearchIndex {
       });
   }
   return fallback;
+}
+
+export interface ProductForIndexing extends ProductEmbeddingInput {
+  _id: string;
+  slug: string;
+  price: number;
+  stock: number;
+}
+
+export interface UpsertOptions {
+  /** Bypass embedding — used for tests. */
+  vectorOverride?: number[];
+}
+
+export async function upsertProduct(
+  product: ProductForIndexing,
+  options: UpsertOptions = {},
+): Promise<void> {
+  const text = buildEmbeddingText(product);
+  if (text.length === 0) {
+    console.warn(`[search] skipping ${product._id}: empty embed text`);
+    return;
+  }
+  const vector = options.vectorOverride ?? (await embedText(text));
+  const index = getSearchIndex();
+  await index.upsert([
+    {
+      id: product._id,
+      vector,
+      metadata: {
+        _id: product._id,
+        slug: product.slug,
+        name: product.name ?? "",
+        category: product.category ?? null,
+        price: product.price,
+        stock: product.stock,
+      },
+    },
+  ]);
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  const index = getSearchIndex();
+  await index.delete(id);
+}
+
+let _testIndex: SearchIndex | null = null;
+export function __setTestIndex(next?: SearchIndex): SearchIndex {
+  if (next) {
+    _testIndex = next;
+    cached = next;
+  }
+  if (!_testIndex) throw new Error("__setTestIndex: no test index set");
+  return _testIndex;
 }

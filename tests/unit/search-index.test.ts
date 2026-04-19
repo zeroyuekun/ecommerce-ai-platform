@@ -144,3 +144,56 @@ describe("getSearchIndex", () => {
     expect(index.backend).toBe("memory");
   });
 });
+
+import { __setTestIndex, deleteProduct, upsertProduct } from "@/lib/search/index";
+
+describe("upsertProduct", () => {
+  beforeEach(() => {
+    __setTestIndex(createInMemoryIndex());
+  });
+
+  it("embeds product text and writes to the index", async () => {
+    const product = {
+      _id: "prod-1",
+      slug: "oak-table",
+      name: "Oak Dining Table",
+      description: "Solid oak table seats six.",
+      category: "dining-room",
+      material: "wood",
+      color: "oak",
+      price: 1200,
+      stock: 4,
+    };
+    await upsertProduct(product, { vectorOverride: [0.1, 0.2, 0.3] });
+    const results = await __setTestIndex().query([0.1, 0.2, 0.3], { topK: 1 });
+    expect(results[0].id).toBe("prod-1");
+    expect(results[0].metadata.slug).toBe("oak-table");
+  });
+});
+
+describe("deleteProduct", () => {
+  beforeEach(() => {
+    __setTestIndex(createInMemoryIndex());
+  });
+
+  it("removes a product from the index", async () => {
+    const idx = __setTestIndex();
+    await idx.upsert([
+      {
+        id: "prod-1",
+        vector: [1, 0, 0],
+        metadata: {
+          _id: "prod-1",
+          slug: "x",
+          name: "X",
+          category: null,
+          price: 0,
+          stock: 0,
+        },
+      },
+    ]);
+    await deleteProduct("prod-1");
+    const results = await idx.query([1, 0, 0], { topK: 5 });
+    expect(results).toHaveLength(0);
+  });
+});
