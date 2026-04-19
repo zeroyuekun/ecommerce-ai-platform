@@ -19,7 +19,8 @@
     "backfill:search": "tsx tools/scripts/backfill-search-index.ts",
     "eval:search": "tsx tests/search-eval/eval.ts",
     "eval:search:promote": "tsx tests/search-eval/eval.ts --promote",
-    "eval:search:check": "tsx tests/search-eval/eval.ts --check"
+    "eval:search:check": "tsx tests/search-eval/eval.ts --check",
+    "load:backfill": "tsx tests/load/backfill-load.ts"
   },
   "dependencies": {
     "@ai-sdk/cohere": "3.0.0-beta.44",
