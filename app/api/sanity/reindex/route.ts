@@ -1,5 +1,8 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
+import { deleteProduct, upsertProduct } from "@/lib/search/index";
+import { PRODUCT_FOR_INDEXING_QUERY } from "@/lib/sanity/queries/product-for-indexing";
+import { client } from "@/sanity/lib/client";
 
 export const runtime = "nodejs";
 
@@ -7,7 +10,6 @@ interface SanityWebhookPayload {
   _id: string;
   _type: string;
   operation: "create" | "update" | "delete";
-  slug?: string;
 }
 
 function constantTimeEqual(a: string, b: string): boolean {
@@ -42,5 +44,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true, skipped: "non-product" });
   }
 
-  return NextResponse.json({ received: true, id: payload._id });
+  try {
+    if (payload.operation === "delete") {
+      await deleteProduct(payload._id);
+      return NextResponse.json({
+        received: true,
+        action: "deleted",
+        id: payload._id,
+      });
+    }
+
+    const product = await client.fetch(PRODUCT_FOR_INDEXING_QUERY, {
+      id: payload._id,
+    });
+    if (!product) {
+      await deleteProduct(payload._id);
+      return NextResponse.json({
+        received: true,
+        action: "deleted-missing",
+        id: payload._id,
+      });
+    }
+
+    await upsertProduct(product);
+    return NextResponse.json({
+      received: true,
+      action: "upserted",
+      id: payload._id,
+    });
+  } catch (err) {
+    console.error("[reindex] FAILED:", err);
+    return NextResponse.json(
+      { error: "Reindex failed", id: payload._id },
+      { status: 500 },
+    );
+  }
 }
