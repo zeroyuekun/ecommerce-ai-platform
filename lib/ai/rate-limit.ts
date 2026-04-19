@@ -173,3 +173,9 @@ export const chatRateLimiter = createRateLimiter("ratelimit:chat", {
   windowMs: 60_000,
   max: 20,
 });
+
+/** Search endpoint limiter: 30 req/min per IP. */
+export const searchRateLimiter = createRateLimiter("ratelimit:search", {
+  windowMs: 60_000,
+  max: 30,
+});
