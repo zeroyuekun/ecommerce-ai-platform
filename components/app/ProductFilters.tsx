@@ -6,10 +6,10 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { Slider } from "@/components/ui/slider";
 import { COLOR_SWATCHES, COLORS, MATERIALS } from "@/lib/constants/filters";
 import { subcategoriesMap } from "@/lib/constants/subcategories";
-import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
+import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
 interface ProductFiltersProps {
-  categories: ALL_CATEGORIES_QUERY_RESULT;
+  categories: ALL_CATEGORIES_QUERYResult;
 }
 
 function MultiFilterGroup({

@@ -1,9 +1,9 @@
 import { PackageSearch } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { FILTER_PRODUCTS_BY_NAME_QUERY_RESULT } from "@/sanity.types";
+import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 import { ProductCard } from "./ProductCard";
 
-type Product = FILTER_PRODUCTS_BY_NAME_QUERY_RESULT[number];
+type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
 
 export interface VariantInfo {
   slug: string;
@@ -59,7 +59,7 @@ function groupVariants(products: Product[]): ProductWithVariants[] {
 }
 
 interface ProductGridProps {
-  products: FILTER_PRODUCTS_BY_NAME_QUERY_RESULT;
+  products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
 }
 
 export function ProductGrid({ products }: ProductGridProps) {

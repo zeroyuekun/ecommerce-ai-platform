@@ -16,12 +16,12 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn, formatPrice } from "@/lib/utils";
-import type { FEATURED_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
+import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
-type FeaturedProduct = FEATURED_PRODUCTS_QUERY_RESULT[number];
+type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
 
 interface FeaturedCarouselProps {
-  products: FEATURED_PRODUCTS_QUERY_RESULT;
+  products: FEATURED_PRODUCTS_QUERYResult;
 }
 
 export function FeaturedCarousel({ products }: FeaturedCarouselProps) {

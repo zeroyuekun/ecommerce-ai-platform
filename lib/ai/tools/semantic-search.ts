@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { getStockMessage, getStockStatus } from "@/lib/constants/stock";
-import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
+import { SEARCH_PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { embedText } from "@/lib/search/embed";
 import { getSearchIndex } from "@/lib/search/index";
 import { formatPrice } from "@/lib/utils";
@@ -50,7 +50,7 @@ export const semanticSearchTool = tool({
 
       const ids = results.map((r) => r.id);
       const { data } = await sanityFetch({
-        query: PRODUCTS_BY_IDS_QUERY,
+        query: SEARCH_PRODUCTS_BY_IDS_QUERY,
         params: { ids },
       });
       const byId = new Map(

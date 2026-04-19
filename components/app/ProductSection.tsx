@@ -3,16 +3,16 @@
 import { SlidersHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type {
-  ALL_CATEGORIES_QUERY_RESULT,
-  FILTER_PRODUCTS_BY_NAME_QUERY_RESULT,
+  ALL_CATEGORIES_QUERYResult,
+  FILTER_PRODUCTS_BY_NAME_QUERYResult,
 } from "@/sanity.types";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
 import { SortSelect } from "./SortSelect";
 
 interface ProductSectionProps {
-  categories: ALL_CATEGORIES_QUERY_RESULT;
-  products: FILTER_PRODUCTS_BY_NAME_QUERY_RESULT;
+  categories: ALL_CATEGORIES_QUERYResult;
+  products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
   searchQuery: string;
 }
 

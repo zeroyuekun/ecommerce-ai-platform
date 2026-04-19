@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { getPopularSearches, recordSearch } from "@/lib/actions/search";
 import { subcategoriesMap } from "@/lib/constants/subcategories";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
-import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
+import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
 const defaultSuggestions = [
   { label: "Bedside table", query: "bedside table" },
@@ -32,7 +32,7 @@ const defaultSuggestions = [
 ];
 
 interface HeaderProps {
-  categories: ALL_CATEGORIES_QUERY_RESULT;
+  categories: ALL_CATEGORIES_QUERYResult;
 }
 
 export function Header({ categories }: HeaderProps) {

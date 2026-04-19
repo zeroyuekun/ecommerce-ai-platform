@@ -69,7 +69,20 @@ export async function POST(req: Request) {
       });
     }
 
-    await upsertProduct(product);
+    if (!product.slug) {
+      return NextResponse.json({
+        received: true,
+        action: "skipped-no-slug",
+        id: payload._id,
+      });
+    }
+
+    await upsertProduct({
+      ...product,
+      slug: product.slug,
+      price: product.price ?? 0,
+      stock: product.stock ?? 0,
+    });
     return NextResponse.json({
       received: true,
       action: "upserted",

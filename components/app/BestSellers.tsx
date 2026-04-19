@@ -9,10 +9,10 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import type { BEST_SELLERS_QUERY_RESULT } from "@/sanity.types";
+import type { BEST_SELLERS_QUERYResult } from "@/sanity.types";
 
 interface BestSellersProps {
-  products: BEST_SELLERS_QUERY_RESULT;
+  products: BEST_SELLERS_QUERYResult;
 }
 
 export function BestSellers({ products }: BestSellersProps) {

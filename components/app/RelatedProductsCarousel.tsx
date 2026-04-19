@@ -9,10 +9,10 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import type { RELATED_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
+import type { RELATED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 interface RelatedProductsCarouselProps {
-  products: RELATED_PRODUCTS_QUERY_RESULT;
+  products: RELATED_PRODUCTS_QUERYResult;
 }
 
 export function RelatedProductsCarousel({

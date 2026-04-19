@@ -5,10 +5,10 @@ import Link from "next/link";
 import { memo, useState } from "react";
 import { COLOR_SWATCHES } from "@/lib/constants/filters";
 import { cn, formatPrice } from "@/lib/utils";
-import type { FILTER_PRODUCTS_BY_NAME_QUERY_RESULT } from "@/sanity.types";
+import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 import type { VariantInfo } from "./ProductGrid";
 
-type Product = FILTER_PRODUCTS_BY_NAME_QUERY_RESULT[number] & {
+type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number] & {
   variants?: VariantInfo[];
 };
 

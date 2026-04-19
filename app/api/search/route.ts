@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { searchRateLimiter } from "@/lib/ai/rate-limit";
-import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
+import { SEARCH_PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { embedText } from "@/lib/search/embed";
 import { getSearchIndex } from "@/lib/search/index";
 import { client } from "@/sanity/lib/client";
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
     const ids = results.map((r) => r.id);
     let products: Array<Record<string, unknown> & { _id: string }> = [];
     if (ids.length > 0) {
-      const hydrated = (await client.fetch(PRODUCTS_BY_IDS_QUERY, {
+      const hydrated = (await client.fetch(SEARCH_PRODUCTS_BY_IDS_QUERY, {
         ids,
       })) as Array<Record<string, unknown> & { _id: string }>;
       const byId = new Map(hydrated.map((p) => [p._id, p]));

@@ -1,6 +1,6 @@
 import { defineQuery } from "next-sanity";
 
-export const PRODUCTS_BY_IDS_QUERY = defineQuery(`
+export const SEARCH_PRODUCTS_BY_IDS_QUERY = defineQuery(`
   *[_type == "product" && _id in $ids]{
     _id,
     name,

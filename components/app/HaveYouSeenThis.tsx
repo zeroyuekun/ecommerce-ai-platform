@@ -9,10 +9,10 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import type { POPULAR_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
+import type { POPULAR_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 interface HaveYouSeenThisProps {
-  products: POPULAR_PRODUCTS_QUERY_RESULT;
+  products: POPULAR_PRODUCTS_QUERYResult;
 }
 
 export function HaveYouSeenThis({ products }: HaveYouSeenThisProps) {
