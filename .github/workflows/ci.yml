@@ -162,3 +162,31 @@ jobs:
         run: pnpm add -g @lhci/cli@0.15.0
       - name: Run Lighthouse CI
         run: lhci autorun
+
+  search-eval:
+    name: Search eval (recall@5 vs baseline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: vars.ENABLE_INTEGRATION_CI == 'true'
+    env:
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+      UPSTASH_VECTOR_REST_URL: ${{ secrets.UPSTASH_VECTOR_REST_URL }}
+      UPSTASH_VECTOR_REST_TOKEN: ${{ secrets.UPSTASH_VECTOR_REST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate Sanity types
+        run: pnpm typegen
+      - name: Run search eval vs baseline
+        run: pnpm eval:search:check
