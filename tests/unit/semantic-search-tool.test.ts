@@ -50,7 +50,16 @@ describe("semanticSearchTool", () => {
     ]);
 
     const { semanticSearchTool } = await import("@/lib/ai/tools/semantic-search");
-    const result = await semanticSearchTool.execute(
+    const execute = semanticSearchTool.execute as unknown as (
+      input: { query: string; topK: number },
+      options: { toolCallId: string; messages: unknown[] },
+    ) => Promise<{
+      found: boolean;
+      message: string;
+      products: Array<{ id: string }>;
+      query: string;
+    }>;
+    const result = await execute(
       { query: "cozy apartment desk", topK: 8 },
       { toolCallId: "t1", messages: [] },
     );
@@ -63,7 +72,11 @@ describe("semanticSearchTool", () => {
     embedTextMock.mockResolvedValueOnce([0.1, 0.2]);
     queryMock.mockResolvedValueOnce([]);
     const { semanticSearchTool } = await import("@/lib/ai/tools/semantic-search");
-    const result = await semanticSearchTool.execute(
+    const execute = semanticSearchTool.execute as unknown as (
+      input: { query: string; topK: number },
+      options: { toolCallId: string; messages: unknown[] },
+    ) => Promise<{ found: boolean }>;
+    const result = await execute(
       { query: "xyz nonsense", topK: 8 },
       { toolCallId: "t2", messages: [] },
     );
