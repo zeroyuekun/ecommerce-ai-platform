@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sanity generated types — regenerate via `pnpm typegen`
+sanity.types.ts
+schema.json
