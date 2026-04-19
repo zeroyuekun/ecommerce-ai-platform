@@ -91,13 +91,18 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
   }, []);
 
   useEffect(() => {
+    // Empty signature = empty cart; no fetch needed and no timer to schedule.
+    if (!signature) {
+      setStockMap(new Map());
+      setIsLoading(false);
+      return;
+    }
     const timer = setTimeout(runFetch, DEBOUNCE_MS);
     return () => {
       clearTimeout(timer);
       abortRef.current?.abort();
     };
-    // signature intentionally drives the effect — rerun only when cart shape changes.
-  }, [signature, runFetch]);
+  }, [runFetch, signature]);
 
   const hasStockIssues = useMemo(() => {
     for (const info of stockMap.values()) {

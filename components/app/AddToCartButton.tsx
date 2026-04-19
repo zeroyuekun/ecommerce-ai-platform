@@ -46,6 +46,7 @@ export function AddToCartButton({
   if (isOutOfStock) {
     return (
       <button
+        type="button"
         disabled
         className={cn(
           "flex h-11 w-full items-center justify-center bg-zinc-200 text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500",

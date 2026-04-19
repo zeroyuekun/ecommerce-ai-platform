@@ -114,7 +114,7 @@ function StockEditor(handle: DocumentHandle) {
       type="number"
       min="0"
       value={(stock as number) ?? 0}
-      onChange={(e) => editStock(parseInt(e.target.value) || 0)}
+      onChange={(e) => editStock(parseInt(e.target.value, 10) || 0)}
       placeholder="0"
     />
   );

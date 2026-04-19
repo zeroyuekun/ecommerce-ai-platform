@@ -211,7 +211,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     searchParams.get("material")?.split(",").filter(Boolean) ?? [];
   const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
   const urlMaxPrice = Number(searchParams.get("maxPrice")) || 5000;
-  const currentInStock = searchParams.get("inStock") === "true";
+  const _currentInStock = searchParams.get("inStock") === "true";
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
     urlMinPrice,

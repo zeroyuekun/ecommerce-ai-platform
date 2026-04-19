@@ -168,7 +168,7 @@ export const productType = defineType({
         : `$${price ?? 0}`;
       return {
         title,
-        subtitle: `${subtitle ? subtitle + " • " : ""}${priceDisplay}`,
+        subtitle: `${subtitle ? `${subtitle} • ` : ""}${priceDisplay}`,
         media,
       };
     },

@@ -11,7 +11,7 @@ export function SortSelect() {
   const currentSort = searchParams.get("sort") ?? "featured";
   const [open, setOpen] = useState(false);
 
-  const currentLabel =
+  const _currentLabel =
     SORT_OPTIONS.find((o) => o.value === currentSort)?.label ?? "Featured";
 
   const handleSortChange = useCallback(

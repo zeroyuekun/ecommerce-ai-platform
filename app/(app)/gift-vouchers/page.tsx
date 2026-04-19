@@ -45,20 +45,30 @@ export default function GiftVouchersPage() {
         <div className="mx-auto mt-12 max-w-md">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label
+                htmlFor="voucher-recipient-email"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
                 Recipient&apos;s Email
               </label>
               <input
+                id="voucher-recipient-email"
+                name="recipientEmail"
                 type="email"
                 className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                 placeholder="recipient@email.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label
+                htmlFor="voucher-message"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
                 Personal Message (optional)
               </label>
               <textarea
+                id="voucher-message"
+                name="message"
                 rows={3}
                 className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                 placeholder="Add a personal touch..."

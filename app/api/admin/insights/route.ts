@@ -1,5 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { gateway, generateText } from "ai";
+import { safeParseJson } from "@/lib/ai/json-extract";
 import {
   ORDER_STATUS_DISTRIBUTION_QUERY,
   ORDERS_LAST_7_DAYS_QUERY,
@@ -63,50 +64,6 @@ interface RevenuePeriod {
   previousPeriod: number;
   currentOrderCount: number;
   previousOrderCount: number;
-}
-
-// Extracts the first balanced JSON object from `text`. Greedy `/\{[\s\S]*\}/`
-// over-matches when the model emits multiple objects or trailing prose.
-function extractBalancedJson(text: string): string | null {
-  let depth = 0;
-  let start = -1;
-  let inString = false;
-  let escape = false;
-  for (let i = 0; i < text.length; i += 1) {
-    const ch = text[i];
-    if (escape) {
-      escape = false;
-      continue;
-    }
-    if (ch === "\\") {
-      escape = true;
-      continue;
-    }
-    if (ch === '"') {
-      inString = !inString;
-      continue;
-    }
-    if (inString) continue;
-    if (ch === "{") {
-      if (depth === 0) start = i;
-      depth += 1;
-    } else if (ch === "}") {
-      depth -= 1;
-      if (depth === 0 && start !== -1) return text.slice(start, i + 1);
-    }
-  }
-  return null;
-}
-
-function safeParseJson<T>(text: string): T {
-  const trimmed = text.trim();
-  try {
-    return JSON.parse(trimmed) as T;
-  } catch {
-    const candidate = extractBalancedJson(trimmed);
-    if (!candidate) throw new Error("No JSON object found in response");
-    return JSON.parse(candidate) as T;
-  }
 }
 
 export async function GET() {

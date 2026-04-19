@@ -25,7 +25,7 @@ function StockInputContent(handle: StockInputProps) {
       type="number"
       min={0}
       value={stockValue}
-      onChange={(e) => editStock(parseInt(e.target.value) || 0)}
+      onChange={(e) => editStock(parseInt(e.target.value, 10) || 0)}
       className={cn(
         "h-8 w-20 text-center",
         isOutOfStock &&

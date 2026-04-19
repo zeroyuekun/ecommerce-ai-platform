@@ -81,40 +81,60 @@ export default function ContactPage() {
             </h2>
             <form className="mt-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label
+                  htmlFor="contact-name"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
                   Name
                 </label>
                 <input
+                  id="contact-name"
+                  name="name"
                   type="text"
                   className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                   placeholder="Your name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label
+                  htmlFor="contact-email"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
                   Email
                 </label>
                 <input
+                  id="contact-email"
+                  name="email"
                   type="email"
                   className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                   placeholder="your@email.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label
+                  htmlFor="contact-subject"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
                   Subject
                 </label>
                 <input
+                  id="contact-subject"
+                  name="subject"
                   type="text"
                   className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                   placeholder="How can we help?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label
+                  htmlFor="contact-message"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
                   Message
                 </label>
                 <textarea
+                  id="contact-message"
+                  name="message"
                   rows={5}
                   className="mt-1 w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
                   placeholder="Tell us more..."

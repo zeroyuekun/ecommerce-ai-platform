@@ -23,8 +23,8 @@ export function CategoryTiles({
   activeCategory,
 }: CategoryTilesProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [_canScrollPrev, setCanScrollPrev] = useState(false);
+  const [_canScrollNext, setCanScrollNext] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 

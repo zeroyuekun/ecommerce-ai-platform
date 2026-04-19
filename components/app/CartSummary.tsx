@@ -38,6 +38,7 @@ export function CartSummary({ hasStockIssues = false }: CartSummaryProps) {
       <div className="mt-5">
         {hasStockIssues ? (
           <button
+            type="button"
             disabled
             className="w-full bg-zinc-200 py-3.5 text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
           >

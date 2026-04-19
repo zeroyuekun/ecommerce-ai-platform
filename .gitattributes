@@ -1,0 +1,17 @@
+# Enforce LF line endings across the repo on all platforms.
+# Works with core.autocrlf=true on Windows: files are stored as LF in the
+# index and checked out as LF in the working tree, so local tooling (Biome,
+# Prettier, etc.) matches what CI sees on Linux runners.
+* text=auto eol=lf
+
+# Binary files that should never be modified.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.mp4 binary
+*.webm binary

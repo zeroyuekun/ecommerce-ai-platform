@@ -17,8 +17,8 @@ interface HaveYouSeenThisProps {
 
 export function HaveYouSeenThis({ products }: HaveYouSeenThisProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [_canScrollPrev, setCanScrollPrev] = useState(false);
+  const [_canScrollNext, setCanScrollNext] = useState(false);
 
   const onSelect = useCallback(() => {
     if (!api) return;

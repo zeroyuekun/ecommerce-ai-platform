@@ -46,6 +46,7 @@ function QuantityAddToCart({
   if (isOutOfStock) {
     return (
       <button
+        type="button"
         disabled
         className="flex h-[52px] w-full items-center justify-center bg-zinc-200 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
       >

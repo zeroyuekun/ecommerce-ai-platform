@@ -19,7 +19,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   getOrderStatus,
   ORDER_STATUS_CONFIG,
-  type OrderStatusValue,
 } from "@/lib/constants/orderStatus";
 
 interface StatusSelectProps extends DocumentHandle {}

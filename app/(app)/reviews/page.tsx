@@ -70,10 +70,15 @@ export default function ReviewsPage() {
             Customer Reviews
           </h1>
           <div className="mt-4 flex items-center justify-center gap-2">
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              className="flex"
+              role="img"
+              aria-label={`Average rating ${averageRating} out of 5`}
+            >
+              {["s1", "s2", "s3", "s4", "s5"].map((k) => (
                 <Star
-                  key={i}
+                  key={k}
+                  aria-hidden
                   className="h-5 w-5 fill-yellow-400 text-yellow-400"
                 />
               ))}
@@ -97,12 +102,17 @@ export default function ReviewsPage() {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    className="flex gap-0.5"
+                    role="img"
+                    aria-label={`Rated ${review.rating} out of 5 stars`}
+                  >
+                    {["s1", "s2", "s3", "s4", "s5"].map((k, starIndex) => (
                       <Star
-                        key={i}
+                        key={k}
+                        aria-hidden
                         className={`h-4 w-4 ${
-                          i < review.rating
+                          starIndex < review.rating
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-zinc-200 dark:text-zinc-700"
                         }`}

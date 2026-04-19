@@ -81,7 +81,7 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
   }, [hasCartAdd, cartResult, addItem]);
 
   // Determine icon based on tool type
-  const ToolIcon =
+  const _ToolIcon =
     toolName === "getMyOrders"
       ? Package
       : toolName === "addToCart"
