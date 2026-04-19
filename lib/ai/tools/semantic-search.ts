@@ -1,9 +1,9 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { getStockMessage, getStockStatus } from "@/lib/constants/stock";
+import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { embedText } from "@/lib/search/embed";
 import { getSearchIndex } from "@/lib/search/index";
-import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { formatPrice } from "@/lib/utils";
 import { sanityFetch } from "@/sanity/lib/live";
 

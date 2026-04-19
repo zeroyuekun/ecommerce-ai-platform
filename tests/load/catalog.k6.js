@@ -1,6 +1,7 @@
 // Hits the /products page (ISR-cached). Target: P95 < 200ms.
-import http from "k6/http";
+
 import { check, sleep } from "k6";
+import http from "k6/http";
 
 const BASE = __ENV.BASE_URL || "http://localhost:3000";
 

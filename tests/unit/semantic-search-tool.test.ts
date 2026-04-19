@@ -18,7 +18,8 @@ vi.mock("@/lib/search/index", () => ({
 }));
 
 vi.mock("@/sanity/lib/live", () => ({
-  sanityFetch: (...args: unknown[]) => Promise.resolve({ data: fetchMock(...args) }),
+  sanityFetch: (...args: unknown[]) =>
+    Promise.resolve({ data: fetchMock(...args) }),
 }));
 
 describe("semanticSearchTool", () => {
@@ -49,7 +50,9 @@ describe("semanticSearchTool", () => {
       { _id: "p1", slug: "a", name: "A", price: 100, stock: 1 },
     ]);
 
-    const { semanticSearchTool } = await import("@/lib/ai/tools/semantic-search");
+    const { semanticSearchTool } = await import(
+      "@/lib/ai/tools/semantic-search"
+    );
     const execute = semanticSearchTool.execute as unknown as (
       input: { query: string; topK: number },
       options: { toolCallId: string; messages: unknown[] },
@@ -71,7 +74,9 @@ describe("semanticSearchTool", () => {
   it("returns found=false when no matches", async () => {
     embedTextMock.mockResolvedValueOnce([0.1, 0.2]);
     queryMock.mockResolvedValueOnce([]);
-    const { semanticSearchTool } = await import("@/lib/ai/tools/semantic-search");
+    const { semanticSearchTool } = await import(
+      "@/lib/ai/tools/semantic-search"
+    );
     const execute = semanticSearchTool.execute as unknown as (
       input: { query: string; topK: number },
       options: { toolCallId: string; messages: unknown[] },

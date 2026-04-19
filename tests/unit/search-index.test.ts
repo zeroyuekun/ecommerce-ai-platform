@@ -145,7 +145,11 @@ describe("getSearchIndex", () => {
   });
 });
 
-import { __setTestIndex, deleteProduct, upsertProduct } from "@/lib/search/index";
+import {
+  __setTestIndex,
+  deleteProduct,
+  upsertProduct,
+} from "@/lib/search/index";
 
 describe("upsertProduct", () => {
   beforeEach(() => {

@@ -6,7 +6,10 @@
   { "query": "warm natural wood dining table for six", "relevantIds": [] },
   { "query": "something for a small balcony", "relevantIds": [] },
   { "query": "desk for a work-from-home setup", "relevantIds": [] },
-  { "query": "bedside table that doesn't dominate the room", "relevantIds": [] },
+  {
+    "query": "bedside table that doesn't dominate the room",
+    "relevantIds": []
+  },
   { "query": "storage for a tidy entryway", "relevantIds": [] },
   { "query": "play area for toddlers", "relevantIds": [] },
   { "query": "reading chair for a quiet corner", "relevantIds": [] },
@@ -14,7 +17,10 @@
   { "query": "bedroom feel: calm and minimal", "relevantIds": [] },
   { "query": "lighting for a moody lounge", "relevantIds": [] },
   { "query": "outdoor seating that survives rain", "relevantIds": [] },
-  { "query": "coffee table under $500 that looks expensive", "relevantIds": [] },
+  {
+    "query": "coffee table under $500 that looks expensive",
+    "relevantIds": []
+  },
   { "query": "bookshelf for a rental where I can't drill", "relevantIds": [] },
   { "query": "soft fabric sofa for families", "relevantIds": [] },
   { "query": "guest bedroom essentials", "relevantIds": [] },

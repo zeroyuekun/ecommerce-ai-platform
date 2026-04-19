@@ -7,7 +7,13 @@ export interface ProductEmbeddingInput {
 }
 
 export function buildEmbeddingText(input: ProductEmbeddingInput): string {
-  return [input.name, input.description, input.category, input.material, input.color]
+  return [
+    input.name,
+    input.description,
+    input.category,
+    input.material,
+    input.color,
+  ]
     .filter((v): v is string => typeof v === "string" && v.length > 0)
     .join("\n");
 }

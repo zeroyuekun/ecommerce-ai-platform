@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { searchRateLimiter } from "@/lib/ai/rate-limit";
+import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { embedText } from "@/lib/search/embed";
 import { getSearchIndex } from "@/lib/search/index";
-import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { client } from "@/sanity/lib/client";
 
 export const runtime = "nodejs";

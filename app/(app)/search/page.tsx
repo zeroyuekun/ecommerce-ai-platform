@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { embedText } from "@/lib/search/embed";
 import { getSearchIndex } from "@/lib/search/index";
-import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
 import { formatPrice } from "@/lib/utils";
 import { sanityFetch } from "@/sanity/lib/live";
 
@@ -109,7 +109,9 @@ export default async function SearchPage({
 
       {query.length === 0 ? (
         <div>
-          <p className="mb-3 text-sm text-muted-foreground">Try one of these:</p>
+          <p className="mb-3 text-sm text-muted-foreground">
+            Try one of these:
+          </p>
           <ul className="space-y-2">
             {SUGGESTED_QUERIES.map((s) => (
               <li key={s}>

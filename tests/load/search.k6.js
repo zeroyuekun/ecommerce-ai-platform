@@ -1,5 +1,5 @@
-import http from "k6/http";
 import { check, sleep } from "k6";
+import http from "k6/http";
 
 const BASE = __ENV.BASE_URL || "http://localhost:3000";
 const SCENARIO = __ENV.SCENARIO || "baseline";
@@ -49,9 +49,7 @@ export const options = {
   },
   thresholds: {
     "http_req_failed{expected_response:true}": ["rate<0.01"],
-    http_req_duration: [
-      SCENARIO === "spike" ? "p(95)<1500" : "p(95)<500",
-    ],
+    http_req_duration: [SCENARIO === "spike" ? "p(95)<1500" : "p(95)<500"],
   },
 };
 

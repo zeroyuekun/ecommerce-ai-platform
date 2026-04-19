@@ -1,7 +1,8 @@
 // Hits /api/chat with a canned user message. Requires a Clerk test-mode
 // session token exported as CLERK_TEST_SESSION. In CI this is a secret.
-import http from "k6/http";
+
 import { check, sleep } from "k6";
+import http from "k6/http";
 
 const BASE = __ENV.BASE_URL || "http://localhost:3000";
 const SCENARIO = __ENV.SCENARIO || "baseline";

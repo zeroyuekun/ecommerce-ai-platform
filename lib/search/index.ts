@@ -1,6 +1,10 @@
 import { embedText } from "./embed";
 import { buildEmbeddingText, type ProductEmbeddingInput } from "./text";
-import type { ProductEmbeddingMetadata, SearchOptions, SearchResult } from "./types";
+import type {
+  ProductEmbeddingMetadata,
+  SearchOptions,
+  SearchResult,
+} from "./types";
 
 export interface IndexRecord {
   id: string;
@@ -33,8 +37,10 @@ function matchesFilter(
   filter: NonNullable<SearchOptions["filter"]>,
 ): boolean {
   if (filter.category && meta.category !== filter.category) return false;
-  if (typeof filter.minPrice === "number" && meta.price < filter.minPrice) return false;
-  if (typeof filter.maxPrice === "number" && meta.price > filter.maxPrice) return false;
+  if (typeof filter.minPrice === "number" && meta.price < filter.minPrice)
+    return false;
+  if (typeof filter.maxPrice === "number" && meta.price > filter.maxPrice)
+    return false;
   return true;
 }
 
@@ -94,8 +100,10 @@ async function createUpstashIndex(): Promise<SearchIndex> {
       const filter = options.filter;
       const parts: string[] = [];
       if (filter?.category) parts.push(`category = '${filter.category}'`);
-      if (typeof filter?.minPrice === "number") parts.push(`price >= ${filter.minPrice}`);
-      if (typeof filter?.maxPrice === "number") parts.push(`price <= ${filter.maxPrice}`);
+      if (typeof filter?.minPrice === "number")
+        parts.push(`price >= ${filter.minPrice}`);
+      if (typeof filter?.maxPrice === "number")
+        parts.push(`price <= ${filter.maxPrice}`);
       const res = await index.query(
         {
           vector,
@@ -116,7 +124,8 @@ async function createUpstashIndex(): Promise<SearchIndex> {
 
 function hasUpstashVectorEnv(): boolean {
   return Boolean(
-    process.env.UPSTASH_VECTOR_REST_URL && process.env.UPSTASH_VECTOR_REST_TOKEN,
+    process.env.UPSTASH_VECTOR_REST_URL &&
+      process.env.UPSTASH_VECTOR_REST_TOKEN,
   );
 }
 

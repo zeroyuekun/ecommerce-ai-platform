@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
-import { deleteProduct, upsertProduct } from "@/lib/search/index";
 import { PRODUCT_FOR_INDEXING_QUERY } from "@/lib/sanity/queries/product-for-indexing";
+import { deleteProduct, upsertProduct } from "@/lib/search/index";
 import { client } from "@/sanity/lib/client";
 
 export const runtime = "nodejs";
@@ -21,7 +21,10 @@ function verifySignature(body: string, signature: string | null): boolean {
   if (!signature) return false;
   const secret = process.env.SANITY_REVALIDATE_SECRET;
   if (!secret) return false;
-  const expected = crypto.createHmac("sha256", secret).update(body).digest("hex");
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(body)
+    .digest("hex");
   return constantTimeEqual(expected, signature);
 }
 
