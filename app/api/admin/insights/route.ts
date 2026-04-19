@@ -1,14 +1,14 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { generateText, gateway } from "ai";
-import { client } from "@/sanity/lib/client";
+import { gateway, generateText } from "ai";
 import {
-  ORDERS_LAST_7_DAYS_QUERY,
   ORDER_STATUS_DISTRIBUTION_QUERY,
-  TOP_SELLING_PRODUCTS_QUERY,
+  ORDERS_LAST_7_DAYS_QUERY,
   PRODUCTS_INVENTORY_QUERY,
-  UNFULFILLED_ORDERS_QUERY,
   REVENUE_BY_PERIOD_QUERY,
+  TOP_SELLING_PRODUCTS_QUERY,
+  UNFULFILLED_ORDERS_QUERY,
 } from "@/lib/sanity/queries/stats";
+import { client } from "@/sanity/lib/client";
 
 interface OrderItem {
   quantity: number;
@@ -65,15 +65,65 @@ interface RevenuePeriod {
   previousOrderCount: number;
 }
 
+// Extracts the first balanced JSON object from `text`. Greedy `/\{[\s\S]*\}/`
+// over-matches when the model emits multiple objects or trailing prose.
+function extractBalancedJson(text: string): string | null {
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === "{") {
+      if (depth === 0) start = i;
+      depth += 1;
+    } else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0 && start !== -1) return text.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
+function safeParseJson<T>(text: string): T {
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed) as T;
+  } catch {
+    const candidate = extractBalancedJson(trimmed);
+    if (!candidate) throw new Error("No JSON object found in response");
+    return JSON.parse(candidate) as T;
+  }
+}
+
 export async function GET() {
   const { userId } = await auth();
   if (!userId) {
-    return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return Response.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 },
+    );
   }
 
   const user = await currentUser();
   if (user?.publicMetadata?.role !== "admin") {
-    return Response.json({ success: false, error: "Forbidden" }, { status: 403 });
+    return Response.json(
+      { success: false, error: "Forbidden" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -130,29 +180,22 @@ export async function GET() {
       .sort((a, b) => b.totalQuantity - a.totalQuantity)
       .slice(0, 5);
 
-    // Find products needing restock (low stock but high sales)
-    const productSalesById = new Map(
-      Array.from(productSalesMap.entries()).map(([id, data]) => [
-        id,
-        data.totalQuantity,
-      ])
-    );
+    // Single pass over inventory: bifurcate into restock/slow-moving buckets.
+    // Reuses productSalesMap directly — no duplicate Map.
+    const needsRestockAll: Product[] = [];
+    const slowMovingAll: Product[] = [];
+    let lowStockCount = 0;
+    for (const p of productsInventory) {
+      if (p.stock <= 5) lowStockCount += 1;
+      const salesQty = productSalesMap.get(p._id)?.totalQuantity ?? 0;
+      if (p.stock <= 5 && salesQty > 0) needsRestockAll.push(p);
+      else if (p.stock > 10 && salesQty === 0) slowMovingAll.push(p);
+    }
 
-    const needsRestock = productsInventory
-      .filter((p) => {
-        const salesQty = productSalesById.get(p._id) || 0;
-        return p.stock <= 5 && salesQty > 0;
-      })
+    const needsRestock = needsRestockAll
       .sort((a, b) => a.stock - b.stock)
       .slice(0, 5);
-
-    // Slow moving inventory (in stock but no sales)
-    const slowMoving = productsInventory
-      .filter((p) => {
-        const salesQty = productSalesById.get(p._id) || 0;
-        return p.stock > 10 && salesQty === 0;
-      })
-      .slice(0, 5);
+    const slowMoving = slowMovingAll.slice(0, 5);
 
     // Helper to calculate days since order
     const getDaysSinceOrder = (createdAt: string) => {
@@ -204,7 +247,7 @@ export async function GET() {
           category: p.category,
         })),
         totalProducts: productsInventory.length,
-        lowStockCount: productsInventory.filter((p) => p.stock <= 5).length,
+        lowStockCount,
       },
       operations: {
         statusDistribution,
@@ -215,7 +258,7 @@ export async function GET() {
           itemCount: o.itemCount,
         })),
         urgentOrders: unfulfilledOrders.filter(
-          (o) => getDaysSinceOrder(o.createdAt) > 2
+          (o) => getDaysSinceOrder(o.createdAt) > 2,
         ).length,
       },
     };
@@ -276,13 +319,9 @@ Generate insights in the required JSON format.`,
       };
     };
     try {
-      // Extract JSON from the response (in case there's extra text)
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        insights = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
+      // Try direct parse first — model usually returns clean JSON.
+      // Fall back to balanced-brace extraction if there's preamble/trailing text.
+      insights = safeParseJson<typeof insights>(text);
     } catch {
       // Fallback insights if parsing fails
       insights = {
@@ -329,7 +368,7 @@ Generate insights in the required JSON format.`,
         orderCount: revenuePeriod.currentOrderCount || 0,
         avgOrderValue: avgOrderValue.toFixed(2),
         unfulfilledCount: unfulfilledOrders.length,
-        lowStockCount: productsInventory.filter((p) => p.stock <= 5).length,
+        lowStockCount,
       },
       generatedAt: new Date().toISOString(),
     });
@@ -340,7 +379,7 @@ Generate insights in the required JSON format.`,
         success: false,
         error: "Failed to generate insights. Please try again later.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

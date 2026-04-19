@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { sanityFetch } from "@/sanity/lib/live";
+import Link from "next/link";
+import { ProductSection } from "@/components/app/ProductSection";
+import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
 import {
-  FILTER_PRODUCTS_BY_NAME_QUERY,
+  FILTER_PRODUCTS_BY_BEST_SELLING_QUERY,
   FILTER_PRODUCTS_BY_NAME_DESC_QUERY,
+  FILTER_PRODUCTS_BY_NAME_QUERY,
   FILTER_PRODUCTS_BY_NEWEST_QUERY,
   FILTER_PRODUCTS_BY_PRICE_ASC_QUERY,
   FILTER_PRODUCTS_BY_PRICE_DESC_QUERY,
-  FILTER_PRODUCTS_BY_BEST_SELLING_QUERY,
   FILTER_PRODUCTS_BY_RELEVANCE_QUERY,
 } from "@/lib/sanity/queries/products";
-import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
-import { ProductSection } from "@/components/app/ProductSection";
-import Link from "next/link";
+import { sanityFetch } from "@/sanity/lib/live";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -31,15 +31,17 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const title =
-    slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
+  const title = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
   return {
     title,
     description: `Shop our ${title.toLowerCase()} collection. Premium furniture and homewares at Kozy.`,
   };
 }
 
-export default async function CategoryPage({ params, searchParams }: PageProps) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { slug } = await params;
   const sp = await searchParams;
 
@@ -92,7 +94,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     query: ALL_CATEGORIES_QUERY,
   });
 
-  const categoryTitle = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
+  const categoryTitle =
+    slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">

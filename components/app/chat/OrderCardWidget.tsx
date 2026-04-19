@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { StackedProductImages } from "@/components/app/StackedProductImages";
 import type { OrderSummary } from "@/lib/ai/tools/get-my-orders";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { formatDate, formatOrderNumber } from "@/lib/utils";
-import { StackedProductImages } from "@/components/app/StackedProductImages";
 
 interface OrderCardWidgetProps {
   order: OrderSummary;

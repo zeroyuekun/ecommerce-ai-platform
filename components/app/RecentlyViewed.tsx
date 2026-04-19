@@ -1,22 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { ProductCard } from "@/components/app/ProductCard";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
 } from "@/components/ui/carousel";
-import { useRecentlyViewedIds } from "@/lib/store/recently-viewed-store-provider";
 import { getProductsByIds } from "@/lib/actions/products";
+import { useRecentlyViewedIds } from "@/lib/store/recently-viewed-store-provider";
 import type { PRODUCTS_BY_IDS_FULL_QUERY_RESULT } from "@/sanity.types";
 
 export function RecentlyViewed() {
   const productIds = useRecentlyViewedIds();
-  const [products, setProducts] =
-    useState<PRODUCTS_BY_IDS_FULL_QUERY_RESULT>([]);
+  const [products, setProducts] = useState<PRODUCTS_BY_IDS_FULL_QUERY_RESULT>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);

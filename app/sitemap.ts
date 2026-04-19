@@ -7,10 +7,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all product slugs and category slugs from Sanity
   const [products, categories] = await Promise.all([
     client.fetch<{ slug: string; updatedAt: string }[]>(
-      `*[_type == "product"]{ "slug": slug.current, "updatedAt": _updatedAt }`
+      `*[_type == "product"]{ "slug": slug.current, "updatedAt": _updatedAt }`,
     ),
     client.fetch<{ slug: string }[]>(
-      `*[_type == "category"]{ "slug": slug.current }`
+      `*[_type == "category"]{ "slug": slug.current }`,
     ),
   ]);
 

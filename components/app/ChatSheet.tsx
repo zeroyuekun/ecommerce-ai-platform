@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useAuth } from "@clerk/nextjs";
 import { ImageIcon, Loader2, X as XIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
-  useIsChatOpen,
   useChatActions,
+  useIsChatOpen,
   usePendingMessage,
 } from "@/lib/store/chat-store-provider";
 
 import {
   getMessageText,
   getToolParts,
-  WelcomeScreen,
   MessageBubble,
   ToolCallUI,
+  WelcomeScreen,
 } from "./chat";
 
 export function ChatSheet() {
@@ -24,7 +24,10 @@ export function ChatSheet() {
   const pendingMessage = usePendingMessage();
   const { isSignedIn } = useAuth();
   const [input, setInput] = useState("");
-  const [imagePreview, setImagePreview] = useState<{ url: string; file: File } | null>(null);
+  const [imagePreview, setImagePreview] = useState<{
+    url: string;
+    file: File;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +52,8 @@ export function ChatSheet() {
     e.preventDefault();
     if ((!input.trim() && !imagePreview) || isLoading) return;
 
-    const text = input.trim() || (imagePreview ? "What can you tell me about this?" : "");
+    const text =
+      input.trim() || (imagePreview ? "What can you tell me about this?" : "");
     if (imagePreview) {
       const dt = new DataTransfer();
       dt.items.add(imagePreview.file);
@@ -99,7 +103,11 @@ export function ChatSheet() {
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
               Shopping Assistant
             </span>
-            <button type="button" onClick={closeChat} className="text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
+            <button
+              type="button"
+              onClick={closeChat}
+              className="text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
               <XIcon className="h-4 w-4" />
             </button>
           </div>
@@ -186,7 +194,10 @@ export function ChatSheet() {
               </div>
             </div>
           )}
-          <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+          >
             <input
               ref={fileInputRef}
               type="file"

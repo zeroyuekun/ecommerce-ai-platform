@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { CreditCard, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Loader2, CreditCard } from "lucide-react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useCartItems } from "@/lib/store/cart-store-provider";
 import { createCheckoutSession } from "@/lib/actions/checkout";
+import { useCartItems } from "@/lib/store/cart-store-provider";
 
 interface CheckoutButtonProps {
   disabled?: boolean;

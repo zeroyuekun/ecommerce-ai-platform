@@ -82,4 +82,3 @@ export const ORDER_BY_STRIPE_PAYMENT_ID_QUERY = defineQuery(`*[
   _type == "order"
   && stripePaymentId == $stripePaymentId
 ][0]{ _id }`);
-

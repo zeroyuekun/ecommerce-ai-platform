@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { sanityFetch } from "@/sanity/lib/live";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ProductDetail } from "@/components/app/ProductDetail";
+import { RecentlyViewed } from "@/components/app/RecentlyViewed";
+import { RelatedProductsCarousel } from "@/components/app/RelatedProductsCarousel";
 import {
   PRODUCT_BY_SLUG_QUERY,
-  VARIANT_SIBLINGS_FULL_QUERY,
   RELATED_PRODUCTS_QUERY,
+  VARIANT_SIBLINGS_FULL_QUERY,
 } from "@/lib/sanity/queries/products";
-import { ProductDetail } from "@/components/app/ProductDetail";
-import { RelatedProductsCarousel } from "@/components/app/RelatedProductsCarousel";
-import { RecentlyViewed } from "@/components/app/RecentlyViewed";
+import { sanityFetch } from "@/sanity/lib/live";
 
 interface ProductPageProps {
   params: Promise<{
@@ -40,8 +40,7 @@ export async function generateMetadata({
       `Shop ${product.name} at Kozy. Premium furniture and homewares.`,
     openGraph: {
       title: product.name ?? undefined,
-      description:
-        product.description?.slice(0, 160) ?? undefined,
+      description: product.description?.slice(0, 160) ?? undefined,
       ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
     },
   };

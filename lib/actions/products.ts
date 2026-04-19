@@ -1,7 +1,7 @@
 "use server";
 
-import { sanityFetch } from "@/sanity/lib/live";
 import { PRODUCTS_BY_IDS_FULL_QUERY } from "@/lib/sanity/queries/products";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export async function getProductsByIds(ids: string[]) {
   if (ids.length === 0) return [];

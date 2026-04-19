@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ProductCard } from "@/components/app/ProductCard";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 import type { BEST_SELLERS_QUERY_RESULT } from "@/sanity.types";
 
@@ -48,7 +48,7 @@ export function BestSellers({ products }: BestSellersProps) {
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -72,7 +72,10 @@ export function BestSellers({ products }: BestSellersProps) {
             className="absolute left-2 top-[40%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
             aria-label="Scroll left"
           >
-            <ChevronLeft className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+            <ChevronLeft
+              className="h-4 w-4 text-zinc-600 dark:text-zinc-300"
+              strokeWidth={2}
+            />
           </button>
 
           <button
@@ -81,7 +84,10 @@ export function BestSellers({ products }: BestSellersProps) {
             className="absolute right-2 top-[40%] z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
             aria-label="Scroll right"
           >
-            <ChevronRight className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+            <ChevronRight
+              className="h-4 w-4 text-zinc-600 dark:text-zinc-300"
+              strokeWidth={2}
+            />
           </button>
 
           <Carousel

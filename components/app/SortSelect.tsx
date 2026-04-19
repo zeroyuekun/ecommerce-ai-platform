@@ -1,8 +1,8 @@
 "use client";
 
+import { Check, ChevronDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
 import { SORT_OPTIONS } from "@/lib/constants/filters";
 
 export function SortSelect() {
@@ -44,10 +44,7 @@ export function SortSelect() {
 
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
             {SORT_OPTIONS.map((option) => {
               const isActive = currentSort === option.value;
@@ -64,7 +61,10 @@ export function SortSelect() {
                 >
                   {option.label}
                   {isActive && (
-                    <Check className="h-3.5 w-3.5 text-zinc-900 dark:text-zinc-100" strokeWidth={2} />
+                    <Check
+                      className="h-3.5 w-3.5 text-zinc-900 dark:text-zinc-100"
+                      strokeWidth={2}
+                    />
                   )}
                 </button>
               );

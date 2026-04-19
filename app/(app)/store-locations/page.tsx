@@ -1,4 +1,4 @@
-import { MapPin, Clock, Phone } from "lucide-react";
+import { Clock, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 const stores = [

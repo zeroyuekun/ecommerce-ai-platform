@@ -1,24 +1,66 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { Hand, Leaf, Shield, Truck, X } from "lucide-react";
 import Image from "next/image";
-import { X, Hand, Leaf, Shield, Truck } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const originalGalleryImages = [
-  { src: "https://cdn.decorilla.com/online-decorating/wp-content/uploads/2024/01/High-end-brands-furniture-Cameron-Design-House-1024x574.jpeg?width=900", alt: "High end brands furniture - Cameron Design House" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Amelia-R-750x.jpeg", alt: "High end brands furniture - Amelia R" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-companies-in-a-contemporary-dining-room-Katerina-P-750x.jpeg", alt: "High end furniture in a contemporary dining room - Katerina P" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Meral-Y-750x.jpeg", alt: "High end brands furniture - Meral Y" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-websites-Dina-H-750x.jpeg", alt: "High end furniture - Dina H" },
-  { src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2026/01/Serene-boho-modern-bedroom-interior-by-Decorilla.jpg", alt: "Serene boho modern bedroom interior by Decorilla" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Sonia-C-750x.jpg", alt: "High end furniture retailers - Sonia C" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Kelly-Wearstler-750x.jpg", alt: "High end furniture - Kelly Wearstler" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-outlet-Nathalie-I-750x.jpeg", alt: "High end furniture outlet - Nathalie I" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Tov-Furniture-750x.jpg", alt: "Best high end furniture stores - Tov Furniture" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-Erin-R-750x.jpg", alt: "Best high end furniture - Erin R" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Natuzzi-750x.jpg", alt: "High end furniture retailers - Natuzzi" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Arlen-A-750x.jpg", alt: "High end furniture stores - Arlen A" },
-  { src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Vitra-750x.jpg", alt: "Best high end furniture stores - Vitra" },
+  {
+    src: "https://cdn.decorilla.com/online-decorating/wp-content/uploads/2024/01/High-end-brands-furniture-Cameron-Design-House-1024x574.jpeg?width=900",
+    alt: "High end brands furniture - Cameron Design House",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Amelia-R-750x.jpeg",
+    alt: "High end brands furniture - Amelia R",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-companies-in-a-contemporary-dining-room-Katerina-P-750x.jpeg",
+    alt: "High end furniture in a contemporary dining room - Katerina P",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Meral-Y-750x.jpeg",
+    alt: "High end brands furniture - Meral Y",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-websites-Dina-H-750x.jpeg",
+    alt: "High end furniture - Dina H",
+  },
+  {
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2026/01/Serene-boho-modern-bedroom-interior-by-Decorilla.jpg",
+    alt: "Serene boho modern bedroom interior by Decorilla",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Sonia-C-750x.jpg",
+    alt: "High end furniture retailers - Sonia C",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Kelly-Wearstler-750x.jpg",
+    alt: "High end furniture - Kelly Wearstler",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-outlet-Nathalie-I-750x.jpeg",
+    alt: "High end furniture outlet - Nathalie I",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Tov-Furniture-750x.jpg",
+    alt: "Best high end furniture stores - Tov Furniture",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-Erin-R-750x.jpg",
+    alt: "Best high end furniture - Erin R",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Natuzzi-750x.jpg",
+    alt: "High end furniture retailers - Natuzzi",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Arlen-A-750x.jpg",
+    alt: "High end furniture stores - Arlen A",
+  },
+  {
+    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Vitra-750x.jpg",
+    alt: "Best high end furniture stores - Vitra",
+  },
 ];
 
 const craftmanshipImages = [
@@ -84,7 +126,7 @@ export function StyleGallery() {
           });
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(el);
@@ -102,7 +144,7 @@ export function StyleGallery() {
           setCraftVisible(true);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
 
     observer.observe(el);
@@ -121,24 +163,48 @@ export function StyleGallery() {
         </p>
       </div>
 
-      <div ref={gridRef} className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 space-y-2">
+      <div
+        ref={gridRef}
+        className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 space-y-2"
+      >
         {/* Top section: 5 equal cols, big-left spans 2x2 */}
         <div className="grid grid-cols-5 gap-2">
           <div className="col-span-2 row-span-2">
-            <GalleryImage image={originalGalleryImages[0]} onClick={() => openLightbox(0)} visible={visibleImages.has(0)} />
+            <GalleryImage
+              image={originalGalleryImages[0]}
+              onClick={() => openLightbox(0)}
+              visible={visibleImages.has(0)}
+            />
           </div>
           {originalGalleryImages.slice(1, 7).map((img, i) => (
-            <GalleryImage key={i} image={img} onClick={() => openLightbox(i + 1)} visible={visibleImages.has(i + 1)} />
+            <GalleryImage
+              key={i}
+              image={img}
+              onClick={() => openLightbox(i + 1)}
+              visible={visibleImages.has(i + 1)}
+            />
           ))}
         </div>
 
         {/* Bottom section: 5 equal cols, big-right spans 2x2 */}
         <div className="grid grid-cols-5 gap-2">
           {originalGalleryImages.slice(7, 13).map((img, i) => (
-            <GalleryImage key={i} image={img} onClick={() => openLightbox(i + 7)} visible={visibleImages.has(i + 7)} />
+            <GalleryImage
+              key={i}
+              image={img}
+              onClick={() => openLightbox(i + 7)}
+              visible={visibleImages.has(i + 7)}
+            />
           ))}
-          <div className="col-span-2 row-span-2" style={{ gridColumn: '4 / 6', gridRow: '1 / 3' }}>
-            <GalleryImage image={originalGalleryImages[13]} onClick={() => openLightbox(13)} visible={visibleImages.has(13)} />
+          <div
+            className="col-span-2 row-span-2"
+            style={{ gridColumn: "4 / 6", gridRow: "1 / 3" }}
+          >
+            <GalleryImage
+              image={originalGalleryImages[13]}
+              onClick={() => openLightbox(13)}
+              visible={visibleImages.has(13)}
+            />
           </div>
         </div>
       </div>
@@ -150,7 +216,10 @@ export function StyleGallery() {
         </h2>
       </div>
 
-      <div ref={craftRef} className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+      <div
+        ref={craftRef}
+        className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8"
+      >
         <div className="flex items-end gap-6 pb-16">
           {craftmanshipImages.map((img, i) => {
             const isOdd = i % 2 === 0;
@@ -189,21 +258,49 @@ export function StyleGallery() {
             Why Choose Kozy
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Furniture that feels like home. We put quality materials and thoughtful design into every piece, so you can create spaces you actually want to spend time in.
+            Furniture that feels like home. We put quality materials and
+            thoughtful design into every piece, so you can create spaces you
+            actually want to spend time in.
           </p>
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-y-8 gap-x-6 sm:grid-cols-4">
           {[
-            { icon: Hand, title: "Handcrafted", desc: "Made by skilled artisans" },
-            { icon: Leaf, title: "Sustainable", desc: "Responsibly sourced materials" },
-            { icon: Shield, title: "Built to Last", desc: "Premium quality guaranteed" },
-            { icon: Truck, title: "Free Delivery", desc: "White-glove service included" },
+            {
+              icon: Hand,
+              title: "Handcrafted",
+              desc: "Made by skilled artisans",
+            },
+            {
+              icon: Leaf,
+              title: "Sustainable",
+              desc: "Responsibly sourced materials",
+            },
+            {
+              icon: Shield,
+              title: "Built to Last",
+              desc: "Premium quality guaranteed",
+            },
+            {
+              icon: Truck,
+              title: "Free Delivery",
+              desc: "White-glove service included",
+            },
           ].map((item) => (
-            <div key={item.title} className="flex flex-col items-center text-center">
-              <item.icon className="h-6 w-6 text-zinc-900 dark:text-zinc-100" strokeWidth={1.5} />
-              <p className="mt-3 text-[13px] font-medium uppercase tracking-wide text-zinc-900 dark:text-zinc-100">{item.title}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+            <div
+              key={item.title}
+              className="flex flex-col items-center text-center"
+            >
+              <item.icon
+                className="h-6 w-6 text-zinc-900 dark:text-zinc-100"
+                strokeWidth={1.5}
+              />
+              <p className="mt-3 text-[13px] font-medium uppercase tracking-wide text-zinc-900 dark:text-zinc-100">
+                {item.title}
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                {item.desc}
+              </p>
             </div>
           ))}
         </div>
@@ -229,7 +326,10 @@ export function StyleGallery() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={originalGalleryImages[selectedImage].src.replace(/w=\d+/, 'w=1200')}
+              src={originalGalleryImages[selectedImage].src.replace(
+                /w=\d+/,
+                "w=1200",
+              )}
               alt={originalGalleryImages[selectedImage].alt}
               className="max-h-[85vh] max-w-[85vw] object-contain shadow-2xl"
             />
@@ -255,7 +355,8 @@ function GalleryImage({ image, onClick, visible }: GalleryImageProps) {
       style={{
         transform: visible ? "scale(1)" : "scale(0)",
         opacity: visible ? 1 : 0,
-        transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease-out",
+        transition:
+          "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease-out",
       }}
       onMouseEnter={(e) => {
         if (visible) e.currentTarget.style.transform = "scale(1.02)";

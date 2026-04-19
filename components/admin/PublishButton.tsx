@@ -1,14 +1,14 @@
 "use client";
 
-import { Suspense, useState } from "react";
 import {
+  type DocumentHandle,
+  discardDocument,
+  publishDocument,
   useApplyDocumentActions,
   useDocument,
-  publishDocument,
-  discardDocument,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
-import { Save, Check, Loader2, Undo2 } from "lucide-react";
+import { Check, Loader2, Save, Undo2 } from "lucide-react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {

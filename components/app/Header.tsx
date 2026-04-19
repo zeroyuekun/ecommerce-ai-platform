@@ -1,16 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { ChevronRight, MapPin, Package, Search, ShoppingCart, User } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import {
+  ChevronRight,
+  MapPin,
+  Package,
+  Search,
+  ShoppingCart,
+  User,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
-import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
-import { recordSearch, getPopularSearches } from "@/lib/actions/search";
+import { Button } from "@/components/ui/button";
+import { getPopularSearches, recordSearch } from "@/lib/actions/search";
 import { subcategoriesMap } from "@/lib/constants/subcategories";
+import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
 const defaultSuggestions = [
@@ -33,7 +40,11 @@ export function Header({ categories }: HeaderProps) {
     label: cat.title ?? "",
     slug: cat.slug ?? "",
     image: cat.image?.asset?.url ?? "",
-    subcategories: (subcategoriesMap[cat.slug ?? ""] ?? []) as { label: string; query: string; type?: string }[],
+    subcategories: (subcategoriesMap[cat.slug ?? ""] ?? []) as {
+      label: string;
+      query: string;
+      type?: string;
+    }[],
   }));
   const { openCart } = useCartActions();
   const totalItems = useTotalItems();
@@ -84,7 +95,7 @@ export function Header({ categories }: HeaderProps) {
             results.map((r) => ({
               label: r.query.charAt(0).toUpperCase() + r.query.slice(1),
               query: r.query,
-            }))
+            })),
           );
         }
       })
@@ -120,7 +131,10 @@ export function Header({ categories }: HeaderProps) {
 
       // Accumulate scroll distance in the current direction
       // Reset accumulator when direction changes
-      if ((delta > 0 && scrollAccumulator.current < 0) || (delta < 0 && scrollAccumulator.current > 0)) {
+      if (
+        (delta > 0 && scrollAccumulator.current < 0) ||
+        (delta < 0 && scrollAccumulator.current > 0)
+      ) {
         scrollAccumulator.current = 0;
       }
       scrollAccumulator.current += delta;
@@ -182,20 +196,29 @@ export function Header({ categories }: HeaderProps) {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${hidden ? "-translate-y-full" : "translate-y-0"} ${!solid ? "bg-transparent" : "bg-white/95 backdrop-blur-md shadow-sm dark:bg-zinc-950/95"}`}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${hidden ? "-translate-y-full" : "translate-y-0"} ${!solid ? "bg-transparent" : "bg-white/95 backdrop-blur-md shadow-sm dark:bg-zinc-950/95"}`}
+    >
       {/* Main header row */}
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-10">
         {/* Left: Logo */}
         <a href="/" className="flex shrink-0 items-center">
-          <span className={`font-serif text-4xl font-medium tracking-wide transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}>
+          <span
+            className={`font-serif text-4xl font-medium tracking-wide transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}
+          >
             Kozy.
           </span>
         </a>
 
         {/* Center: Search bar */}
-        <form onSubmit={handleSearch} className="absolute left-1/2 z-50 hidden -translate-x-1/2 sm:block w-[40%] lg:w-[35%]">
+        <form
+          onSubmit={handleSearch}
+          className="absolute left-1/2 z-50 hidden -translate-x-1/2 sm:block w-[40%] lg:w-[35%]"
+        >
           <div className="relative">
-            <Search className={`absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`} />
+            <Search
+              className={`absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-500 ${!solid ? "text-white" : "text-zinc-900 dark:text-zinc-100"}`}
+            />
             <input
               ref={inputRef}
               type="text"
@@ -232,9 +255,16 @@ export function Header({ categories }: HeaderProps) {
         </form>
 
         {/* Right: Icons */}
-        <div className={`flex shrink-0 items-center gap-1 transition-colors duration-500 ${!solid ? "[&_svg]:text-white [&_button]:text-white" : ""}`}>
+        <div
+          className={`flex shrink-0 items-center gap-1 transition-colors duration-500 ${!solid ? "[&_svg]:text-white [&_button]:text-white" : ""}`}
+        >
           {/* Location */}
-          <Button variant="ghost" size="icon" className="hover:bg-transparent dark:hover:bg-transparent" asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:bg-transparent dark:hover:bg-transparent"
+            asChild
+          >
             <Link href="/store-locations" title="Store Location">
               <MapPin className="h-5 w-5" />
               <span className="sr-only">Store locator</span>
@@ -243,7 +273,12 @@ export function Header({ categories }: HeaderProps) {
 
           {/* My Orders icon */}
           <SignedIn>
-            <Button variant="ghost" size="icon" className="hover:bg-transparent dark:hover:bg-transparent" asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-transparent dark:hover:bg-transparent"
+              asChild
+            >
               <Link href="/orders" title="My Orders">
                 <Package className="h-5 w-5" />
                 <span className="sr-only">My Orders</span>
@@ -261,7 +296,9 @@ export function Header({ categories }: HeaderProps) {
           >
             <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
-              <span className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-medium ${!solid ? "bg-white text-zinc-900" : "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"}`}>
+              <span
+                className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-medium ${!solid ? "bg-white text-zinc-900" : "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"}`}
+              >
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
@@ -292,7 +329,12 @@ export function Header({ categories }: HeaderProps) {
           </SignedIn>
           <SignedOut>
             <SignInButton mode="modal">
-              <Button variant="ghost" size="icon" className="hover:bg-transparent dark:hover:bg-transparent" title="Sign In">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-transparent dark:hover:bg-transparent"
+                title="Sign In"
+              >
                 <User className="h-5 w-5" />
                 <span className="sr-only">Sign in</span>
               </Button>
@@ -309,7 +351,11 @@ export function Header({ categories }: HeaderProps) {
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
           {/* New — far left */}
-          <div ref={newLinkRef} className="relative" onMouseEnter={() => setActiveCategory(null)}>
+          <div
+            ref={newLinkRef}
+            className="relative"
+            onMouseEnter={() => setActiveCategory(null)}
+          >
             <Link
               href="/shop?category=new"
               onClick={() => setActiveCategory(null)}
@@ -337,14 +383,20 @@ export function Header({ categories }: HeaderProps) {
                 onClick={() => setActiveCategory(null)}
                 className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
                   !solid
-                    ? activeCategory === cat.slug ? "text-white" : "text-white/80 hover:text-white"
-                    : activeCategory === cat.slug ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+                    ? activeCategory === cat.slug
+                      ? "text-white"
+                      : "text-white/80 hover:text-white"
+                    : activeCategory === cat.slug
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
                 }`}
               >
                 {cat.label}
                 <span
                   className={`absolute -bottom-2.5 left-1/2 h-[2px] -translate-x-1/2 transition-all duration-300 ${!solid ? "bg-white" : "bg-zinc-900 dark:bg-zinc-100"} ${
-                    activeCategory === cat.slug ? "w-full" : "w-0 group-hover:w-full"
+                    activeCategory === cat.slug
+                      ? "w-full"
+                      : "w-0 group-hover:w-full"
                   }`}
                 />
               </Link>
@@ -352,7 +404,11 @@ export function Header({ categories }: HeaderProps) {
           ))}
 
           {/* Sale — far right */}
-          <div ref={saleLinkRef} className="relative" onMouseEnter={() => setActiveCategory(null)}>
+          <div
+            ref={saleLinkRef}
+            className="relative"
+            onMouseEnter={() => setActiveCategory(null)}
+          >
             <Link
               href="/shop?category=sale"
               onClick={() => setActiveCategory(null)}
@@ -371,88 +427,91 @@ export function Header({ categories }: HeaderProps) {
         </div>
 
         {/* Mega dropdown — width matches New-to-Sale span */}
-        {activeCategoryData && (() => {
-          const navRect = navRef.current?.getBoundingClientRect();
-          const newRect = newLinkRef.current?.getBoundingClientRect();
-          const saleRect = saleLinkRef.current?.getBoundingClientRect();
-          const dropdownStyle: React.CSSProperties =
-            navRect && newRect && saleRect
-              ? {
-                  left: newRect.left - navRect.left - 80,
-                  width: saleRect.right - newRect.left + 160,
+        {activeCategoryData &&
+          (() => {
+            const navRect = navRef.current?.getBoundingClientRect();
+            const newRect = newLinkRef.current?.getBoundingClientRect();
+            const saleRect = saleLinkRef.current?.getBoundingClientRect();
+            const dropdownStyle: React.CSSProperties =
+              navRect && newRect && saleRect
+                ? {
+                    left: newRect.left - navRect.left - 80,
+                    width: saleRect.right - newRect.left + 160,
+                  }
+                : { left: 0, right: 0 };
+            return (
+              <div
+                className="absolute top-full z-50 origin-top bg-white shadow-xl dark:bg-zinc-950 animate-in fade-in slide-in-from-top-3 duration-300 ease-out"
+                style={dropdownStyle}
+                onMouseEnter={() =>
+                  handleCategoryHover(activeCategoryData.slug)
                 }
-              : { left: 0, right: 0 };
-          return (
-          <div
-            className="absolute top-full z-50 origin-top bg-white shadow-xl dark:bg-zinc-950 animate-in fade-in slide-in-from-top-3 duration-300 ease-out"
-            style={dropdownStyle}
-            onMouseEnter={() => handleCategoryHover(activeCategoryData.slug)}
-            onMouseLeave={handleCategoryLeave}
-          >
-            <div className="flex gap-8 px-8 py-6">
-              {/* Left: subcategory links in three columns */}
-              <div className="flex-1">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
-                  {activeCategoryData.label}
-                </p>
-                <div className="grid grid-cols-3 gap-x-6 gap-y-0">
-                  {activeCategoryData.subcategories.map((sub) => {
-                    const params = new URLSearchParams();
-                    params.set("category", activeCategoryData.slug);
-                    if (sub.type) params.set("type", sub.type);
-                    if (sub.query) params.set("q", sub.query);
-                    return (
-                      <Link
-                        key={sub.type ?? sub.query}
-                        href={`/shop?${params.toString()}`}
-                        onClick={() => setActiveCategory(null)}
-                        className="block py-1 text-[13px] uppercase text-zinc-600 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
-                      >
-                        {sub.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-                <div className="mt-4 pt-3">
-                  <Link
-                    href={`/shop?category=${activeCategoryData.slug}`}
-                    onClick={() => setActiveCategory(null)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
-                  >
-                    Shop All {activeCategoryData.label}
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right: featured category image */}
-              <div className="hidden shrink-0 md:block">
-                <Link
-                  href={`/shop?category=${activeCategoryData.slug}`}
-                  onClick={() => setActiveCategory(null)}
-                  className="group relative block h-[260px] w-[260px] overflow-hidden bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <Image
-                    src={activeCategoryData.image}
-                    alt={activeCategoryData.label}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="260px"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5">
-                    <p className="text-sm font-medium uppercase text-white">
+                onMouseLeave={handleCategoryLeave}
+              >
+                <div className="flex gap-8 px-8 py-6">
+                  {/* Left: subcategory links in three columns */}
+                  <div className="flex-1">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
                       {activeCategoryData.label}
                     </p>
-                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-normal uppercase text-white/80">
-                      Shop Now <ChevronRight className="h-3 w-3" />
-                    </p>
+                    <div className="grid grid-cols-3 gap-x-6 gap-y-0">
+                      {activeCategoryData.subcategories.map((sub) => {
+                        const params = new URLSearchParams();
+                        params.set("category", activeCategoryData.slug);
+                        if (sub.type) params.set("type", sub.type);
+                        if (sub.query) params.set("q", sub.query);
+                        return (
+                          <Link
+                            key={sub.type ?? sub.query}
+                            href={`/shop?${params.toString()}`}
+                            onClick={() => setActiveCategory(null)}
+                            className="block py-1 text-[13px] uppercase text-zinc-600 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
+                          >
+                            {sub.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-4 pt-3">
+                      <Link
+                        href={`/shop?category=${activeCategoryData.slug}`}
+                        onClick={() => setActiveCategory(null)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-zinc-900 transition-colors hover:underline dark:text-zinc-100"
+                      >
+                        Shop All {activeCategoryData.label}
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
-                </Link>
+
+                  {/* Right: featured category image */}
+                  <div className="hidden shrink-0 md:block">
+                    <Link
+                      href={`/shop?category=${activeCategoryData.slug}`}
+                      onClick={() => setActiveCategory(null)}
+                      className="group relative block h-[260px] w-[260px] overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+                    >
+                      <Image
+                        src={activeCategoryData.image}
+                        alt={activeCategoryData.label}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="260px"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5">
+                        <p className="text-sm font-medium uppercase text-white">
+                          {activeCategoryData.label}
+                        </p>
+                        <p className="mt-1 inline-flex items-center gap-1 text-xs font-normal uppercase text-white/80">
+                          Shop Now <ChevronRight className="h-3 w-3" />
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          );
-        })()}
+            );
+          })()}
       </nav>
     </header>
   );

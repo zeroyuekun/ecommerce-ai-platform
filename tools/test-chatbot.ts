@@ -11,8 +11,8 @@
  * Cost:  $0 — no AI credits used, only Sanity reads
  */
 
-import { config } from "dotenv";
 import { createClient } from "@sanity/client";
+import { config } from "dotenv";
 
 // ── Load env ──────────────────────────────────────────────
 config({ path: ".env.local" });
@@ -22,7 +22,9 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2025-12-05";
 
 if (!projectId || !dataset) {
-  console.error("Missing NEXT_PUBLIC_SANITY_PROJECT_ID or NEXT_PUBLIC_SANITY_DATASET in .env.local");
+  console.error(
+    "Missing NEXT_PUBLIC_SANITY_PROJECT_ID or NEXT_PUBLIC_SANITY_DATASET in .env.local",
+  );
   process.exit(1);
 }
 
@@ -140,18 +142,29 @@ async function searchProducts(params: {
   };
 }
 
-async function addToCart(params: { productSlug?: string; productName?: string; quantity?: number }) {
+async function addToCart(params: {
+  productSlug?: string;
+  productName?: string;
+  quantity?: number;
+}) {
   const quantity = params.quantity ?? 1;
   let product: any = null;
 
   if (params.productSlug) {
-    product = await sanity.fetch(PRODUCT_BY_SLUG_QUERY, { slug: params.productSlug });
+    product = await sanity.fetch(PRODUCT_BY_SLUG_QUERY, {
+      slug: params.productSlug,
+    });
   }
   if (!product && params.productName) {
-    product = await sanity.fetch(PRODUCT_BY_NAME_QUERY, { name: params.productName });
+    product = await sanity.fetch(PRODUCT_BY_NAME_QUERY, {
+      name: params.productName,
+    });
   }
   if (!product) {
-    return { success: false, message: `Product not found: "${params.productSlug || params.productName}"` };
+    return {
+      success: false,
+      message: `Product not found: "${params.productSlug || params.productName}"`,
+    };
   }
 
   const stockStatus = getStockStatus(product.stock);
@@ -159,7 +172,10 @@ async function addToCart(params: { productSlug?: string; productName?: string; q
     return { success: false, message: `${product.name} is out of stock.` };
   }
   if (product.stock != null && quantity > product.stock) {
-    return { success: false, message: `Only ${product.stock} of ${product.name} available.` };
+    return {
+      success: false,
+      message: `Only ${product.stock} of ${product.name} available.`,
+    };
   }
 
   return {
@@ -177,9 +193,12 @@ async function addToCart(params: { productSlug?: string; productName?: string; q
 }
 
 async function getMyOrders(userId: string, status?: string) {
-  if (!userId) return { found: false, message: "Not authenticated", orders: [] };
+  if (!userId)
+    return { found: false, message: "Not authenticated", orders: [] };
 
-  const orders: any[] = await sanity.fetch(ORDERS_BY_USER_QUERY, { clerkUserId: userId });
+  const orders: any[] = await sanity.fetch(ORDERS_BY_USER_QUERY, {
+    clerkUserId: userId,
+  });
   const filtered = status ? orders.filter((o) => o.status === status) : orders;
 
   return {
@@ -214,13 +233,24 @@ async function testSearchProducts() {
     assert(typeof p.id === "string" && p.id.length > 0, "Product has _id");
     assert(typeof p.name === "string", `Product has name: "${p.name}"`);
     assert(typeof p.slug === "string", `Product has slug: "${p.slug}"`);
-    assert(typeof p.price === "number" && p.price > 0, `Product has price: ${p.priceFormatted}`);
     assert(
-      ["in_stock", "low_stock", "out_of_stock", "unknown"].includes(p.stockStatus),
-      `Stock status valid: "${p.stockStatus}"`
+      typeof p.price === "number" && p.price > 0,
+      `Product has price: ${p.priceFormatted}`,
     );
-    assert(typeof p.stockMessage === "string", `Stock message: "${p.stockMessage}"`);
-    assert(p.productUrl === `/products/${p.slug}`, "productUrl formatted correctly");
+    assert(
+      ["in_stock", "low_stock", "out_of_stock", "unknown"].includes(
+        p.stockStatus,
+      ),
+      `Stock status valid: "${p.stockStatus}"`,
+    );
+    assert(
+      typeof p.stockMessage === "string",
+      `Stock message: "${p.stockMessage}"`,
+    );
+    assert(
+      p.productUrl === `/products/${p.slug}`,
+      "productUrl formatted correctly",
+    );
   }
 
   // 2. Category filter
@@ -228,7 +258,9 @@ async function testSearchProducts() {
   const bedroom = await searchProducts({ category: "bedroom" });
   assert(bedroom.found, "Bedroom category returns results");
   if (bedroom.found) {
-    const allBedroom = bedroom.products.every((p: any) => p.categorySlug === "bedroom");
+    const allBedroom = bedroom.products.every(
+      (p: any) => p.categorySlug === "bedroom",
+    );
     assert(allBedroom, "All results are in bedroom category");
   }
 
@@ -245,7 +277,9 @@ async function testSearchProducts() {
   console.log("\n  [4] Price range: $100–$300");
   const priceRange = await searchProducts({ minPrice: 100, maxPrice: 300 });
   if (priceRange.found) {
-    const allInRange = priceRange.products.every((p: any) => p.price >= 100 && p.price <= 300);
+    const allInRange = priceRange.products.every(
+      (p: any) => p.price >= 100 && p.price <= 300,
+    );
     assert(allInRange, "All results within $100–$300");
   } else {
     assert(true, "No products in range (valid result)");
@@ -256,7 +290,12 @@ async function testSearchProducts() {
   const tables = await searchProducts({ query: "table" });
   assert(tables.found, "Search for 'table' returns results");
   if (tables.found) {
-    console.log(`    Found ${tables.totalResults} table(s): ${tables.products.slice(0, 3).map((p: any) => p.name).join(", ")}...`);
+    console.log(
+      `    Found ${tables.totalResults} table(s): ${tables.products
+        .slice(0, 3)
+        .map((p: any) => p.name)
+        .join(", ")}...`,
+    );
   }
 
   // 6. No results scenario
@@ -267,10 +306,13 @@ async function testSearchProducts() {
 
   // 7. Combined filters
   console.log("\n  [7] Combined: category=living-room + material=wood");
-  const combined = await searchProducts({ category: "living-room", material: "wood" });
+  const combined = await searchProducts({
+    category: "living-room",
+    material: "wood",
+  });
   if (combined.found) {
     const valid = combined.products.every(
-      (p: any) => p.categorySlug === "living-room" && p.material === "wood"
+      (p: any) => p.categorySlug === "living-room" && p.material === "wood",
     );
     assert(valid, "Combined filters applied correctly");
   } else {
@@ -288,7 +330,9 @@ async function testAddToCart() {
     return;
   }
 
-  const testProduct = products.products.find((p: any) => p.stockStatus === "in_stock") || products.products[0];
+  const testProduct =
+    products.products.find((p: any) => p.stockStatus === "in_stock") ||
+    products.products[0];
 
   // 1. Add by slug
   console.log(`\n  [1] Add by slug: "${testProduct.slug}"`);
@@ -307,7 +351,10 @@ async function testAddToCart() {
 
   // 3. Add with quantity
   console.log("\n  [3] Add with quantity: 2");
-  const withQty = await addToCart({ productSlug: testProduct.slug, quantity: 2 });
+  const withQty = await addToCart({
+    productSlug: testProduct.slug,
+    quantity: 2,
+  });
   if (testProduct.stockCount >= 2) {
     assert(withQty.success, `Added 2x: ${withQty.message}`);
     assert(withQty.cartItem?.quantity === 2, "Quantity is 2");
@@ -322,9 +369,15 @@ async function testAddToCart() {
 
   // 5. Excessive quantity
   console.log("\n  [5] Excessive quantity (9999)");
-  const tooMany = await addToCart({ productSlug: testProduct.slug, quantity: 9999 });
+  const tooMany = await addToCart({
+    productSlug: testProduct.slug,
+    quantity: 9999,
+  });
   if (testProduct.stockCount < 9999) {
-    assert(!tooMany.success, `Correctly rejected overstock: ${tooMany.message}`);
+    assert(
+      !tooMany.success,
+      `Correctly rejected overstock: ${tooMany.message}`,
+    );
   } else {
     assert(tooMany.success, "Product has massive stock (unlikely but valid)");
   }
@@ -346,12 +399,15 @@ async function testGetMyOrders() {
   // Test with status filter
   console.log("\n  [3] Status filter: 'paid'");
   const filtered = await getMyOrders("test-user-no-orders", "paid");
-  assert(!filtered.found || filtered.totalOrders === 0, "No paid orders for fake user");
+  assert(
+    !filtered.found || filtered.totalOrders === 0,
+    "No paid orders for fake user",
+  );
 
   // Validate the order shape if we can find any orders
   console.log("\n  [4] Check for any existing orders in database");
   const anyOrders: any[] = await sanity.fetch(
-    `*[_type == "order"][0...1]{ _id, orderNumber, total, status, clerkUserId }`
+    `*[_type == "order"][0...1]{ _id, orderNumber, total, status, clerkUserId }`,
   );
   if (anyOrders.length > 0 && anyOrders[0].clerkUserId) {
     const realOrders = await getMyOrders(anyOrders[0].clerkUserId);
@@ -359,11 +415,16 @@ async function testGetMyOrders() {
     if (realOrders.orders.length > 0) {
       const o = realOrders.orders[0];
       assert(typeof o.id === "string", "Order has id");
-      assert(typeof o.orderNumber === "string", `Order number: ${o.orderNumber}`);
+      assert(
+        typeof o.orderNumber === "string",
+        `Order number: ${o.orderNumber}`,
+      );
       assert(typeof o.total === "number", `Order total: ${o.totalFormatted}`);
       assert(
-        ["pending", "paid", "shipped", "delivered", "cancelled"].includes(o.status),
-        `Valid status: ${o.status}`
+        ["pending", "paid", "shipped", "delivered", "cancelled"].includes(
+          o.status,
+        ),
+        `Valid status: ${o.status}`,
       );
     }
   } else {
@@ -401,7 +462,9 @@ async function testChatbotFlow() {
       assert(true, "Follow-up search executed");
     }
   } else {
-    console.log("    No bedroom products under $500 — testing with broader search");
+    console.log(
+      "    No bedroom products under $500 — testing with broader search",
+    );
     const fallback = await searchProducts({ category: "bedroom" });
     assert(true, `Fallback found ${fallback.totalResults} bedroom product(s)`);
   }
@@ -409,7 +472,9 @@ async function testChatbotFlow() {
   // Step 4: User checks orders
   console.log('\n  [Flow] User: "Where are my orders?"');
   const step4 = await getMyOrders("test-user");
-  console.log(`    Orders response: ${step4.found ? `${step4.totalOrders} orders` : "No orders found"}`);
+  console.log(
+    `    Orders response: ${step4.found ? `${step4.totalOrders} orders` : "No orders found"}`,
+  );
   assert(true, "Order check executed without error");
 }
 
@@ -430,7 +495,10 @@ async function testAPIRoute() {
 
     console.log("\n  [2] GET /api/chat (method not allowed)");
     const getRes = await fetch(`${baseUrl}/api/chat`, { method: "GET" });
-    assert(getRes.status === 405 || getRes.status === 404, `Rejects GET (got ${getRes.status})`);
+    assert(
+      getRes.status === 405 || getRes.status === 404,
+      `Rejects GET (got ${getRes.status})`,
+    );
   } catch (e: any) {
     if (e.code === "ECONNREFUSED" || e.cause?.code === "ECONNREFUSED") {
       console.log("  ⚠ Dev server not running — API route tests skipped");

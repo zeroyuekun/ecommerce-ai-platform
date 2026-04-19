@@ -1,7 +1,7 @@
 import { PackageSearch } from "lucide-react";
-import { ProductCard } from "./ProductCard";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { FILTER_PRODUCTS_BY_NAME_QUERY_RESULT } from "@/sanity.types";
+import { ProductCard } from "./ProductCard";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERY_RESULT[number];
 

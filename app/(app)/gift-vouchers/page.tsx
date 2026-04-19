@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Gift } from "lucide-react";
+import Link from "next/link";
 
 const voucherAmounts = [50, 100, 150, 200, 500];
 

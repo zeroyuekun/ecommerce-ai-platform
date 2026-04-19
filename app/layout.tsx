@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Cormorant_Garamond, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   description:
     "Discover thoughtfully designed furniture and homewares. From living room essentials to bedroom collections, find pieces that bring warmth and style to every room.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://kozy.com.au"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://kozy.com.au",
   ),
   openGraph: {
     type: "website",
@@ -46,7 +46,12 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${cormorant.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
         </ThemeProvider>
       </body>

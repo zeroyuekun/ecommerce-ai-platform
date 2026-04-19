@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { ChevronDown, Minus, Plus, Truck } from "lucide-react";
 import Link from "next/link";
-import { Plus, Minus, Truck, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { StockBadge } from "@/components/app/StockBadge";
-import { formatPrice } from "@/lib/utils";
 import { COLOR_SWATCHES } from "@/lib/constants/filters";
-import { useChatActions } from "@/lib/store/chat-store-provider";
 import { useCartActions } from "@/lib/store/cart-store-provider";
+import { useChatActions } from "@/lib/store/chat-store-provider";
+import { cn, formatPrice } from "@/lib/utils";
 import type {
   PRODUCT_BY_SLUG_QUERY_RESULT,
   VARIANT_SIBLINGS_FULL_QUERY_RESULT,
@@ -137,7 +136,11 @@ function DetailSection({
   );
 }
 
-export function ProductInfo({ product, variants = [], onVariantSwitch }: ProductInfoProps) {
+export function ProductInfo({
+  product,
+  variants = [],
+  onVariantSwitch,
+}: ProductInfoProps) {
   const { openChatWithMessage } = useChatActions();
   const imageUrl = product.images?.[0]?.asset?.url;
   const isOnSale =
@@ -183,7 +186,8 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
       <div className="mt-7 flex items-center gap-3 border border-zinc-200 px-4 py-3 dark:border-zinc-800">
         <Truck className="h-4 w-4 shrink-0 text-zinc-400" strokeWidth={1.5} />
         <span className="text-[12px] tracking-wide text-zinc-600 dark:text-zinc-400">
-          Free shipping on orders over $100. Leaves warehouse within 2 business days.
+          Free shipping on orders over $100. Leaves warehouse within 2 business
+          days.
         </span>
       </div>
 
@@ -198,9 +202,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
           </span>
           <div className="mt-2.5 flex items-center gap-2 p-1">
             {variants.map((variant) => {
-              const hex = variant.color
-                ? COLOR_SWATCHES[variant.color]
-                : null;
+              const hex = variant.color ? COLOR_SWATCHES[variant.color] : null;
               if (!hex) return null;
               const isActive = variant.slug === product.slug;
               return (
@@ -259,10 +261,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
 
       {/* Stock badge */}
       <div className="mt-7">
-        <StockBadge
-          productId={product._id}
-          stock={product.stock ?? 0}
-        />
+        <StockBadge productId={product._id} stock={product.stock ?? 0} />
       </div>
 
       {/* Quantity + Add to Cart */}
@@ -280,9 +279,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
       <button
         type="button"
         onClick={() =>
-          openChatWithMessage(
-            `Show me products similar to "${product.name}"`,
-          )
+          openChatWithMessage(`Show me products similar to "${product.name}"`)
         }
         className="mt-3 flex h-[52px] w-full items-center justify-center gap-2 border border-zinc-200 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-100"
       >
@@ -335,9 +332,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Material
                 </span>
-                <span className="capitalize">
-                  {product.material}
-                </span>
+                <span className="capitalize">{product.material}</span>
               </div>
             )}
             {product.color && (
@@ -345,9 +340,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Colour
                 </span>
-                <span className="capitalize">
-                  {product.color}
-                </span>
+                <span className="capitalize">{product.color}</span>
               </div>
             )}
             {product.dimensions && (
@@ -355,9 +348,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Dimensions
                 </span>
-                <span>
-                  {product.dimensions}
-                </span>
+                <span>{product.dimensions}</span>
               </div>
             )}
             {product.assemblyRequired !== null && (
@@ -366,9 +357,7 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
                   Assembly
                 </span>
                 <span>
-                  {product.assemblyRequired
-                    ? "Required"
-                    : "Not required"}
+                  {product.assemblyRequired ? "Required" : "Not required"}
                 </span>
               </div>
             )}
@@ -378,16 +367,26 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
         <DetailSection title="Shipping & Returns">
           <div className="space-y-3">
             <div>
-              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Free Shipping</p>
-              <p className="mt-1">Free standard shipping on orders over $100.</p>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                Free Shipping
+              </p>
+              <p className="mt-1">
+                Free standard shipping on orders over $100.
+              </p>
             </div>
             <div>
-              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Express Delivery</p>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                Express Delivery
+              </p>
               <p className="mt-1">Express shipping available at checkout.</p>
             </div>
             <div>
-              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Returns</p>
-              <p className="mt-1">Returns accepted within 30 days of purchase.</p>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                Returns
+              </p>
+              <p className="mt-1">
+                Returns accepted within 30 days of purchase.
+              </p>
             </div>
           </div>
         </DetailSection>
@@ -395,12 +394,22 @@ export function ProductInfo({ product, variants = [], onVariantSwitch }: Product
         <DetailSection title="Care Instructions">
           <div className="space-y-3">
             <div>
-              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Cleaning</p>
-              <p className="mt-1">Wipe clean with a soft, damp cloth. Avoid harsh chemical cleaners.</p>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                Cleaning
+              </p>
+              <p className="mt-1">
+                Wipe clean with a soft, damp cloth. Avoid harsh chemical
+                cleaners.
+              </p>
             </div>
             <div>
-              <p className="font-semibold text-zinc-900 dark:text-zinc-100">Placement</p>
-              <p className="mt-1">Keep away from direct sunlight and heat sources to prevent discolouration.</p>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                Placement
+              </p>
+              <p className="mt-1">
+                Keep away from direct sunlight and heat sources to prevent
+                discolouration.
+              </p>
             </div>
           </div>
         </DetailSection>

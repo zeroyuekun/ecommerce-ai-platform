@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { SlidersHorizontal } from "lucide-react";
-import { ProductFilters } from "./ProductFilters";
-import { ProductGrid } from "./ProductGrid";
-import { SortSelect } from "./SortSelect";
+import { useEffect, useRef, useState } from "react";
 import type {
   ALL_CATEGORIES_QUERY_RESULT,
   FILTER_PRODUCTS_BY_NAME_QUERY_RESULT,
 } from "@/sanity.types";
+import { ProductFilters } from "./ProductFilters";
+import { ProductGrid } from "./ProductGrid";
+import { SortSelect } from "./SortSelect";
 
 interface ProductSectionProps {
   categories: ALL_CATEGORIES_QUERY_RESULT;
@@ -21,7 +21,10 @@ interface ProductSectionProps {
  * Filter sidebar scrolls first; products stay still.
  * Once filters hit bottom/top, the page scrolls normally.
  */
-function useScrollTrap(ref: React.RefObject<HTMLDivElement | null>, active: boolean) {
+function useScrollTrap(
+  ref: React.RefObject<HTMLDivElement | null>,
+  active: boolean,
+) {
   useEffect(() => {
     if (!active) return;
 

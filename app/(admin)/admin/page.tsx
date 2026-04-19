@@ -1,20 +1,20 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import {
-  useApplyDocumentActions,
-  createDocumentHandle,
   createDocument,
+  createDocumentHandle,
+  useApplyDocumentActions,
 } from "@sanity/sdk-react";
-import { Package, ShoppingCart, TrendingUp, Plus, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2, Package, Plus, ShoppingCart, TrendingUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import {
-  StatCard,
+  AIInsightsCard,
   LowStockAlert,
   RecentOrders,
-  AIInsightsCard,
+  StatCard,
 } from "@/components/admin";
+import { Button } from "@/components/ui/button";
 
 export default function AdminDashboard() {
   const router = useRouter();

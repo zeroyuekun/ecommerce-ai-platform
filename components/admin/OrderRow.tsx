@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense } from "react";
+import { type DocumentHandle, useDocumentProjection } from "@sanity/sdk-react";
 import Link from "next/link";
-import { useDocumentProjection, type DocumentHandle } from "@sanity/sdk-react";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
-import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
+import { formatDate, formatOrderNumber, formatPrice } from "@/lib/utils";
 
 interface OrderProjection {
   orderNumber: string;

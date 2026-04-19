@@ -1,6 +1,9 @@
 import { PackageIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
-import { MATERIALS_SANITY_LIST, COLORS_SANITY_LIST } from "@/lib/constants/filters";
+import {
+  COLORS_SANITY_LIST,
+  MATERIALS_SANITY_LIST,
+} from "@/lib/constants/filters";
 
 export const productType = defineType({
   name: "product",
@@ -86,13 +89,15 @@ export const productType = defineType({
       name: "productType",
       type: "string",
       group: "details",
-      description: "Product type for subcategory filtering (e.g., 'beds', 'bedside-tables')",
+      description:
+        "Product type for subcategory filtering (e.g., 'beds', 'bedside-tables')",
     }),
     defineField({
       name: "variantGroup",
       type: "string",
       group: "details",
-      description: "Group ID to link color variants together (e.g., 'osaka-buffet')",
+      description:
+        "Group ID to link color variants together (e.g., 'osaka-buffet')",
     }),
     defineField({
       name: "dimensions",

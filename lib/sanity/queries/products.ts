@@ -309,49 +309,49 @@ export const SEARCH_PRODUCTS_QUERY = defineQuery(`*[
  * Filter products - featured (default sort by name A-Z)
  */
 export const FILTER_PRODUCTS_BY_NAME_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name asc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name asc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - alphabetical Z-A
  */
 export const FILTER_PRODUCTS_BY_NAME_DESC_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name desc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(name desc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - newest first
  */
 export const FILTER_PRODUCTS_BY_NEWEST_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(_createdAt desc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(_createdAt desc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - ordered by price ascending
  */
 export const FILTER_PRODUCTS_BY_PRICE_ASC_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(price asc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(price asc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - ordered by price descending
  */
 export const FILTER_PRODUCTS_BY_PRICE_DESC_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(price desc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(price desc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - best selling (lowest stock = most sold)
  */
 export const FILTER_PRODUCTS_BY_BEST_SELLING_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | order(stock asc, name asc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | order(stock asc, name asc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
  * Filter products - ordered by relevance (when searching)
  */
 export const FILTER_PRODUCTS_BY_RELEVANCE_QUERY = defineQuery(
-  `*[${PRODUCT_FILTER_CONDITIONS}] | ${RELEVANCE_SCORE} | order(_score desc, name asc) ${FILTERED_PRODUCT_PROJECTION}`
+  `*[${PRODUCT_FILTER_CONDITIONS}] | ${RELEVANCE_SCORE} | order(_score desc, name asc) ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
@@ -380,7 +380,7 @@ export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
  * Get products by IDs with full card projection (for recently viewed)
  */
 export const PRODUCTS_BY_IDS_FULL_QUERY = defineQuery(
-  `*[_type == "product" && _id in $ids] ${FILTERED_PRODUCT_PROJECTION}`
+  `*[_type == "product" && _id in $ids] ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**
@@ -388,7 +388,7 @@ export const PRODUCTS_BY_IDS_FULL_QUERY = defineQuery(
  * Uses a mix of featured + best-selling, limited to 8
  */
 export const POPULAR_PRODUCTS_QUERY = defineQuery(
-  `*[_type == "product" && stock > 0 && defined(images) && count(images) > 0] | order(featured desc, stock asc, _createdAt desc) [0...8] ${FILTERED_PRODUCT_PROJECTION}`
+  `*[_type == "product" && stock > 0 && defined(images) && count(images) > 0] | order(featured desc, stock asc, _createdAt desc) [0...8] ${FILTERED_PRODUCT_PROJECTION}`,
 );
 
 /**

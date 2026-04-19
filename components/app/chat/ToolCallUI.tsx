@@ -1,14 +1,20 @@
+import {
+  CheckCircle2,
+  Loader2,
+  Package,
+  Search,
+  ShoppingCart,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
-import { Search, Package, ShoppingCart, CheckCircle2, Loader2 } from "lucide-react";
-import type { ToolCallPart } from "./types";
-import type { SearchProductsResult } from "@/lib/ai/types";
-import type { GetMyOrdersResult } from "@/lib/ai/tools/get-my-orders";
 import type { AddToCartResult } from "@/lib/ai/tools/add-to-cart";
-import { getToolDisplayName } from "./utils";
-import { ProductCardWidget } from "./ProductCardWidget";
-import { OrderCardWidget } from "./OrderCardWidget";
-import { CartAddedWidget } from "./CartAddedWidget";
+import type { GetMyOrdersResult } from "@/lib/ai/tools/get-my-orders";
+import type { SearchProductsResult } from "@/lib/ai/types";
 import { useCartActions } from "@/lib/store/cart-store-provider";
+import { CartAddedWidget } from "./CartAddedWidget";
+import { OrderCardWidget } from "./OrderCardWidget";
+import { ProductCardWidget } from "./ProductCardWidget";
+import type { ToolCallPart } from "./types";
+import { getToolDisplayName } from "./utils";
 
 interface ToolCallUIProps {
   toolPart: ToolCallPart;
@@ -69,7 +75,7 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
           price: cartResult.cartItem.price,
           image: cartResult.cartItem.image,
         },
-        cartResult.cartItem.quantity
+        cartResult.cartItem.quantity,
       );
     }
   }, [hasCartAdd, cartResult, addItem]);
@@ -118,7 +124,8 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
       {hasProducts && productResult?.products && (
         <div className="mt-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500 mb-2">
-            {productResult.products.length} product{productResult.products.length !== 1 ? "s" : ""} found
+            {productResult.products.length} product
+            {productResult.products.length !== 1 ? "s" : ""} found
           </p>
           <div className="space-y-2">
             {productResult.products.map((product) => (
@@ -136,7 +143,8 @@ export function ToolCallUI({ toolPart, closeChat }: ToolCallUIProps) {
       {hasOrders && orderResult?.orders && (
         <div className="mt-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500 mb-2">
-            {orderResult.orders.length} order{orderResult.orders.length !== 1 ? "s" : ""} found
+            {orderResult.orders.length} order
+            {orderResult.orders.length !== 1 ? "s" : ""} found
           </p>
           <div className="space-y-2">
             {orderResult.orders.map((order) => (

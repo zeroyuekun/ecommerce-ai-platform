@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { client, writeClient } from "@/sanity/lib/client";
 import { ORDER_BY_STRIPE_PAYMENT_ID_QUERY } from "@/lib/sanity/queries/orders";
+import { client, writeClient } from "@/sanity/lib/client";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is not defined");
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   if (!signature) {
     return NextResponse.json(
       { error: "Missing stripe-signature header" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     console.error("Webhook signature verification failed:", message);
     return NextResponse.json(
       { error: `Webhook Error: ${message}` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -68,7 +68,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     if (existingOrder) {
       console.log(
-        `Webhook already processed for payment ${stripePaymentId}, skipping`
+        `Webhook already processed for payment ${stripePaymentId}, skipping`,
       );
       return;
     }
@@ -89,10 +89,36 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const productIds = productIdsString.split(",");
     const quantities = quantitiesString.split(",").map(Number);
 
-    // Get line items from Stripe
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+    if (productIds.length !== quantities.length) {
+      throw new Error(
+        "productIds/quantities length mismatch in session metadata",
+      );
+    }
+    if (quantities.some((q) => !Number.isFinite(q) || q <= 0)) {
+      throw new Error("Invalid quantities in session metadata");
+    }
 
-    // Build order items array
+    // Fetch line items with product metadata so we can match by productId rather than array index.
+    // `product_data.metadata.productId` is set at session creation in lib/actions/checkout.ts.
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+      expand: ["data.price.product"],
+      limit: 100,
+    });
+
+    const priceByProductId = new Map<string, number>();
+    for (const li of lineItems.data) {
+      const product = li.price?.product;
+      const productId =
+        typeof product === "object" && product && !("deleted" in product)
+          ? product.metadata?.productId
+          : undefined;
+      if (productId && typeof li.amount_total === "number" && li.quantity) {
+        // Convert total (in minor units) → per-unit major currency.
+        priceByProductId.set(productId, li.amount_total / 100 / li.quantity);
+      }
+    }
+
+    // Build order items array keyed by productId, not array index.
     const orderItems = productIds.map((productId, index) => ({
       _key: `item-${index}`,
       product: {
@@ -100,9 +126,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         _ref: productId,
       },
       quantity: quantities[index],
-      priceAtPurchase: lineItems.data[index]?.amount_total
-        ? lineItems.data[index].amount_total / 100
-        : 0,
+      priceAtPurchase: priceByProductId.get(productId) ?? 0,
     }));
 
     // Generate order number
@@ -148,7 +172,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       .reduce(
         (tx, productId, i) =>
           tx.patch(productId, (p) => p.dec({ stock: quantities[i] })),
-        writeClient.transaction()
+        writeClient.transaction(),
       )
       .commit();
 

@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense } from "react";
 import {
+  type DocumentHandle,
+  publishDocument,
+  useApplyDocumentActions,
   useDocument,
   useEditDocument,
-  useApplyDocumentActions,
-  publishDocument,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
+import { Suspense } from "react";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ORDER_STATUS_CONFIG, getOrderStatus, type OrderStatusValue } from "@/lib/constants/orderStatus";
+import {
+  getOrderStatus,
+  ORDER_STATUS_CONFIG,
+  type OrderStatusValue,
+} from "@/lib/constants/orderStatus";
 
 interface StatusSelectProps extends DocumentHandle {}
 

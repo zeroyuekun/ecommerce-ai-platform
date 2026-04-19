@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
 import { useDocuments } from "@sanity/sdk-react";
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 

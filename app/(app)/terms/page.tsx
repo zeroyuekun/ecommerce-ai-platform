@@ -23,9 +23,9 @@ export default function TermsPage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               These terms and conditions govern your use of the Kozy website
-              (kozy.com.au) and any purchases made through the site. By accessing
-              our website or placing an order, you agree to be bound by these
-              terms.
+              (kozy.com.au) and any purchases made through the site. By
+              accessing our website or placing an order, you agree to be bound
+              by these terms.
             </p>
           </section>
 
@@ -37,8 +37,8 @@ export default function TermsPage() {
               All product descriptions, images, and prices on our website are as
               accurate as possible. However, we reserve the right to correct any
               errors and to change or update information at any time. Prices are
-              listed in Australian Dollars (AUD) and include GST unless otherwise
-              stated.
+              listed in Australian Dollars (AUD) and include GST unless
+              otherwise stated.
             </p>
           </section>
 
@@ -49,8 +49,8 @@ export default function TermsPage() {
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               When you place an order, you are making an offer to purchase. We
               reserve the right to accept or decline your order. An order
-              confirmation email does not constitute acceptance. Acceptance occurs
-              when we dispatch the goods.
+              confirmation email does not constitute acceptance. Acceptance
+              occurs when we dispatch the goods.
             </p>
           </section>
 
@@ -60,8 +60,8 @@ export default function TermsPage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               Payment must be made at the time of purchase. We accept Visa,
-              Mastercard, American Express, PayPal, Apple Pay, Afterpay, and Zip.
-              All payments are processed securely.
+              Mastercard, American Express, PayPal, Apple Pay, Afterpay, and
+              Zip. All payments are processed securely.
             </p>
           </section>
 
@@ -70,10 +70,10 @@ export default function TermsPage() {
               5. Shipping & Delivery
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Delivery timeframes are estimates and may vary. We are not liable for
-              delays caused by circumstances beyond our control. Risk of loss and
-              title for items pass to you upon delivery. Please refer to our
-              Shipping page for full details.
+              Delivery timeframes are estimates and may vary. We are not liable
+              for delays caused by circumstances beyond our control. Risk of
+              loss and title for items pass to you upon delivery. Please refer
+              to our Shipping page for full details.
             </p>
           </section>
 
@@ -96,8 +96,8 @@ export default function TermsPage() {
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               All content on this website, including text, images, logos, and
               design, is the property of Kozy Australia and is protected by
-              copyright law. You may not reproduce, distribute, or use any content
-              without our written permission.
+              copyright law. You may not reproduce, distribute, or use any
+              content without our written permission.
             </p>
           </section>
 
@@ -106,9 +106,9 @@ export default function TermsPage() {
               8. Limitation of Liability
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              To the maximum extent permitted by law, Kozy Australia shall not be
-              liable for any indirect, incidental, or consequential damages arising
-              from the use of our website or products.
+              To the maximum extent permitted by law, Kozy Australia shall not
+              be liable for any indirect, incidental, or consequential damages
+              arising from the use of our website or products.
             </p>
           </section>
 
@@ -117,9 +117,9 @@ export default function TermsPage() {
               9. Governing Law
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              These terms are governed by the laws of New South Wales, Australia.
-              Any disputes will be subject to the exclusive jurisdiction of the
-              courts of New South Wales.
+              These terms are governed by the laws of New South Wales,
+              Australia. Any disputes will be subject to the exclusive
+              jurisdiction of the courts of New South Wales.
             </p>
           </section>
 
@@ -128,9 +128,10 @@ export default function TermsPage() {
               10. Changes to Terms
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              We may update these terms from time to time. Changes will be posted
-              on this page with an updated revision date. Continued use of the
-              website after changes constitutes acceptance of the updated terms.
+              We may update these terms from time to time. Changes will be
+              posted on this page with an updated revision date. Continued use
+              of the website after changes constitutes acceptance of the updated
+              terms.
             </p>
           </section>
         </div>

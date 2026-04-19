@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 
 import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
@@ -54,7 +54,7 @@ export function CategoryTiles({
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -81,7 +81,10 @@ export function CategoryTiles({
           className="absolute left-10 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+          <ChevronLeft
+            className="h-4 w-4 text-zinc-600 dark:text-zinc-300"
+            strokeWidth={2}
+          />
         </button>
 
         <button
@@ -90,7 +93,10 @@ export function CategoryTiles({
           className="absolute right-10 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-4 w-4 text-zinc-600 dark:text-zinc-300" strokeWidth={2} />
+          <ChevronRight
+            className="h-4 w-4 text-zinc-600 dark:text-zinc-300"
+            strokeWidth={2}
+          />
         </button>
 
         <Carousel

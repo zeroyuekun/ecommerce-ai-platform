@@ -1,23 +1,23 @@
 "use client";
 
-import { Suspense } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import {
+  type DocumentHandle,
   useDocument,
   useDocumentProjection,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
 import { CircleAlert, ExternalLink, Star } from "lucide-react";
-import { TableCell, TableRow } from "@/components/ui/table";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { isLowStock, isOutOfStock } from "@/lib/constants/stock";
-import { StockInput } from "./StockInput";
-import { PriceInput } from "./PriceInput";
+import { formatPrice } from "@/lib/utils";
 import { FeaturedToggle } from "./FeaturedToggle";
+import { PriceInput } from "./PriceInput";
 import { PublishButton, RevertButton } from "./PublishButton";
+import { StockInput } from "./StockInput";
 
 interface ProductProjection {
   name: string;

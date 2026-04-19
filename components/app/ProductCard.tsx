@@ -1,10 +1,10 @@
 "use client";
 
-import { memo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cn, formatPrice } from "@/lib/utils";
+import { memo, useState } from "react";
 import { COLOR_SWATCHES } from "@/lib/constants/filters";
+import { cn, formatPrice } from "@/lib/utils";
 import type { FILTER_PRODUCTS_BY_NAME_QUERY_RESULT } from "@/sanity.types";
 import type { VariantInfo } from "./ProductGrid";
 
@@ -17,7 +17,10 @@ interface ProductCardProps {
   compact?: boolean;
 }
 
-export const ProductCard = memo(function ProductCard({ product, compact = false }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({
+  product,
+  compact = false,
+}: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
 
@@ -33,7 +36,8 @@ export const ProductCard = memo(function ProductCard({ product, compact = false 
   const price = activeVariant?.price ?? product.price;
   const salePrice = activeVariant?.salePrice ?? product.salePrice;
   const stock = activeVariant?.stock ?? product.stock ?? 0;
-  const isNew = activeVariant?.isNew ?? ("isNew" in product ? product.isNew : false);
+  const isNew =
+    activeVariant?.isNew ?? ("isNew" in product ? product.isNew : false);
 
   const isOutOfStock = stock <= 0;
   const isOnSale = salePrice != null && salePrice < (price ?? 0);
@@ -46,7 +50,12 @@ export const ProductCard = memo(function ProductCard({ product, compact = false 
     >
       {/* Image */}
       <Link href={`/products/${slug}`} className="relative block">
-        <div className={cn("relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50", compact ? "aspect-square" : "aspect-square")}>
+        <div
+          className={cn(
+            "relative overflow-hidden bg-zinc-100 dark:bg-zinc-800/50",
+            compact ? "aspect-square" : "aspect-square",
+          )}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -89,7 +98,12 @@ export const ProductCard = memo(function ProductCard({ product, compact = false 
       </Link>
 
       {/* Product Info */}
-      <div className={cn("flex flex-col items-start", compact ? "gap-1 pt-2" : "gap-1.5 pt-4")}>
+      <div
+        className={cn(
+          "flex flex-col items-start",
+          compact ? "gap-1 pt-2" : "gap-1.5 pt-4",
+        )}
+      >
         {/* Color swatches */}
         {hasVariants ? (
           <div className="flex items-center gap-1.5">
@@ -102,13 +116,17 @@ export const ProductCard = memo(function ProductCard({ product, compact = false 
                   key={variant.slug}
                   type="button"
                   onClick={() => setActiveVariantIndex(index)}
-                  title={variant.color.charAt(0).toUpperCase() + variant.color.slice(1)}
+                  title={
+                    variant.color.charAt(0).toUpperCase() +
+                    variant.color.slice(1)
+                  }
                   className={cn(
                     "h-3.5 w-3.5 rounded-full transition-all",
                     isActive
                       ? "ring-1 ring-zinc-900 ring-offset-1 dark:ring-zinc-100 dark:ring-offset-zinc-950"
                       : "ring-1 ring-zinc-200 hover:ring-zinc-400 dark:ring-zinc-600 dark:hover:ring-zinc-400",
-                    variant.color === "white" && "ring-1 ring-zinc-300 dark:ring-zinc-500",
+                    variant.color === "white" &&
+                      "ring-1 ring-zinc-300 dark:ring-zinc-500",
                   )}
                   style={{ backgroundColor: hex }}
                 />
@@ -116,7 +134,8 @@ export const ProductCard = memo(function ProductCard({ product, compact = false 
             })}
           </div>
         ) : (
-          color && COLOR_SWATCHES[color] && (
+          color &&
+          COLOR_SWATCHES[color] && (
             <span
               className={cn(
                 "inline-block h-3 w-3 rounded-full",

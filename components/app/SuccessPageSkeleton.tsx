@@ -16,7 +16,7 @@ export function SuccessPageSkeleton() {
         {/* Order Details Card */}
         <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-6 text-left dark:border-zinc-800 dark:bg-zinc-950">
           <Skeleton className="h-5 w-32" />
-          
+
           <div className="mt-4 space-y-3">
             <div className="flex justify-between">
               <Skeleton className="h-4 w-28" />

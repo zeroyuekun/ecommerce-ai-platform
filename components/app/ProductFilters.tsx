@@ -1,10 +1,10 @@
 "use client";
 
+import { Check, Minus, Plus, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect, useTransition } from "react";
-import { Plus, Minus, Check, X } from "lucide-react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { Slider } from "@/components/ui/slider";
-import { COLORS, MATERIALS, COLOR_SWATCHES } from "@/lib/constants/filters";
+import { COLOR_SWATCHES, COLORS, MATERIALS } from "@/lib/constants/filters";
 import { subcategoriesMap } from "@/lib/constants/subcategories";
 import type { ALL_CATEGORIES_QUERY_RESULT } from "@/sanity.types";
 
@@ -58,9 +58,15 @@ function MultiFilterGroup({
           )}
         </span>
         {open ? (
-          <Minus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+          <Minus
+            className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+            strokeWidth={1.5}
+          />
         ) : (
-          <Plus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+          <Plus
+            className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+            strokeWidth={1.5}
+          />
         )}
       </button>
 
@@ -83,7 +89,10 @@ function MultiFilterGroup({
                   }`}
                 >
                   {isSelected && (
-                    <Check className="h-2.5 w-2.5 text-white dark:text-zinc-900" strokeWidth={2.5} />
+                    <Check
+                      className="h-2.5 w-2.5 text-white dark:text-zinc-900"
+                      strokeWidth={2.5}
+                    />
                   )}
                 </span>
                 <span
@@ -142,9 +151,15 @@ function ColorSwatchGroup({
           )}
         </span>
         {open ? (
-          <Minus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+          <Minus
+            className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+            strokeWidth={1.5}
+          />
         ) : (
-          <Plus className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+          <Plus
+            className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+            strokeWidth={1.5}
+          />
         )}
       </button>
 
@@ -185,11 +200,15 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const currentCategories = searchParams.get("category")?.split(",").filter(Boolean) ?? [];
+  const currentCategories =
+    searchParams.get("category")?.split(",").filter(Boolean) ?? [];
   const currentSearch = searchParams.get("q") ?? "";
-  const currentTypes = searchParams.get("type")?.split(",").filter(Boolean) ?? [];
-  const currentColors = searchParams.get("color")?.split(",").filter(Boolean) ?? [];
-  const currentMaterials = searchParams.get("material")?.split(",").filter(Boolean) ?? [];
+  const currentTypes =
+    searchParams.get("type")?.split(",").filter(Boolean) ?? [];
+  const currentColors =
+    searchParams.get("color")?.split(",").filter(Boolean) ?? [];
+  const currentMaterials =
+    searchParams.get("material")?.split(",").filter(Boolean) ?? [];
   const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
   const urlMaxPrice = Number(searchParams.get("maxPrice")) || 5000;
   const currentInStock = searchParams.get("inStock") === "true";
@@ -257,16 +276,17 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   })();
 
   // Build active filter pills
-  const activeFilters: { key: string; label: string; onRemove: () => void }[] = [];
+  const activeFilters: { key: string; label: string; onRemove: () => void }[] =
+    [];
 
   const categoryLookup = Object.fromEntries(
-    categories.map((c) => [c.slug ?? "", c.title ?? ""])
+    categories.map((c) => [c.slug ?? "", c.title ?? ""]),
   );
 
   currentCategories.forEach((slug) => {
     activeFilters.push({
       key: `cat-${slug}`,
-      label: slug === "sale" ? "Sale" : categoryLookup[slug] ?? slug,
+      label: slug === "sale" ? "Sale" : (categoryLookup[slug] ?? slug),
       onRemove: () => {
         const remaining = currentCategories.filter((s) => s !== slug);
         updateParams({
@@ -285,7 +305,9 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       label: typeLabel,
       onRemove: () => {
         const remaining = currentTypes.filter((t) => t !== type);
-        updateParams({ type: remaining.length > 0 ? remaining.join(",") : null });
+        updateParams({
+          type: remaining.length > 0 ? remaining.join(",") : null,
+        });
       },
     });
   });
@@ -297,7 +319,9 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       label: colorLabel,
       onRemove: () => {
         const remaining = currentColors.filter((c) => c !== color);
-        updateParams({ color: remaining.length > 0 ? remaining.join(",") : null });
+        updateParams({
+          color: remaining.length > 0 ? remaining.join(",") : null,
+        });
       },
     });
   });
@@ -309,7 +333,9 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       label: matLabel,
       onRemove: () => {
         const remaining = currentMaterials.filter((m) => m !== mat);
-        updateParams({ material: remaining.length > 0 ? remaining.join(",") : null });
+        updateParams({
+          material: remaining.length > 0 ? remaining.join(",") : null,
+        });
       },
     });
   });
@@ -333,7 +359,11 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   const hasActiveFilters = activeFilters.length > 0;
 
   const categoryOptions = [
-    { value: "sale", label: "Sale", className: "text-red-600 dark:text-red-400" },
+    {
+      value: "sale",
+      label: "Sale",
+      className: "text-red-600 dark:text-red-400",
+    },
     ...categories.map((c) => ({
       value: c.slug ?? "",
       label: c.title ?? "",
@@ -414,14 +444,18 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
         {/* Color - swatches */}
         <ColorSwatchGroup
           values={currentColors}
-          onChange={(vals) => updateParams({ color: vals.length > 0 ? vals.join(",") : null })}
+          onChange={(vals) =>
+            updateParams({ color: vals.length > 0 ? vals.join(",") : null })
+          }
         />
 
         {/* Material */}
         <MultiFilterGroup
           label="Material"
           values={currentMaterials}
-          onChange={(vals) => updateParams({ material: vals.length > 0 ? vals.join(",") : null })}
+          onChange={(vals) =>
+            updateParams({ material: vals.length > 0 ? vals.join(",") : null })
+          }
           options={materialOptions}
         />
 

@@ -1,10 +1,10 @@
 "use server";
 
-import { client, writeClient } from "@/sanity/lib/client";
 import {
   POPULAR_SEARCHES_QUERY,
   SEARCH_QUERY_BY_TEXT_QUERY,
 } from "@/lib/sanity/queries/searchQueries";
+import { client, writeClient } from "@/sanity/lib/client";
 
 /**
  * Record a search query — creates or increments count
@@ -14,13 +14,12 @@ export async function recordSearch(rawQuery: string) {
   if (!query || query.length < 2) return;
 
   try {
-    const existing = await client.fetch(SEARCH_QUERY_BY_TEXT_QUERY, { searchText: query });
+    const existing = await client.fetch(SEARCH_QUERY_BY_TEXT_QUERY, {
+      searchText: query,
+    });
 
     if (existing) {
-      await writeClient
-        .patch(existing._id)
-        .inc({ count: 1 })
-        .commit();
+      await writeClient.patch(existing._id).inc({ count: 1 }).commit();
     } else {
       await writeClient.create({
         _type: "searchQuery",
@@ -42,7 +41,10 @@ export async function getPopularSearches(): Promise<
 > {
   try {
     const results = await client.fetch(POPULAR_SEARCHES_QUERY);
-    return (results ?? []).map((r) => ({ query: r.query, count: r.count ?? 0 }));
+    return (results ?? []).map((r) => ({
+      query: r.query,
+      count: r.count ?? 0,
+    }));
   } catch (error) {
     console.error("Failed to fetch popular searches:", error);
     return [];

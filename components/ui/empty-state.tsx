@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
   /** Lucide icon to display */
@@ -82,13 +82,13 @@ export function EmptyState({
       className={cn(
         "flex flex-col items-center justify-center text-center",
         config.container,
-        className
+        className,
       )}
     >
       <div
         className={cn(
           "flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800",
-          config.iconWrapper
+          config.iconWrapper,
         )}
       >
         <Icon className={cn("text-zinc-400", config.icon)} />
@@ -96,7 +96,7 @@ export function EmptyState({
       <h2
         className={cn(
           "font-semibold text-zinc-900 dark:text-zinc-100",
-          config.title
+          config.title,
         )}
       >
         {title}
@@ -105,7 +105,7 @@ export function EmptyState({
         <p
           className={cn(
             "max-w-sm text-zinc-500 dark:text-zinc-400",
-            config.description
+            config.description,
           )}
         >
           {description}
@@ -115,4 +115,3 @@ export function EmptyState({
     </div>
   );
 }
-

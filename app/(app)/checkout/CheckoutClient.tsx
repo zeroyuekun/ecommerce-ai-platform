@@ -1,17 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import { AlertTriangle, ArrowLeft, Loader2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
-import { ArrowLeft, ShoppingBag, AlertTriangle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { CheckoutButton } from "@/components/app/CheckoutButton";
-import { formatPrice } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useCartStock } from "@/lib/hooks/useCartStock";
 import {
   useCartItems,
-  useTotalPrice,
   useTotalItems,
+  useTotalPrice,
 } from "@/lib/store/cart-store-provider";
-import { useCartStock } from "@/lib/hooks/useCartStock";
+import { formatPrice } from "@/lib/utils";
 
 export function CheckoutClient() {
   const items = useCartItems();

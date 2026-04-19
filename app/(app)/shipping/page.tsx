@@ -44,9 +44,13 @@ export default function ShippingPage() {
               Free Shipping
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Enjoy <strong className="text-zinc-900 dark:text-zinc-100">free standard shipping</strong> on all orders over
-              $500 to metro areas across Australia. Orders under $500 are charged a
-              flat rate based on the delivery method selected.
+              Enjoy{" "}
+              <strong className="text-zinc-900 dark:text-zinc-100">
+                free standard shipping
+              </strong>{" "}
+              on all orders over $500 to metro areas across Australia. Orders
+              under $500 are charged a flat rate based on the delivery method
+              selected.
             </p>
           </section>
 
@@ -117,9 +121,12 @@ export default function ShippingPage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               Once your order has been dispatched, you&apos;ll receive an email
-              with tracking details. You can also view your order status by logging
-              into your account and visiting the{" "}
-              <Link href="/orders" className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100">
+              with tracking details. You can also view your order status by
+              logging into your account and visiting the{" "}
+              <Link
+                href="/orders"
+                className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
+              >
                 Orders
               </Link>{" "}
               page.

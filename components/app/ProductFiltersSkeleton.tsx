@@ -18,7 +18,10 @@ export function ProductFiltersSkeleton() {
 
       {/* Filter groups */}
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="border-t border-zinc-200 py-5 dark:border-zinc-700/60">
+        <div
+          key={i}
+          className="border-t border-zinc-200 py-5 dark:border-zinc-700/60"
+        >
           <div className="flex items-center justify-between">
             <Skeleton className="h-3 w-20" />
             <Skeleton className="h-4 w-4" />

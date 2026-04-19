@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { SuccessClient } from "./SuccessClient";
 import { getCheckoutSession } from "@/lib/actions/checkout";
+import { SuccessClient } from "./SuccessClient";
 
 export const metadata = {
   title: "Order Confirmed | Furniture Shop",

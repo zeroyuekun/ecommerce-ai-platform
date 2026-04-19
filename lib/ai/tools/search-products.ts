@@ -1,12 +1,12 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { sanityFetch } from "@/sanity/lib/live";
+import type { SearchProduct } from "@/lib/ai/types";
+import { COLOR_VALUES, MATERIAL_VALUES } from "@/lib/constants/filters";
+import { getStockMessage, getStockStatus } from "@/lib/constants/stock";
 import { AI_SEARCH_PRODUCTS_QUERY } from "@/lib/sanity/queries/products";
 import { formatPrice } from "@/lib/utils";
-import { getStockStatus, getStockMessage } from "@/lib/constants/stock";
-import { MATERIAL_VALUES, COLOR_VALUES } from "@/lib/constants/filters";
+import { sanityFetch } from "@/sanity/lib/live";
 import type { AI_SEARCH_PRODUCTS_QUERY_RESULT } from "@/sanity.types";
-import type { SearchProduct } from "@/lib/ai/types";
 
 const productSearchSchema = z.object({
   query: z
@@ -14,14 +14,14 @@ const productSearchSchema = z.object({
     .optional()
     .default("")
     .describe(
-      "Search term to find products by name, description, or category (e.g., 'oak table', 'leather sofa', 'dining')"
+      "Search term to find products by name, description, or category (e.g., 'oak table', 'leather sofa', 'dining')",
     ),
   category: z
     .string()
     .optional()
     .default("")
     .describe(
-      "Filter by category slug (e.g., 'living-room', 'bedroom', 'dining-room', 'office-storage', 'outdoor', 'kids', 'baby', 'lighting-decor', 'youth', 'furniture-sets')"
+      "Filter by category slug (e.g., 'living-room', 'bedroom', 'dining-room', 'office-storage', 'outdoor', 'kids', 'baby', 'lighting-decor', 'youth', 'furniture-sets')",
     ),
   material: z
     .enum(["", ...MATERIAL_VALUES])

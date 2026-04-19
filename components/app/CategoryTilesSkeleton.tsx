@@ -8,7 +8,7 @@ export function CategoryTilesSkeleton() {
         <div className="flex-shrink-0 overflow-hidden rounded-xl">
           <Skeleton className="h-32 w-56 sm:h-56 sm:w-80" />
         </div>
-        
+
         {/* Category tiles skeletons */}
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="flex-shrink-0 overflow-hidden rounded-xl">

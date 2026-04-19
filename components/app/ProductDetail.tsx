@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { ProductGallery } from "./ProductGallery";
-import { ProductInfo } from "./ProductInfo";
-import { RecentlyViewedTracker } from "./RecentlyViewedTracker";
+import { useCallback, useState } from "react";
 import type {
   PRODUCT_BY_SLUG_QUERY_RESULT,
   VARIANT_SIBLINGS_FULL_QUERY_RESULT,
 } from "@/sanity.types";
+import { ProductGallery } from "./ProductGallery";
+import { ProductInfo } from "./ProductInfo";
+import { RecentlyViewedTracker } from "./RecentlyViewedTracker";
 
 type Product = NonNullable<PRODUCT_BY_SLUG_QUERY_RESULT>;
 

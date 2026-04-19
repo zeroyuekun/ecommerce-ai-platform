@@ -36,7 +36,9 @@ export function NewsletterBanner() {
           </div>
 
           {submitted || message ? (
-            <p className={`text-sm font-medium ${submitted ? "text-amber-400" : "text-zinc-300"}`}>
+            <p
+              className={`text-sm font-medium ${submitted ? "text-amber-400" : "text-zinc-300"}`}
+            >
               {message}
             </p>
           ) : (

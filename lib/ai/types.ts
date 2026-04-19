@@ -39,6 +39,6 @@ export interface SearchProductsResult {
   };
 }
 
-// Re-export order types from the tool
-export type { OrderSummary, GetMyOrdersResult } from "./tools/get-my-orders";
 export type { AddToCartResult } from "./tools/add-to-cart";
+// Re-export order types from the tool
+export type { GetMyOrdersResult, OrderSummary } from "./tools/get-my-orders";

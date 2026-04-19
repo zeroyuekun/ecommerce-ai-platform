@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Package, Sparkles } from "lucide-react";
+import { Package, Search, ShoppingCart, Sparkles } from "lucide-react";
 
 interface WelcomeScreenProps {
   onSuggestionClick: (message: { text: string }) => void;
@@ -60,7 +60,10 @@ export function WelcomeScreen({
             className="group flex w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-left transition-all duration-200 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 transition-colors group-hover:bg-zinc-200 dark:bg-zinc-800 dark:group-hover:bg-zinc-700">
-              <cap.icon className="h-4 w-4 text-zinc-500 dark:text-zinc-400" strokeWidth={1.5} />
+              <cap.icon
+                className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+                strokeWidth={1.5}
+              />
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-zinc-100">
@@ -86,10 +89,9 @@ export function WelcomeScreen({
             >
               {prompt}
             </button>
-          )
+          ),
         )}
       </div>
-
     </div>
   );
 }

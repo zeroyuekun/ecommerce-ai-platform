@@ -1,13 +1,13 @@
 "use client";
 
+import { X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { X } from "lucide-react";
-import { useCartActions } from "@/lib/store/cart-store-provider";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
-import { cn, formatPrice } from "@/lib/utils";
-import type { CartItem as CartItemType } from "@/lib/store/cart-store";
 import type { StockInfo } from "@/lib/hooks/useCartStock";
+import type { CartItem as CartItemType } from "@/lib/store/cart-store";
+import { useCartActions } from "@/lib/store/cart-store-provider";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItemType;

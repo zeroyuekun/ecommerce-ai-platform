@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { ArrowRight, CheckCircle, Package } from "lucide-react";
 import Link from "next/link";
-import { CheckCircle, Package, ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
 import { useCartActions } from "@/lib/store/cart-store-provider";
+import { formatPrice } from "@/lib/utils";
 
 interface SuccessClientProps {
   session: {

@@ -1,24 +1,24 @@
 "use client";
 
-import { Suspense, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import {
-  useDocuments,
-  useApplyDocumentActions,
-  createDocumentHandle,
   createDocument,
+  createDocumentHandle,
+  useApplyDocumentActions,
+  useDocuments,
 } from "@sanity/sdk-react";
-import { Plus, Package, Loader2 } from "lucide-react";
+import { Loader2, Package, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Suspense, useState, useTransition } from "react";
+import {
+  AdminSearch,
+  ProductRow,
+  ProductRowSkeleton,
+  ProductTableHeader,
+  useProductSearchFilter,
+} from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TableBody } from "@/components/ui/table";
-import {
-  ProductRow,
-  ProductRowSkeleton,
-  AdminSearch,
-  useProductSearchFilter,
-  ProductTableHeader,
-} from "@/components/admin";
 
 interface ProductListContentProps {
   filter?: string;

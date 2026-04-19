@@ -1,12 +1,12 @@
-import Link from "next/link";
 import {
-  Truck,
-  RotateCcw,
   CreditCard,
-  Package,
   MessageCircle,
+  Package,
   Phone,
+  RotateCcw,
+  Truck,
 } from "lucide-react";
+import Link from "next/link";
 
 const helpTopics = [
   {

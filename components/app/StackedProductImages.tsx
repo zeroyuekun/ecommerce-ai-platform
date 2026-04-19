@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
+import Image from "next/image";
 
 interface StackedProductImagesProps {
   images: string[];

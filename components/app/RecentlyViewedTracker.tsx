@@ -7,7 +7,9 @@ interface RecentlyViewedTrackerProps {
   productId: string;
 }
 
-export function RecentlyViewedTracker({ productId }: RecentlyViewedTrackerProps) {
+export function RecentlyViewedTracker({
+  productId,
+}: RecentlyViewedTrackerProps) {
   const { addProduct } = useRecentlyViewedActions();
 
   useEffect(() => {

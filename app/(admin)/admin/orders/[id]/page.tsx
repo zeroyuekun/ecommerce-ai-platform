@@ -1,24 +1,24 @@
 "use client";
 
-import { Suspense, use } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { useDocumentProjection, type DocumentHandle } from "@sanity/sdk-react";
+import { type DocumentHandle, useDocumentProjection } from "@sanity/sdk-react";
 import {
   ArrowLeft,
-  MapPin,
   CreditCard,
-  ExternalLink,
   Edit2,
+  ExternalLink,
+  MapPin,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense, use } from "react";
 import {
-  StatusSelect,
   AddressEditor,
   PublishButton,
   RevertButton,
+  StatusSelect,
 } from "@/components/admin";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatDate, formatPrice } from "@/lib/utils";
 
 interface OrderDetailProjection {
   orderNumber: string;

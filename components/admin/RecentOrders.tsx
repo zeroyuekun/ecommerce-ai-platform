@@ -1,17 +1,17 @@
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
 import {
-  useDocuments,
-  useDocumentProjection,
   type DocumentHandle,
+  useDocumentProjection,
+  useDocuments,
 } from "@sanity/sdk-react";
 import { ShoppingCart } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
-import { formatPrice, formatOrderNumber } from "@/lib/utils";
+import { formatOrderNumber, formatPrice } from "@/lib/utils";
 
 interface OrderProjection {
   orderNumber: string;

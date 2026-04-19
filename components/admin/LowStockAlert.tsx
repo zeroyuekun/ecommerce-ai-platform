@@ -1,16 +1,16 @@
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import {
-  useDocuments,
-  useDocumentProjection,
   type DocumentHandle,
+  useDocumentProjection,
+  useDocuments,
 } from "@sanity/sdk-react";
 import { AlertTriangle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductProjection {
   name: string;

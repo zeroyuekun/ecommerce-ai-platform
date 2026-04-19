@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { client } from "@/sanity/lib/client";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products";
 import type { CartItem } from "@/lib/store/cart-store";
+import { client } from "@/sanity/lib/client";
 
 export interface StockInfo {
   productId: string;
@@ -22,42 +22,58 @@ interface UseCartStockReturn {
   refetch: () => void;
 }
 
+const DEBOUNCE_MS = 400;
+
 /**
- * Fetches current stock levels for cart items
- * Returns stock info map and loading state
+ * Fetches current stock levels for cart items.
+ * Debounces rapid cart mutations to avoid thrashing Sanity on quantity changes,
+ * and cancels in-flight requests when the cart changes mid-fetch.
  */
 export function useCartStock(items: CartItem[]): UseCartStockReturn {
   const [stockMap, setStockMap] = useState<StockMap>(new Map());
   const [isLoading, setIsLoading] = useState(false);
 
-  // Memoize product IDs to use as stable dependency
-  const productIds = useMemo(
-    () => items.map((item) => item.productId),
-    [items]
+  // Stable signature — only triggers refetch when productIds/quantities change,
+  // not when a new items array reference is created by unrelated store updates.
+  const signature = useMemo(
+    () => items.map((i) => `${i.productId}:${i.quantity}`).join("|"),
+    [items],
   );
 
-  const fetchStock = useCallback(async () => {
-    if (items.length === 0) {
+  const abortRef = useRef<AbortController | null>(null);
+  const itemsRef = useRef<CartItem[]>(items);
+  itemsRef.current = items;
+
+  const runFetch = useCallback(async () => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length === 0) {
       setStockMap(new Map());
+      setIsLoading(false);
       return;
     }
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setIsLoading(true);
-
     try {
-      const products = await client.fetch(PRODUCTS_BY_IDS_QUERY, {
-        ids: productIds,
-      });
+      const productIds = currentItems.map((i) => i.productId);
+      const products = (await client.fetch(
+        PRODUCTS_BY_IDS_QUERY,
+        { ids: productIds },
+        { signal: controller.signal },
+      )) as Array<{ _id: string; stock?: number }>;
 
-      const newStockMap = new Map<string, StockInfo>();
+      if (controller.signal.aborted) return;
 
-      for (const item of items) {
-        const product = products.find(
-          (p: { _id: string }) => p._id === item.productId
-        );
+      // O(1) lookup instead of products.find() per item.
+      const productById = new Map(products.map((p) => [p._id, p]));
+      const next: StockMap = new Map();
+      for (const item of currentItems) {
+        const product = productById.get(item.productId);
         const currentStock = product?.stock ?? 0;
-
-        newStockMap.set(item.productId, {
+        next.set(item.productId, {
           productId: item.productId,
           currentStock,
           isOutOfStock: currentStock === 0,
@@ -65,27 +81,35 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
           availableQuantity: Math.min(item.quantity, currentStock),
         });
       }
-
-      setStockMap(newStockMap);
+      setStockMap(next);
     } catch (error) {
+      if ((error as { name?: string })?.name === "AbortError") return;
       console.error("Failed to fetch stock:", error);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
-  }, [items, productIds]);
+  }, []);
 
   useEffect(() => {
-    fetchStock();
-  }, [fetchStock]);
+    const timer = setTimeout(runFetch, DEBOUNCE_MS);
+    return () => {
+      clearTimeout(timer);
+      abortRef.current?.abort();
+    };
+    // signature intentionally drives the effect — rerun only when cart shape changes.
+  }, [signature, runFetch]);
 
-  const hasStockIssues = Array.from(stockMap.values()).some(
-    (info) => info.isOutOfStock || info.exceedsStock
-  );
+  const hasStockIssues = useMemo(() => {
+    for (const info of stockMap.values()) {
+      if (info.isOutOfStock || info.exceedsStock) return true;
+    }
+    return false;
+  }, [stockMap]);
 
   return {
     stockMap,
     isLoading,
     hasStockIssues,
-    refetch: fetchStock,
+    refetch: runFetch,
   };
 }

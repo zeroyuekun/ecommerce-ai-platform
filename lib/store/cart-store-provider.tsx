@@ -2,16 +2,16 @@
 
 import {
   createContext,
-  useContext,
-  useRef,
-  useEffect,
   type ReactNode,
+  useContext,
+  useEffect,
+  useRef,
 } from "react";
 import { useStore } from "zustand";
 import {
-  createCartStore,
-  type CartStore,
   type CartState,
+  type CartStore,
+  createCartStore,
   defaultInitState,
 } from "./cart-store";
 

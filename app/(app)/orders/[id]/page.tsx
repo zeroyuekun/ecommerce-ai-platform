@@ -1,12 +1,12 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowLeft, CreditCard, MapPin } from "lucide-react";
-import { sanityFetch } from "@/sanity/lib/live";
-import { ORDER_BY_ID_QUERY } from "@/lib/sanity/queries/orders";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { ORDER_BY_ID_QUERY } from "@/lib/sanity/queries/orders";
+import { formatDate, formatPrice } from "@/lib/utils";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const metadata = {
   title: "Order Details | Furniture Shop",
@@ -187,7 +187,10 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
             {order.address && (
               <div className="border-t border-zinc-100 pt-8 dark:border-zinc-800/60">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-3.5 w-3.5 text-zinc-400" strokeWidth={1.5} />
+                  <MapPin
+                    className="h-3.5 w-3.5 text-zinc-400"
+                    strokeWidth={1.5}
+                  />
                   <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
                     Shipping Address
                   </p>
@@ -209,7 +212,10 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
             {/* Payment Info */}
             <div className="border-t border-zinc-100 pt-8 dark:border-zinc-800/60">
               <div className="flex items-center gap-2">
-                <CreditCard className="h-3.5 w-3.5 text-zinc-400" strokeWidth={1.5} />
+                <CreditCard
+                  className="h-3.5 w-3.5 text-zinc-400"
+                  strokeWidth={1.5}
+                />
                 <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
                   Payment
                 </p>

@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useRef, Suspense } from "react";
-import Image from "next/image";
 import {
+  type DocumentHandle,
+  useClient,
   useDocument,
   useEditDocument,
-  useClient,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
 import {
+  ChevronDown,
+  ChevronUp,
+  ImageIcon,
+  Loader2,
   Upload,
   X,
-  Loader2,
-  ImageIcon,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
+import Image from "next/image";
+import { Suspense, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";

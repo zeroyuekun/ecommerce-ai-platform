@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 import type { AddToCartResult } from "@/lib/ai/tools/add-to-cart";
 
 interface CartAddedWidgetProps {

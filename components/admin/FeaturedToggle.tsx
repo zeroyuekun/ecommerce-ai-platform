@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense } from "react";
 import {
+  type DocumentHandle,
   useDocument,
   useEditDocument,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
 import { Star } from "lucide-react";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";

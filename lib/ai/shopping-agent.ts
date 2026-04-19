@@ -1,7 +1,7 @@
 import { gateway, type Tool, ToolLoopAgent } from "ai";
-import { searchProductsTool } from "./tools/search-products";
-import { createGetMyOrdersTool } from "./tools/get-my-orders";
 import { addToCartTool } from "./tools/add-to-cart";
+import { createGetMyOrdersTool } from "./tools/get-my-orders";
+import { searchProductsTool } from "./tools/search-products";
 
 interface ShoppingAgentOptions {
   userId: string | null;
@@ -214,7 +214,6 @@ Don't just return results and stop. Guide the customer like a real associate wou
 - Link to products using markdown: [Name](/products/slug)
 - End every response with a natural next step or question — never leave the customer at a dead end
 - Limit product results to 3-5 per response. If more are available, mention it: "I've shown you five here — I can pull up more if none of these feel right."`;
-
 
 const ordersInstructions = `
 

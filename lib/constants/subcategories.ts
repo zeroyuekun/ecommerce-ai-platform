@@ -1,4 +1,7 @@
-export const subcategoriesMap: Record<string, { label: string; query: string; type?: string }[]> = {
+export const subcategoriesMap: Record<
+  string,
+  { label: string; query: string; type?: string }[]
+> = {
   "living-room": [
     { label: "Sofas & Sectionals", query: "", type: "sofas" },
     { label: "Coffee & Side Tables", query: "", type: "tables" },
@@ -10,26 +13,26 @@ export const subcategoriesMap: Record<string, { label: string; query: string; ty
     { label: "Dining Tables", query: "", type: "tables" },
     { label: "Dining Chairs", query: "", type: "chairs" },
   ],
-  "bedroom": [
+  bedroom: [
     { label: "Beds & Frames", query: "", type: "beds" },
     { label: "Bedside Tables", query: "", type: "bedside-tables" },
     { label: "Dressers & Drawers", query: "", type: "drawers" },
     { label: "Desks & Vanities", query: "", type: "desks" },
   ],
-  "baby": [
+  baby: [
     { label: "Cots & Cribs", query: "", type: "cots" },
     { label: "Highchairs", query: "", type: "highchairs" },
   ],
-  "kids": [
+  kids: [
     { label: "Kids Beds", query: "", type: "beds" },
     { label: "Desks & Chairs", query: "", type: "desks" },
     { label: "Toy Storage", query: "", type: "storage" },
   ],
-  "youth": [
+  youth: [
     { label: "Teen Beds", query: "", type: "beds" },
     { label: "Bedside Tables", query: "", type: "bedside-tables" },
   ],
-  "outdoor": [
+  outdoor: [
     { label: "Outdoor Seating", query: "", type: "sofas" },
     { label: "Outdoor Tables", query: "", type: "tables" },
   ],
@@ -38,9 +41,7 @@ export const subcategoriesMap: Record<string, { label: string; query: string; ty
     { label: "Office Chairs", query: "", type: "chairs" },
     { label: "Shelving Units", query: "", type: "shelving" },
   ],
-  "lighting-decor": [
-    { label: "Mirrors", query: "", type: "mirrors" },
-  ],
+  "lighting-decor": [{ label: "Mirrors", query: "", type: "mirrors" }],
   "furniture-sets": [
     { label: "Table Sets", query: "", type: "tables" },
     { label: "Storage Sets", query: "", type: "storage" },
@@ -50,7 +51,11 @@ export const subcategoriesMap: Record<string, { label: string; query: string; ty
 /**
  * Find a subcategory label by matching the type or query param against a category's subcategories
  */
-export function getSubcategoryLabel(categorySlug: string, query: string, type?: string): string | null {
+export function getSubcategoryLabel(
+  categorySlug: string,
+  query: string,
+  type?: string,
+): string | null {
   const subs = subcategoriesMap[categorySlug];
   if (!subs) return null;
   if (type) {
@@ -58,7 +63,9 @@ export function getSubcategoryLabel(categorySlug: string, query: string, type?: 
     if (match) return match.label;
   }
   if (query) {
-    const match = subs.find((s) => s.query.toLowerCase() === query.toLowerCase());
+    const match = subs.find(
+      (s) => s.query.toLowerCase() === query.toLowerCase(),
+    );
     return match?.label ?? null;
   }
   return null;

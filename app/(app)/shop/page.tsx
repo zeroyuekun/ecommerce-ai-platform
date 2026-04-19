@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { sanityFetch } from "@/sanity/lib/live";
+import Link from "next/link";
+import { HaveYouSeenThis } from "@/components/app/HaveYouSeenThis";
+import { ProductSection } from "@/components/app/ProductSection";
+import { RecentlyViewed } from "@/components/app/RecentlyViewed";
+import { getSubcategoryLabel } from "@/lib/constants/subcategories";
+import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
 import {
-  FILTER_PRODUCTS_BY_NAME_QUERY,
+  FILTER_PRODUCTS_BY_BEST_SELLING_QUERY,
   FILTER_PRODUCTS_BY_NAME_DESC_QUERY,
+  FILTER_PRODUCTS_BY_NAME_QUERY,
   FILTER_PRODUCTS_BY_NEWEST_QUERY,
   FILTER_PRODUCTS_BY_PRICE_ASC_QUERY,
   FILTER_PRODUCTS_BY_PRICE_DESC_QUERY,
-  FILTER_PRODUCTS_BY_BEST_SELLING_QUERY,
   FILTER_PRODUCTS_BY_RELEVANCE_QUERY,
   POPULAR_PRODUCTS_QUERY,
 } from "@/lib/sanity/queries/products";
-import { ALL_CATEGORIES_QUERY } from "@/lib/sanity/queries/categories";
-import { ProductSection } from "@/components/app/ProductSection";
-import { HaveYouSeenThis } from "@/components/app/HaveYouSeenThis";
-import { RecentlyViewed } from "@/components/app/RecentlyViewed";
-import { getSubcategoryLabel } from "@/lib/constants/subcategories";
-import Link from "next/link";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -41,7 +41,9 @@ export default async function ShopPage({ searchParams }: PageProps) {
   const sp = await searchParams;
 
   const searchQuery = sp.q ?? "";
-  const categorySlugs = sp.category ? sp.category.split(",").filter(Boolean) : [];
+  const categorySlugs = sp.category
+    ? sp.category.split(",").filter(Boolean)
+    : [];
   const productTypes = sp.type ? sp.type.split(",").filter(Boolean) : [];
   const colors = sp.color ? sp.color.split(",") : [];
   const materials = sp.material ? sp.material.split(",") : [];
@@ -91,18 +93,24 @@ export default async function ShopPage({ searchParams }: PageProps) {
     sanityFetch({ query: POPULAR_PRODUCTS_QUERY }),
   ]);
 
-  const isSaleFilter = categorySlugs.length === 1 && categorySlugs[0] === "sale";
-  const activeCategory = categorySlugs.length === 1 && !isSaleFilter
-    ? categories.find((c) => c.slug === categorySlugs[0])
-    : null;
-  const subcategoryLabel = categorySlugs.length === 1
-    ? getSubcategoryLabel(categorySlugs[0], searchQuery, productTypes[0])
-    : null;
+  const isSaleFilter =
+    categorySlugs.length === 1 && categorySlugs[0] === "sale";
+  const activeCategory =
+    categorySlugs.length === 1 && !isSaleFilter
+      ? categories.find((c) => c.slug === categorySlugs[0])
+      : null;
+  const subcategoryLabel =
+    categorySlugs.length === 1
+      ? getSubcategoryLabel(categorySlugs[0], searchQuery, productTypes[0])
+      : null;
   const heading = isSaleFilter
     ? "Sale"
     : categorySlugs.length > 1
-      ? categories.filter((c) => categorySlugs.includes(c.slug ?? "")).map((c) => c.title).join(", ")
-      : subcategoryLabel ?? activeCategory?.title ?? "All Products";
+      ? categories
+          .filter((c) => categorySlugs.includes(c.slug ?? ""))
+          .map((c) => c.title)
+          .join(", ")
+      : (subcategoryLabel ?? activeCategory?.title ?? "All Products");
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">

@@ -22,10 +22,10 @@ export default function ReturnsPage() {
               30-Day Returns
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              If you&apos;re not completely satisfied with your purchase, you may
-              return it within 30 days of delivery for a full refund or exchange.
-              Items must be unused, in their original packaging, and in the same
-              condition you received them.
+              If you&apos;re not completely satisfied with your purchase, you
+              may return it within 30 days of delivery for a full refund or
+              exchange. Items must be unused, in their original packaging, and
+              in the same condition you received them.
             </p>
           </section>
 
@@ -35,24 +35,35 @@ export default function ReturnsPage() {
             </h2>
             <ol className="mt-4 space-y-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               <li className="flex gap-3">
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">1.</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  1.
+                </span>
                 Contact our customer service team at{" "}
-                <Link href="/contact" className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100">
+                <Link
+                  href="/contact"
+                  className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
+                >
                   hello@kozy.com.au
                 </Link>{" "}
                 or call 02 9000 1234.
               </li>
               <li className="flex gap-3">
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">2.</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  2.
+                </span>
                 Provide your order number and the reason for your return.
               </li>
               <li className="flex gap-3">
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">3.</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  3.
+                </span>
                 Our team will arrange a pick-up or provide you with a return
                 shipping label.
               </li>
               <li className="flex gap-3">
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">4.</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  4.
+                </span>
                 Once we receive and inspect the item, we&apos;ll process your
                 refund within 5&ndash;7 business days.
               </li>
@@ -64,9 +75,9 @@ export default function ReturnsPage() {
               Damaged or Faulty Items
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              If your item arrives damaged or faulty, please contact us within 48
-              hours of delivery with photos of the damage. We&apos;ll arrange a
-              replacement or full refund at no extra cost to you.
+              If your item arrives damaged or faulty, please contact us within
+              48 hours of delivery with photos of the damage. We&apos;ll arrange
+              a replacement or full refund at no extra cost to you.
             </p>
           </section>
 
@@ -75,10 +86,11 @@ export default function ReturnsPage() {
               Warranty
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              All Kozy furniture comes with a 2-year structural warranty covering
-              manufacturing defects. This warranty does not cover normal wear and
-              tear, accidental damage, or improper use. For warranty claims, please
-              contact our support team with your order details and photos.
+              All Kozy furniture comes with a 2-year structural warranty
+              covering manufacturing defects. This warranty does not cover
+              normal wear and tear, accidental damage, or improper use. For
+              warranty claims, please contact our support team with your order
+              details and photos.
             </p>
           </section>
 

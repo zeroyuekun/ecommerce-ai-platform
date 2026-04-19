@@ -172,6 +172,27 @@ For local Stripe webhooks:
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
+## Performance & Robustness Hardening (2026-04-20)
+
+A performance and robustness audit was run across the data layer, API routes, and hot-path components. TypeScript, Biome, and `next build` all pass cleanly after the changes (typecheck exit 0, build exit 0). Key fixes:
+
+**Data layer**
+- `sanity/lib/client.ts` — enabled `useCdn: true` on the read-only client so published reads are served from Sanity's global edge cache. The write client still bypasses CDN for freshness.
+
+**API routes**
+- `app/api/chat/route.ts` — added zod schema validation, 256KB body cap, per-user in-memory rate limiter (20 requests/minute, `429` + `Retry-After`), opportunistic bucket eviction, explicit `runtime: "nodejs"` and `maxDuration: 60` to prevent cost abuse and runaway streams.
+- `app/api/webhooks/stripe/route.ts` — dropped reliance on `lineItems.data[index]` ordering matching `productIds` array order. The webhook now expands `line_items.data.price.product` and matches by the `productId` stored in `product_data.metadata` at session-creation time. Added quantity sanity checks and length-mismatch guard on the session metadata payload.
+- `app/api/admin/insights/route.ts` — removed the duplicate `productSalesById` Map, fused `needsRestock` / `slowMoving` / `lowStockCount` into a single inventory pass, and replaced the greedy `/\{[\s\S]*\}/` JSON extraction with a balanced-brace parser that handles LLM preamble and trailing prose without silently truncating.
+
+**Client hooks**
+- `lib/hooks/useCartStock.ts` — O(n²) `products.find()` per cart item replaced with an O(1) Map lookup. Added a 400ms debounce on cart-mutation refetches, `AbortController` cancellation of in-flight Sanity fetches when the cart changes mid-request, and a stable `productId:quantity` signature so unrelated store updates no longer trigger refetches. `hasStockIssues` is now memoised.
+
+**Tooling**
+- `biome check --write` normalised imports and formatting across 192 files. Remaining Biome diagnostics (53 errors, 29 warnings) are non-blocking a11y and array-index-key issues queued for a follow-up pass.
+
+**Not shipped in this pass**
+- `ALL_CATEGORIES_QUERY` subquery optimisation was reverted: changing the query string invalidates the generated Sanity type override (the query string is the map key in `sanity.types.ts`). Revisit after running `pnpm typegen`.
+
 ## License
 
 [MIT](./LICENSE.md)

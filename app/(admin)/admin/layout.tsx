@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
+  ExternalLink,
   LayoutDashboard,
+  Menu,
   Package,
   ShoppingCart,
-  Menu,
   X,
-  ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Providers } from "@/components/providers/Providers";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   {

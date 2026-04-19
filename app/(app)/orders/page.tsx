@@ -1,14 +1,14 @@
-import { Suspense } from "react";
-import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { Package, ChevronRight } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import { sanityFetch } from "@/sanity/lib/live";
-import { ORDERS_BY_USER_QUERY } from "@/lib/sanity/queries/orders";
-import { getOrderStatus } from "@/lib/constants/orderStatus";
-import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
-import { StackedProductImages } from "@/components/app/StackedProductImages";
+import { ChevronRight, Package } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 import { OrderCardSkeleton } from "@/components/app/OrderCardSkeleton";
+import { StackedProductImages } from "@/components/app/StackedProductImages";
+import { EmptyState } from "@/components/ui/empty-state";
+import { getOrderStatus } from "@/lib/constants/orderStatus";
+import { ORDERS_BY_USER_QUERY } from "@/lib/sanity/queries/orders";
+import { formatDate, formatOrderNumber, formatPrice } from "@/lib/utils";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const metadata = {
   title: "Your Orders | Furniture Shop",
@@ -118,12 +118,11 @@ async function OrderList({ clerkUserId }: { clerkUserId: string }) {
 
               <div className="flex items-end justify-between">
                 <p className="truncate text-[12px] tracking-[0.03em] text-zinc-500 dark:text-zinc-400">
-                  {order.itemCount}{" "}
-                  {order.itemCount === 1 ? "item" : "items"}
+                  {order.itemCount} {order.itemCount === 1 ? "item" : "items"}
                   {order.itemNames && order.itemNames.length > 0 && (
                     <span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
                       — {order.itemNames.slice(0, 2).filter(Boolean).join(", ")}
-                      {(order.itemNames.length) > 2 && "..."}
+                      {order.itemNames.length > 2 && "..."}
                     </span>
                   )}
                 </p>

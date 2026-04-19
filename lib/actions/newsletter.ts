@@ -14,7 +14,7 @@ export async function subscribeNewsletter(email: string) {
   try {
     const existing = await client.fetch(
       `*[_type == "newsletterSignup" && email == $email][0]`,
-      { email: trimmed }
+      { email: trimmed },
     );
 
     if (existing) {
@@ -27,9 +27,15 @@ export async function subscribeNewsletter(email: string) {
       signedUpAt: new Date().toISOString(),
     });
 
-    return { success: true, message: "Thanks! Check your inbox for your code." };
+    return {
+      success: true,
+      message: "Thanks! Check your inbox for your code.",
+    };
   } catch (error) {
     console.error("Newsletter signup failed:", error);
-    return { success: false, message: "Something went wrong. Please try again." };
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 }

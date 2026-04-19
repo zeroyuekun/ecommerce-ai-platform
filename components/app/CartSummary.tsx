@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
 import {
-  useTotalPrice,
-  useTotalItems,
   useCartActions,
+  useTotalItems,
+  useTotalPrice,
 } from "@/lib/store/cart-store-provider";
+import { formatPrice } from "@/lib/utils";
 
 interface CartSummaryProps {
   hasStockIssues?: boolean;

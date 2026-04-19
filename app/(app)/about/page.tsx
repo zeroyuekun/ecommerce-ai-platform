@@ -142,10 +142,10 @@ export default function AboutPage() {
               Built to Last a Lifetime
             </h2>
             <p className="mt-6 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              From the selection of raw materials to the final finishing touches,
-              we maintain the highest standards of quality. Our furniture is
-              designed in Australia and crafted using time-honoured techniques
-              combined with modern innovation.
+              From the selection of raw materials to the final finishing
+              touches, we maintain the highest standards of quality. Our
+              furniture is designed in Australia and crafted using time-honoured
+              techniques combined with modern innovation.
             </p>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               We work with skilled artisans who share our passion for
@@ -192,7 +192,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

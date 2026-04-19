@@ -7,7 +7,10 @@ export function ProductGallerySkeleton() {
       <div className="hidden sm:flex sm:gap-3">
         <div className="flex flex-col gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[72px] w-[72px] shrink-0 lg:h-[80px] lg:w-[80px]" />
+            <Skeleton
+              key={i}
+              className="h-[72px] w-[72px] shrink-0 lg:h-[80px] lg:w-[80px]"
+            />
           ))}
         </div>
         <Skeleton className="aspect-square flex-1" />

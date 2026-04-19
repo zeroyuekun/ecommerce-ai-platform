@@ -1,9 +1,9 @@
 import { tool } from "ai";
-import { z } from "zod";
-import { sanityFetch } from "@/sanity/lib/live";
 import { defineQuery } from "next-sanity";
-import { formatPrice } from "@/lib/utils";
+import { z } from "zod";
 import { getStockStatus } from "@/lib/constants/stock";
+import { formatPrice } from "@/lib/utils";
+import { sanityFetch } from "@/sanity/lib/live";
 
 const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   _type == "product"
@@ -49,14 +49,14 @@ const addToCartSchema = z.object({
     .optional()
     .default("")
     .describe(
-      "The product slug (e.g., 'osaka-buffet-natural'). Preferred over name for exact matching."
+      "The product slug (e.g., 'osaka-buffet-natural'). Preferred over name for exact matching.",
     ),
   productName: z
     .string()
     .optional()
     .default("")
     .describe(
-      "The product name to search for (e.g., 'Osaka Buffet'). Used if slug is not available."
+      "The product name to search for (e.g., 'Osaka Buffet'). Used if slug is not available.",
     ),
   quantity: z
     .number()

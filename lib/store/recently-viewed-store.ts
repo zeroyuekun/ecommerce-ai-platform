@@ -1,5 +1,5 @@
-import { createStore } from "zustand/vanilla";
 import { persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
 
 const MAX_RECENTLY_VIEWED = 12;
 
@@ -29,7 +29,10 @@ export const createRecentlyViewedStore = () =>
           set((state) => {
             const filtered = state.productIds.filter((id) => id !== productId);
             return {
-              productIds: [productId, ...filtered].slice(0, MAX_RECENTLY_VIEWED),
+              productIds: [productId, ...filtered].slice(
+                0,
+                MAX_RECENTLY_VIEWED,
+              ),
             };
           }),
 

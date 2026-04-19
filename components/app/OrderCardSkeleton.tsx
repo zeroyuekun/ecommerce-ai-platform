@@ -8,7 +8,10 @@ export function OrderCardSkeleton({ count = 3 }: OrderCardSkeletonProps) {
   return (
     <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex items-center gap-5 py-6 first:pt-0 last:pb-0 sm:gap-6">
+        <div
+          key={i}
+          className="flex items-center gap-5 py-6 first:pt-0 last:pb-0 sm:gap-6"
+        >
           <Skeleton className="h-20 w-20 shrink-0" />
           <div className="flex min-w-0 flex-1 flex-col gap-3">
             <div className="flex items-start justify-between gap-3">

@@ -31,7 +31,8 @@ export default function PrivacyPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-zinc-400">&bull;</span>
-                Payment information (processed securely via our payment providers)
+                Payment information (processed securely via our payment
+                providers)
               </li>
               <li className="flex gap-2">
                 <span className="text-zinc-400">&bull;</span>
@@ -81,9 +82,9 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
               We take the security of your data seriously. All transactions are
-              encrypted using SSL technology, and we do not store your payment card
-              details on our servers. Access to personal information is restricted
-              to authorised personnel only.
+              encrypted using SSL technology, and we do not store your payment
+              card details on our servers. Access to personal information is
+              restricted to authorised personnel only.
             </p>
           </section>
 
@@ -103,9 +104,9 @@ export default function PrivacyPage() {
               Cookies
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Our website uses cookies to enhance your browsing experience, analyse
-              site traffic, and personalise content. You can manage your cookie
-              preferences through your browser settings.
+              Our website uses cookies to enhance your browsing experience,
+              analyse site traffic, and personalise content. You can manage your
+              cookie preferences through your browser settings.
             </p>
           </section>
 
@@ -141,8 +142,8 @@ export default function PrivacyPage() {
               Contact Us
             </h2>
             <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              If you have questions about our privacy practices, please contact us
-              at hello@kozy.com.au or call 02 9000 1234.
+              If you have questions about our privacy practices, please contact
+              us at hello@kozy.com.au or call 02 9000 1234.
             </p>
           </section>
         </div>

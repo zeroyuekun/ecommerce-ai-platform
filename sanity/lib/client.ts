@@ -2,12 +2,14 @@ import { createClient } from "next-sanity";
 
 import { apiVersion, dataset, projectId } from "../env";
 
-// Read-only client (for fetching data)
+// Read-only client (for fetching data).
+// CDN is safe for published reads; freshness is handled by Next.js cache + revalidation tags.
+// Bypasses CDN automatically when a token is attached (e.g., draft-mode previews).
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  useCdn: true,
   perspective: "published",
 });
 

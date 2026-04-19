@@ -1,6 +1,6 @@
-import Link from "next/link";
-import Image from "next/image";
 import { Package } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import type { SearchProduct } from "@/lib/ai/types";
 
 interface ProductCardWidgetProps {

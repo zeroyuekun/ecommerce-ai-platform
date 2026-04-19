@@ -1,17 +1,17 @@
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
+  type DocumentHandle,
+  deleteDocument,
+  discardDocument,
   useApplyDocumentActions,
   useDocument,
   useQuery,
-  deleteDocument,
-  discardDocument,
-  type DocumentHandle,
 } from "@sanity/sdk-react";
 import { Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
