@@ -17,9 +17,9 @@
     "lighthouse": "pnpm dlx @lhci/cli@0.15.0 autorun",
     "typegen": "sanity schema extract && sanity typegen generate --enforce-required-fields",
     "backfill:search": "tsx tools/scripts/backfill-search-index.ts",
-    "eval:search": "tsx tests/search-eval/eval.ts",
-    "eval:search:promote": "tsx tests/search-eval/eval.ts --promote",
-    "eval:search:check": "tsx tests/search-eval/eval.ts --check",
+    "eval:search": "tsx --env-file-if-exists=.env.local tests/search-eval/eval.ts",
+    "eval:search:promote": "tsx --env-file-if-exists=.env.local tests/search-eval/eval.ts --promote",
+    "eval:search:check": "tsx --env-file-if-exists=.env.local tests/search-eval/eval.ts --check",
     "load:backfill": "tsx tests/load/backfill-load.ts"
   },
   "dependencies": {

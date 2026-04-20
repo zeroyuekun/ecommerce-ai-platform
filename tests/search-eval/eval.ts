@@ -1,8 +1,11 @@
-import "dotenv/config";
-import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { embedText } from "@/lib/search/embed";
-import { getSearchIndex } from "@/lib/search/index";
+import { defineQuery } from "next-sanity";
+import { embedBatch } from "@/lib/search/embed";
+import { getSearchIndex, type IndexRecord } from "@/lib/search/index";
+import { buildEmbeddingText } from "@/lib/search/text";
+import { client } from "@/sanity/lib/client";
 
 interface Query {
   query: string;
@@ -25,13 +28,59 @@ interface RunResult {
 }
 
 const DIR = join(process.cwd(), "tests", "search-eval");
+const CACHE_FILE = join(DIR, ".embeddings-cache.json");
 
-async function runOne(q: Query): Promise<{
-  recallAt5: number;
-  reciprocalRank: number;
-  topIds: string[];
-}> {
-  const vector = await embedText(q.query);
+function loadCache(): Record<string, number[]> {
+  if (!existsSync(CACHE_FILE)) return {};
+  try {
+    return JSON.parse(readFileSync(CACHE_FILE, "utf8")) as Record<
+      string,
+      number[]
+    >;
+  } catch {
+    return {};
+  }
+}
+
+function saveCache(cache: Record<string, number[]>): void {
+  writeFileSync(CACHE_FILE, JSON.stringify(cache));
+}
+
+function hashText(text: string): string {
+  return createHash("sha256").update(text).digest("hex").slice(0, 16);
+}
+
+async function embedWithCache(
+  texts: string[],
+  cache: Record<string, number[]>,
+): Promise<number[][]> {
+  const missing: string[] = [];
+  const missingIdx: number[] = [];
+  const result: (number[] | null)[] = texts.map((t) => {
+    const cached = cache[hashText(t)];
+    return cached ?? null;
+  });
+  for (let i = 0; i < texts.length; i += 1) {
+    if (result[i] === null) {
+      missingIdx.push(i);
+      missing.push(texts[i]);
+    }
+  }
+  if (missing.length > 0) {
+    const fresh = await embedBatch(missing);
+    for (let i = 0; i < missing.length; i += 1) {
+      cache[hashText(missing[i])] = fresh[i];
+      result[missingIdx[i]] = fresh[i];
+    }
+    saveCache(cache);
+  }
+  return result as number[][];
+}
+
+async function runOne(
+  q: Query,
+  vector: number[],
+): Promise<{ recallAt5: number; reciprocalRank: number; topIds: string[] }> {
   const res = await getSearchIndex().query(vector, { topK: 10 });
   const topIds = res.map((r) => r.id);
   const relevant = new Set(q.relevantIds);
@@ -48,20 +97,94 @@ async function runOne(q: Query): Promise<{
   return { recallAt5, reciprocalRank, topIds };
 }
 
+const ALL_PRODUCTS_QUERY = defineQuery(`
+  *[_type == "product"]{
+    _id,
+    "slug": slug.current,
+    name,
+    description,
+    price,
+    stock,
+    material,
+    color,
+    "category": category->slug.current
+  }
+`);
+
+interface SeedProduct {
+  _id: string;
+  slug: string;
+  name: string | null;
+  description: string | null;
+  price: number;
+  stock: number;
+  material: string | null;
+  color: string | null;
+  category: string | null;
+}
+
+async function seedIndex(cache: Record<string, number[]>) {
+  const products = (await client.fetch(ALL_PRODUCTS_QUERY)) as SeedProduct[];
+  const index = getSearchIndex();
+  const texts: string[] = [];
+  const kept: SeedProduct[] = [];
+  for (const p of products) {
+    const text = buildEmbeddingText(p);
+    if (text.length === 0) continue;
+    texts.push(text);
+    kept.push(p);
+  }
+  const vectors = await embedWithCache(texts, cache);
+  const records: IndexRecord[] = kept.map((p, i) => ({
+    id: p._id,
+    vector: vectors[i],
+    metadata: {
+      _id: p._id,
+      slug: p.slug,
+      name: p.name ?? "",
+      category: p.category,
+      price: p.price,
+      stock: p.stock,
+    },
+  }));
+  await index.upsert(records);
+  console.log(
+    `[eval] seeded ${records.length} products into ${index.backend} index`,
+  );
+}
+
 async function main() {
+  const cache = loadCache();
+
+  // Seed when explicitly asked, or when the backend is in-memory (tests, local
+  // runs without Upstash). The Upstash backend is assumed to be pre-populated
+  // by the backfill script, so we skip seeding there.
+  const shouldSeed =
+    process.argv.includes("--seed") || getSearchIndex().backend === "memory";
+  if (shouldSeed) {
+    await seedIndex(cache);
+  }
+
   const queries = JSON.parse(
     readFileSync(join(DIR, "queries.json"), "utf8"),
   ) as Query[];
 
-  const scored: RunResult["perQuery"] = [];
-  let skipped = 0;
+  const scorable = queries.filter((q) => q.relevantIds.length > 0);
+  const skipped = queries.length - scorable.length;
 
-  for (const q of queries) {
-    if (q.relevantIds.length === 0) {
-      skipped += 1;
-      continue;
-    }
-    const { recallAt5, reciprocalRank, topIds } = await runOne(q);
+  // Embeddings are deterministic: cache to disk to avoid re-hitting AI Gateway.
+  const vectors =
+    scorable.length === 0
+      ? []
+      : await embedWithCache(
+          scorable.map((q) => q.query),
+          cache,
+        );
+
+  const scored: RunResult["perQuery"] = [];
+  for (let i = 0; i < scorable.length; i += 1) {
+    const q = scorable[i];
+    const { recallAt5, reciprocalRank, topIds } = await runOne(q, vectors[i]);
     scored.push({
       query: q.query,
       recallAt5,

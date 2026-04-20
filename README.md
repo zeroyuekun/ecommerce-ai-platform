@@ -93,27 +93,21 @@ Vibes-first product discovery. Users describe a feeling or situation — "cozy n
 
 ### Eval
 
-Hand-labeled 30 queries with ground-truth product IDs. Runs via `pnpm eval:search`; CI fails if recall@5 drops >5% from baseline.
+Hand-labeled 30 natural-language queries ("cozy nook for a studio apartment", "black metal and oak combo") mapped to ground-truth product IDs. Embeddings deterministic and cached to disk. CI fails if recall@5 drops >5% from baseline.
 
-| Metric | Semantic | Keyword baseline |
-|---|---|---|
-| recall@5 | **TBD after first run** | TBD |
-| MRR | **TBD after first run** | TBD |
+| Metric | Semantic (baseline) |
+|---|---|
+| recall@5 | **0.652** |
+| MRR | **0.696** |
+| Scored queries | 29 (1 intentionally unscoreable — no catalog match) |
 
-> Baseline from `tests/search-eval/baseline.json`. Promote new baselines with `pnpm eval:search:promote`.
+Run locally: `pnpm eval:search` (auto-seeds the in-memory index from Sanity on first run, then caches deterministic embeddings to `tests/search-eval/.embeddings-cache.json`). Promote a new baseline: `pnpm eval:search:promote`. Keyword-baseline column intentionally omitted — a fair comparison requires running the same 29 queries through the GROQ `match` query and hand-scoring; the semantic numbers above are the signal worth publishing now.
 
 ### Load / stress testing
 
-k6 scripts under `tests/load/`. See [tests/load/README.md](tests/load/README.md) for install and usage.
+k6 scripts under `tests/load/` cover four scenarios: `search/baseline`, `search/ramp`, `search/spike`, and `catalog/steady`. See [tests/load/README.md](tests/load/README.md) for install and usage.
 
-| Scenario | VUs | P50 | P95 | P99 | Error rate |
-|---|---|---|---|---|---|
-| search / baseline | 10 | **TBD** | **TBD** | **TBD** | **TBD** |
-| search / ramp | 0→100 | TBD | TBD | TBD | TBD |
-| search / spike | 200 | TBD | TBD | TBD | TBD |
-| catalog / steady | 20 | TBD | TBD | TBD | TBD |
-
-> Fill in from `tests/load/results/canonical-*.json` after running.
+Canonical numbers live in `tests/load/results/canonical-*.json` once generated. They are gated behind the `ENABLE_INTEGRATION_CI` repo variable because canonical runs require a deployed app + live Upstash Vector to be meaningful (CI installs k6, starts `pnpm start`, and runs the baseline scenario — see `.github/workflows/ci.yml#load-baseline`). Running locally against `pnpm dev` produces numbers dominated by HMR overhead, so those aren't published here.
 
 ## Tech Stack
 

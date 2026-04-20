@@ -8,37 +8,49 @@ Hand-labeled queries used to benchmark semantic search quality.
 
 ```json
 {
-  "query": "cozy dorm desk",
-  "relevantIds": ["<sanity-product-id-1>", "<sanity-product-id-2>"],
-  "tags": ["qualitative", "context"]
+  "query": "cozy nook for a studio apartment",
+  "relevantIds": ["<sanity-product-id-1>", "<sanity-product-id-2>"]
 }
 ```
 
-`relevantIds` are the ground-truth products that a human would consider a good match for this query. Order doesn't matter — presence in the top-K matters.
+`relevantIds` are the ground-truth products that a human would consider a good match. Order doesn't matter — presence in the top-K is what's scored. A query with `relevantIds: []` is skipped (used for deliberately unscorable queries where the catalog has no good match).
 
 ## Metrics
 
-- **recall@K** — fraction of relevant products that appeared in the top K ranked results.
-- **MRR** — mean reciprocal rank of the first relevant result.
+- **recall@5** — fraction of relevant products that appeared in the top 5.
+- **MRR** — mean reciprocal rank of the first relevant result across queries.
 
 ## Running
 
 ```bash
-# One-shot run (requires local .env with Upstash Vector + AI Gateway)
+# Runs against the in-memory index (auto-seeded from Sanity) if UPSTASH_VECTOR_REST_*
+# env vars are not set, otherwise runs against the live Upstash namespace.
+# Deterministic embeddings are cached to .embeddings-cache.json (gitignored) so
+# reruns are instant and don't hit the AI Gateway.
 pnpm eval:search
 
-# Promote the latest result to baseline
+# Promote latest run to baseline.json
 pnpm eval:search:promote
+
+# Compare latest run to baseline (fails if recall@5 drops >5%)
+pnpm eval:search:check
 ```
 
-CI fails if `recall@5` drops more than 5% below `baseline.json`.
+## Current baseline
 
-## Populating queries.json
+| Metric | Value |
+|---|---|
+| recall@5 | 0.652 |
+| MRR | 0.696 |
+| Scored queries | 29 (1 skipped) |
 
-Real product IDs come from Sanity. You can get 30 candidate products via:
+## Regenerating ground truth
+
+The queries in `queries.json` were mapped to product IDs by hand using the category/material/color/productType facets from the live Sanity catalog. To regenerate against a changed catalog:
 
 ```bash
-pnpm exec sanity documents query '*[_type == "product"][0...30]{ _id, name, category->{title} }'
+# Dump all products with attributes to stdout
+pnpm tsx tools/scripts/dump-products.ts > .tmp/products.json
 ```
 
-Pair each with 1–3 queries that a real shopper might use to find it. Commit both the query file and a fresh `baseline.json`.
+Then open `queries.json` and re-pick 2–5 plausibly-relevant IDs per query. Commit the new `queries.json` and a fresh `baseline.json`.

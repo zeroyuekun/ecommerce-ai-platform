@@ -1,7 +1,6 @@
 {
-  "recallAt5": 0,
-  "mrr": 0,
-  "numQueries": 0,
-  "runAt": "1970-01-01T00:00:00.000Z",
-  "note": "Initial placeholder. Run `pnpm eval:search:promote` after first real run."
+  "recallAt5": 0.6517241379310345,
+  "mrr": 0.6957307060755336,
+  "numQueries": 29,
+  "runAt": "2026-04-20T06:17:29.050Z"
 }
