@@ -83,32 +83,6 @@ The storefront design is inspired by luxury and modern furniture brands like Van
 **Additional Pages**
 - About, Contact, Blog, FAQ, Help Centre, Privacy Policy, Returns, Gift Vouchers, Shipping, Terms & Conditions, Customer Reviews, Store Locations (6 Australian locations)
 
-## Semantic product search
-
-Vibes-first product discovery. Users describe a feeling or situation — "cozy nook for a studio apartment", "kids' room that'll last" — and the system returns products ranked by meaning, not keyword overlap.
-
-**Stack:** Vercel AI Gateway (`openai/text-embedding-3-small`, 1536-dim) → Upstash Vector (namespace `products`) → Sanity hydrate.
-
-**Architecture:** Sanity webhook fires on product publish → `/api/sanity/reindex` verifies the HMAC and re-embeds → Upstash upsert. On search, `/api/search` embeds the query, queries the index, hydrates full docs from Sanity, preserves vector ranking. See [ADR-0005](docs/adr/0005-semantic-search-with-upstash-vector.md).
-
-### Eval
-
-Hand-labeled 30 natural-language queries ("cozy nook for a studio apartment", "black metal and oak combo") mapped to ground-truth product IDs. Embeddings deterministic and cached to disk. CI fails if recall@5 drops >5% from baseline.
-
-| Metric | Semantic (baseline) |
-|---|---|
-| recall@5 | **0.652** |
-| MRR | **0.696** |
-| Scored queries | 29 (1 intentionally unscoreable — no catalog match) |
-
-Run locally: `pnpm eval:search` (auto-seeds the in-memory index from Sanity on first run, then caches deterministic embeddings to `tests/search-eval/.embeddings-cache.json`). Promote a new baseline: `pnpm eval:search:promote`. Keyword-baseline column intentionally omitted — a fair comparison requires running the same 29 queries through the GROQ `match` query and hand-scoring; the semantic numbers above are the signal worth publishing now.
-
-### Load / stress testing
-
-k6 scripts under `tests/load/` cover four scenarios: `search/baseline`, `search/ramp`, `search/spike`, and `catalog/steady`. See [tests/load/README.md](tests/load/README.md) for install and usage.
-
-Canonical numbers live in `tests/load/results/canonical-*.json` once generated. They are gated behind the `ENABLE_INTEGRATION_CI` repo variable because canonical runs require a deployed app + live Upstash Vector to be meaningful (CI installs k6, starts `pnpm start`, and runs the baseline scenario — see `.github/workflows/ci.yml#load-baseline`). Running locally against `pnpm dev` produces numbers dominated by HMR overhead, so those aren't published here.
-
 ## Tech Stack
 
 | Layer | Technology |

@@ -48,12 +48,3 @@ next-env.d.ts
 # Sanity generated types — regenerate via `pnpm typegen`
 sanity.types.ts
 schema.json
-
-# Search eval ephemeral results (keep baseline.json tracked)
-tests/search-eval/results-*.json
-tests/search-eval/latest.json
-tests/search-eval/.embeddings-cache.json
-
-# k6 ephemeral result files (commit canonical runs explicitly by adding -f)
-tests/load/results/*.json
-!tests/load/results/canonical-*.json

@@ -2,7 +2,6 @@ import { gateway, type Tool, ToolLoopAgent } from "ai";
 import { addToCartTool } from "./tools/add-to-cart";
 import { createGetMyOrdersTool } from "./tools/get-my-orders";
 import { searchProductsTool } from "./tools/search-products";
-import { semanticSearchTool } from "./tools/semantic-search";
 
 interface ShoppingAgentOptions {
   userId: string | null;
@@ -148,23 +147,6 @@ Clean lines in natural oak. Compact at 45cm wide — works well in smaller bedro
 - Weave stock status into the description: "In stock", "Only a few left", or "Currently unavailable — but the [alternative] is similar and available"
 - If something is out of stock, suggest an alternative in the same sentence
 
-## semanticSearch Tool Usage
-
-Use \`semanticSearch\` when the customer describes *how a space should feel* or *the situation the piece is for*, rather than a specific product type or hard filter.
-
-**Pick semanticSearch for:**
-- "something cozy for a tiny apartment"
-- "mid-century vibe for the living room"
-- "a gift for someone who reads a lot"
-- "makes a kids' room feel playful but not chaotic"
-
-**Pick searchProducts (the filter-based tool) for:**
-- "show me oak dining tables under $1500"
-- "what leather sofas are in stock"
-- any query with a clear category, material, color, or price constraint
-
-**You can call both in the same turn** — e.g., use semanticSearch to find candidates that match a vibe, then filter them down with searchProducts if the customer has hard constraints.
-
 ## addToCart Tool Usage
 
 You can add products directly to the customer's cart.
@@ -289,7 +271,6 @@ export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
 
   const tools: Record<string, Tool> = {
     searchProducts: searchProductsTool,
-    semanticSearch: semanticSearchTool,
     addToCart: addToCartTool,
   };
 

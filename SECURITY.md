@@ -9,8 +9,6 @@ Please email eddie.zeng95@gmail.com with a clear description and reproduction st
 | Surface | Auth required | Notes |
 |---|---|---|
 | `/api/chat` | Clerk `userId` | Returns 401 without a valid session. |
-| `/api/search` | None | Public, rate-limited. |
-| `/api/sanity/reindex` | HMAC | `SANITY_REVALIDATE_SECRET` must match webhook signature. |
 | `/api/webhooks/stripe` | HMAC | Stripe signature verified via `stripe.webhooks.constructEvent`. |
 | `/studio` and `(admin)/**` | Clerk + role | Admin role required. |
 | Sanity write operations | `SANITY_API_WRITE_TOKEN` | Server-only; never exposed to the client. |
@@ -22,12 +20,10 @@ Implemented in `lib/ai/rate-limit.ts`. Backed by Upstash Redis when `UPSTASH_RED
 | Endpoint | Limit | Key |
 |---|---|---|
 | `/api/chat` | 20 req / 60s | Clerk `userId` |
-| `/api/search` | 30 req / 60s | client IP |
 
 ## Webhook verification
 
 - **Stripe:** constructed event verification with `STRIPE_WEBHOOK_SECRET`. Rejects unsigned or tampered payloads with 400.
-- **Sanity reindex:** HMAC-SHA256 of raw body vs `sanity-webhook-signature` header, using `SANITY_REVALIDATE_SECRET`. Constant-time comparison.
 
 ## Secret management
 
