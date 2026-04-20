@@ -179,6 +179,8 @@ export function ChatSheet() {
           {imagePreview && (
             <div className="mb-2 flex items-start gap-2">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                {/* blob URL from user upload — next/image cannot optimize */}
+                {/* biome-ignore lint/performance/noImgElement: blob URL from user upload, not optimizable */}
                 <img
                   src={imagePreview.url}
                   alt="Upload preview"

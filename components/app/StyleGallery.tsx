@@ -112,6 +112,15 @@ export function StyleGallery() {
   }, []);
 
   useEffect(() => {
+    if (selectedImage === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedImage, closeLightbox]);
+
+  useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
 
@@ -178,7 +187,7 @@ export function StyleGallery() {
           </div>
           {originalGalleryImages.slice(1, 7).map((img, i) => (
             <GalleryImage
-              key={i}
+              key={img.src}
               image={img}
               onClick={() => openLightbox(i + 1)}
               visible={visibleImages.has(i + 1)}
@@ -190,7 +199,7 @@ export function StyleGallery() {
         <div className="grid grid-cols-5 gap-2">
           {originalGalleryImages.slice(7, 13).map((img, i) => (
             <GalleryImage
-              key={i}
+              key={img.src}
               image={img}
               onClick={() => openLightbox(i + 7)}
               visible={visibleImages.has(i + 7)}
@@ -225,7 +234,7 @@ export function StyleGallery() {
             const isOdd = i % 2 === 0;
             return (
               <div
-                key={i}
+                key={img.src}
                 className="relative w-1/4 overflow-hidden h-[260px] sm:h-[370px]"
                 style={{
                   marginBottom: isOdd ? "4rem" : "0",
@@ -309,10 +318,17 @@ export function StyleGallery() {
       {/* Lightbox */}
       {selectedImage !== null && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image preview"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={closeLightbox}
         >
-          <div className="absolute inset-0 bg-black/80 animate-in fade-in duration-200" />
+          <button
+            type="button"
+            aria-label="Close image preview"
+            onClick={closeLightbox}
+            className="absolute inset-0 bg-black/80 animate-in fade-in duration-200"
+          />
           <button
             type="button"
             onClick={closeLightbox}
@@ -321,16 +337,16 @@ export function StyleGallery() {
           >
             <X className="h-6 w-6" />
           </button>
-          <div
-            className="relative animate-in zoom-in-50 duration-500 ease-out"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
+          <div className="relative animate-in zoom-in-50 duration-500 ease-out pointer-events-none">
+            <Image
               src={originalGalleryImages[selectedImage].src.replace(
                 /w=\d+/,
                 "w=1200",
               )}
               alt={originalGalleryImages[selectedImage].alt}
+              width={1200}
+              height={900}
+              sizes="85vw"
               className="max-h-[85vh] max-w-[85vw] object-contain shadow-2xl"
             />
           </div>

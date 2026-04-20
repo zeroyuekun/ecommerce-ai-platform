@@ -9,6 +9,7 @@ export function OrderCardSkeleton({ count = 3 }: OrderCardSkeletonProps) {
     <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
       {Array.from({ length: count }).map((_, i) => (
         <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: fixed-count skeleton placeholders, position IS the identity
           key={i}
           className="flex items-center gap-5 py-6 first:pt-0 last:pb-0 sm:gap-6"
         >

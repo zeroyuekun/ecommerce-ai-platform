@@ -1,5 +1,4 @@
 import { defineQuery } from "next-sanity";
-import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 
 // ============================================
 // Shared Query Fragments (DRY)
@@ -55,39 +54,6 @@ const RELEVANCE_SCORE = `score(
 // ============================================
 
 /**
- * Get all products with category expanded
- * Used on landing page
- */
-export const ALL_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
-] | order(name asc) {
-  _id,
-  name,
-  "slug": slug.current,
-  description,
-  price,
-  "images": images[]{
-    _key,
-    asset->{
-      _id,
-      url
-    },
-    hotspot
-  },
-  category->{
-    _id,
-    title,
-    "slug": slug.current
-  },
-  material,
-  color,
-  dimensions,
-  stock,
-  featured,
-  assemblyRequired
-}`);
-
-/**
  * Get featured products for homepage carousel
  */
 export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
@@ -117,60 +83,12 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
 }`);
 
 /**
- * Get products for the style gallery grid (14 products with images)
- */
-export const GALLERY_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
-  && defined(images)
-  && count(images) > 0
-  && stock > 0
-] | order(_createdAt desc) [0...14] {
-  _id,
-  name,
-  "slug": slug.current,
-  "image": images[0]{
-    asset->{
-      _id,
-      url
-    }
-  }
-}`);
-
-/**
  * Get best seller products for homepage carousel (8 products)
  */
 export const BEST_SELLERS_QUERY = defineQuery(`*[
   _type == "product"
   && stock > 0
 ] | order(stock asc, name asc) [0...8] ${FILTERED_PRODUCT_PROJECTION}`);
-
-/**
- * Get products by category slug
- */
-export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[
-  _type == "product"
-  && category->slug.current == $categorySlug
-] | order(name asc) {
-  _id,
-  name,
-  "slug": slug.current,
-  price,
-  "image": images[0]{
-    asset->{
-      _id,
-      url
-    },
-    hotspot
-  },
-  category->{
-    _id,
-    title,
-    "slug": slug.current
-  },
-  material,
-  color,
-  stock
-}`);
 
 /**
  * Get single product by slug
@@ -206,25 +124,6 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   stock,
   featured,
   assemblyRequired
-}`);
-
-/**
- * Get color variant siblings for a product (minimal, for swatch display)
- */
-export const VARIANT_SIBLINGS_QUERY = defineQuery(`*[
-  _type == "product"
-  && variantGroup == $variantGroup
-  && defined(variantGroup)
-  && variantGroup != ""
-] | order(name asc) {
-  _id,
-  "slug": slug.current,
-  color,
-  "image": images[0]{
-    asset->{
-      url
-    }
-  }
 }`);
 
 /**
@@ -392,27 +291,6 @@ export const POPULAR_PRODUCTS_QUERY = defineQuery(
 );
 
 /**
- * Get low stock products (admin)
- * Uses LOW_STOCK_THRESHOLD constant for consistency
- */
-export const LOW_STOCK_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
-  && stock > 0
-  && stock <= ${LOW_STOCK_THRESHOLD}
-] | order(stock asc) {
-  _id,
-  name,
-  "slug": slug.current,
-  stock,
-  "image": images[0]{
-    asset->{
-      _id,
-      url
-    }
-  }
-}`);
-
-/**
  * Get related products from the same category (excluding current product)
  */
 export const RELATED_PRODUCTS_QUERY = defineQuery(
@@ -423,24 +301,6 @@ export const RELATED_PRODUCTS_QUERY = defineQuery(
   && stock > 0
 ] | order(name asc) [0...4] ${FILTERED_PRODUCT_PROJECTION}`,
 );
-
-/**
- * Get out of stock products (admin)
- */
-export const OUT_OF_STOCK_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
-  && stock == 0
-] | order(name asc) {
-  _id,
-  name,
-  "slug": slug.current,
-  "image": images[0]{
-    asset->{
-      _id,
-      url
-    }
-  }
-}`);
 
 // ============================================
 // AI Shopping Assistant Query

@@ -118,7 +118,11 @@
       "Bash(ls -la /c/Users/Admin/ecommerce-ai-platform/app/\\\\\\(admin\\\\\\)/ | grep -E \"\\\\.tsx$|\\\\.ts$\")",
       "Bash(ls -la /c/Users/Admin/ecommerce-ai-platform/app/\\\\\\(app\\\\\\)/*.tsx)",
       "Bash(find ./app -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" \\\\\\) 2>/dev/null | head -50)",
-      "Bash(cd C:/Users/Admin/ecommerce-ai-platform && npx tsx tools/test-chatbot.ts 2>&1)"
+      "Bash(cd C:/Users/Admin/ecommerce-ai-platform && npx tsx tools/test-chatbot.ts 2>&1)",
+      "WebFetch(domain:www.snoopy.co.jp)",
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(python --version 2>/dev/null || python3 --version 2>/dev/null; pip --version 2>/dev/null; node --version 2>/dev/null; npm --version 2>/dev/null)",
+      "Bash(cd C:/Users/Admin/loan-approval-ai-system && mkdir -p .claude)"
     ]
   }
 }

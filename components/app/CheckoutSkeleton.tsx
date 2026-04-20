@@ -20,6 +20,7 @@ export function CheckoutSkeleton() {
             {/* Items List */}
             <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {Array.from({ length: 3 }).map((_, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: fixed-count skeleton placeholders, position IS the identity
                 <div key={i} className="flex gap-4 px-6 py-4">
                   <Skeleton className="h-20 w-20 shrink-0 rounded-md" />
                   <div className="flex flex-1 flex-col justify-between">

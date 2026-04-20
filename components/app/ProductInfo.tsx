@@ -10,13 +10,13 @@ import { useCartActions } from "@/lib/store/cart-store-provider";
 import { useChatActions } from "@/lib/store/chat-store-provider";
 import { cn, formatPrice } from "@/lib/utils";
 import type {
-  PRODUCT_BY_SLUG_QUERY_RESULT,
-  VARIANT_SIBLINGS_FULL_QUERY_RESULT,
+  PRODUCT_BY_SLUG_QUERYResult,
+  VARIANT_SIBLINGS_FULL_QUERYResult,
 } from "@/sanity.types";
 
 interface ProductInfoProps {
-  product: NonNullable<PRODUCT_BY_SLUG_QUERY_RESULT>;
-  variants?: VARIANT_SIBLINGS_FULL_QUERY_RESULT;
+  product: NonNullable<PRODUCT_BY_SLUG_QUERYResult>;
+  variants?: VARIANT_SIBLINGS_FULL_QUERYResult;
   onVariantSwitch?: (slug: string) => void;
 }
 
@@ -296,7 +296,7 @@ export function ProductInfo({
                 .split(/\n\n+/)
                 .map((paragraph) => paragraph.trim())
                 .filter(Boolean)
-                .map((paragraph, i) => {
+                .map((paragraph) => {
                   const lines = paragraph.split("\n");
                   const firstLine = lines[0].trim();
                   const rest = lines.slice(1).join("\n").trim();
@@ -307,7 +307,7 @@ export function ProductInfo({
 
                   if (isHeadedBlock) {
                     return (
-                      <div key={i}>
+                      <div key={paragraph}>
                         <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                           {firstLine}
                         </p>
@@ -317,7 +317,7 @@ export function ProductInfo({
                   }
 
                   return (
-                    <p key={i} className="whitespace-pre-line">
+                    <p key={paragraph} className="whitespace-pre-line">
                       {paragraph}
                     </p>
                   );

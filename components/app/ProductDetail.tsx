@@ -2,18 +2,18 @@
 
 import { useCallback, useState } from "react";
 import type {
-  PRODUCT_BY_SLUG_QUERY_RESULT,
-  VARIANT_SIBLINGS_FULL_QUERY_RESULT,
+  PRODUCT_BY_SLUG_QUERYResult,
+  VARIANT_SIBLINGS_FULL_QUERYResult,
 } from "@/sanity.types";
 import { ProductGallery } from "./ProductGallery";
 import { ProductInfo } from "./ProductInfo";
 import { RecentlyViewedTracker } from "./RecentlyViewedTracker";
 
-type Product = NonNullable<PRODUCT_BY_SLUG_QUERY_RESULT>;
+type Product = NonNullable<PRODUCT_BY_SLUG_QUERYResult>;
 
 interface ProductDetailProps {
   product: Product;
-  variants: VARIANT_SIBLINGS_FULL_QUERY_RESULT;
+  variants: VARIANT_SIBLINGS_FULL_QUERYResult;
 }
 
 export function ProductDetail({ product, variants }: ProductDetailProps) {

@@ -1,5 +1,4 @@
 export * from "./CartAddedWidget";
-export * from "./LoadingIndicator";
 export * from "./MessageBubble";
 export * from "./MessageContent";
 export * from "./OrderCardWidget";

@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/carousel";
 import { getProductsByIds } from "@/lib/actions/products";
 import { useRecentlyViewedIds } from "@/lib/store/recently-viewed-store-provider";
-import type { PRODUCTS_BY_IDS_FULL_QUERY_RESULT } from "@/sanity.types";
+import type { PRODUCTS_BY_IDS_FULL_QUERYResult } from "@/sanity.types";
 
 export function RecentlyViewed() {
   const productIds = useRecentlyViewedIds();
-  const [products, setProducts] = useState<PRODUCTS_BY_IDS_FULL_QUERY_RESULT>(
+  const [products, setProducts] = useState<PRODUCTS_BY_IDS_FULL_QUERYResult>(
     [],
   );
   const [loading, setLoading] = useState(true);

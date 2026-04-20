@@ -61,20 +61,6 @@ export const ORDER_BY_ID_QUERY = defineQuery(`*[
 }`);
 
 /**
- * Get recent orders (for admin dashboard)
- */
-export const RECENT_ORDERS_QUERY = defineQuery(`*[
-  _type == "order"
-] | order(createdAt desc) [0...$limit] {
-  _id,
-  orderNumber,
-  email,
-  total,
-  status,
-  createdAt
-}`);
-
-/**
  * Check if order exists by Stripe payment ID
  * Used for webhook idempotency check
  */

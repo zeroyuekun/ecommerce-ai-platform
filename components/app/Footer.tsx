@@ -1,4 +1,5 @@
 import { Mail, Phone } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const footerLinks = {
@@ -167,10 +168,12 @@ export function Footer() {
             { src: "/payments/applepay.svg", alt: "Apple Pay" },
             { src: "/payments/afterpay.svg", alt: "Afterpay" },
           ].map((card) => (
-            <img
+            <Image
               key={card.alt}
               src={card.src}
               alt={card.alt}
+              width={48}
+              height={32}
               className="h-8 w-auto rounded"
             />
           ))}

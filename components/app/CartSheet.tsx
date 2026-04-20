@@ -43,9 +43,11 @@ export function CartSheet() {
     >
       {/* Custom overlay — modal={false} prevents body scroll lock / layout shift */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out fade-in-0 duration-500"
+        <button
+          type="button"
+          aria-label="Close cart"
           onClick={closeCart}
+          className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out fade-in-0 duration-500"
         />
       )}
       <SheetContent
