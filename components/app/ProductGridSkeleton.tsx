@@ -4,6 +4,7 @@ export function ProductGridSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: fixed-count skeleton placeholders, position IS the identity
         <div key={i} className="flex flex-col">
           <Skeleton className="aspect-[3/4] w-full" />
           <div className="space-y-2 pt-3">

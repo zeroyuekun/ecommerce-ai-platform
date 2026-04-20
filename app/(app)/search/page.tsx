@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { SEARCH_PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products-by-ids";
@@ -61,10 +62,12 @@ async function Results({ query }: { query: string }) {
             className="rounded border p-4 hover:shadow-md transition"
           >
             {prod.images?.[0]?.asset?.url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={prod.images[0].asset.url}
                 alt={prod.name}
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="mb-3 aspect-square w-full object-cover"
                 loading="lazy"
               />

@@ -44,7 +44,13 @@ export function SortSelect() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <button
+            type="button"
+            aria-label="Close sort menu"
+            tabIndex={-1}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40"
+          />
           <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
             {SORT_OPTIONS.map((option) => {
               const isActive = currentSort === option.value;

@@ -86,6 +86,7 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
         <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-6">
           {Array.from({ length: count }).map((_, index) => (
             <button
+              // biome-ignore lint/suspicious/noArrayIndexKey: fixed-count dot indicators, position IS the identity
               key={`dot-${index}`}
               type="button"
               onClick={() => scrollTo(index)}

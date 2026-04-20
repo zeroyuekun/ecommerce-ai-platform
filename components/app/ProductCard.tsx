@@ -21,7 +21,6 @@ export const ProductCard = memo(function ProductCard({
   product,
   compact = false,
 }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
 
   const variants = product.variants;
@@ -43,11 +42,7 @@ export const ProductCard = memo(function ProductCard({
   const isOnSale = salePrice != null && salePrice < (price ?? 0);
 
   return (
-    <div
-      className="group flex flex-col"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="group flex flex-col">
       {/* Image */}
       <Link href={`/products/${slug}`} className="relative block">
         <div
@@ -61,10 +56,7 @@ export const ProductCard = memo(function ProductCard({
               src={imageUrl}
               alt={product.name ?? "Product image"}
               fill
-              className={cn(
-                "object-cover transition-all duration-700 ease-out",
-                isHovered && "scale-105",
-              )}
+              className="object-cover transition-all duration-700 ease-out group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (

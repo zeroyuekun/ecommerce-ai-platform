@@ -19,6 +19,7 @@ export function ProductFiltersSkeleton() {
       {/* Filter groups */}
       {Array.from({ length: 4 }).map((_, i) => (
         <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: fixed-count skeleton placeholders, position IS the identity
           key={i}
           className="border-t border-zinc-200 py-5 dark:border-zinc-700/60"
         >

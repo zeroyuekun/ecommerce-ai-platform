@@ -351,13 +351,11 @@ export function Header({ categories }: HeaderProps) {
       >
         <div className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 lg:gap-8 lg:px-8 scrollbar-hide">
           {/* New — far left */}
-          <div
-            ref={newLinkRef}
-            className="relative"
-            onMouseEnter={() => setActiveCategory(null)}
-          >
+          <div ref={newLinkRef} className="relative">
             <Link
               href="/shop?category=new"
+              onMouseEnter={() => setActiveCategory(null)}
+              onFocus={() => setActiveCategory(null)}
               onClick={() => setActiveCategory(null)}
               className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
                 !solid
@@ -373,13 +371,11 @@ export function Header({ categories }: HeaderProps) {
           </div>
 
           {categoryLinks.map((cat) => (
-            <div
-              key={cat.slug}
-              className="relative"
-              onMouseEnter={() => handleCategoryHover(cat.slug)}
-            >
+            <div key={cat.slug} className="relative">
               <Link
                 href={`/shop?category=${cat.slug}`}
+                onMouseEnter={() => handleCategoryHover(cat.slug)}
+                onFocus={() => handleCategoryHover(cat.slug)}
                 onClick={() => setActiveCategory(null)}
                 className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
                   !solid
@@ -404,13 +400,11 @@ export function Header({ categories }: HeaderProps) {
           ))}
 
           {/* Sale — far right */}
-          <div
-            ref={saleLinkRef}
-            className="relative"
-            onMouseEnter={() => setActiveCategory(null)}
-          >
+          <div ref={saleLinkRef} className="relative">
             <Link
               href="/shop?category=sale"
+              onMouseEnter={() => setActiveCategory(null)}
+              onFocus={() => setActiveCategory(null)}
               onClick={() => setActiveCategory(null)}
               className={`group relative whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
                 !solid
@@ -440,6 +434,7 @@ export function Header({ categories }: HeaderProps) {
                   }
                 : { left: 0, right: 0 };
             return (
+              // biome-ignore lint/a11y/noStaticElementInteractions: hover-maintained dropdown; inner Links provide keyboard navigation
               <div
                 className="absolute top-full z-50 origin-top bg-white shadow-xl dark:bg-zinc-950 animate-in fade-in slide-in-from-top-3 duration-300 ease-out"
                 style={dropdownStyle}

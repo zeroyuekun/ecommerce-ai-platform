@@ -296,7 +296,7 @@ export function ProductInfo({
                 .split(/\n\n+/)
                 .map((paragraph) => paragraph.trim())
                 .filter(Boolean)
-                .map((paragraph, i) => {
+                .map((paragraph) => {
                   const lines = paragraph.split("\n");
                   const firstLine = lines[0].trim();
                   const rest = lines.slice(1).join("\n").trim();
@@ -307,7 +307,7 @@ export function ProductInfo({
 
                   if (isHeadedBlock) {
                     return (
-                      <div key={i}>
+                      <div key={paragraph}>
                         <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                           {firstLine}
                         </p>
@@ -317,7 +317,7 @@ export function ProductInfo({
                   }
 
                   return (
-                    <p key={i} className="whitespace-pre-line">
+                    <p key={paragraph} className="whitespace-pre-line">
                       {paragraph}
                     </p>
                   );
