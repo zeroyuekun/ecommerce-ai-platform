@@ -10,9 +10,14 @@ vi.mock("ai", async (orig) => {
   const actual = await orig<typeof import("ai")>();
   return { ...actual, createAgentUIStreamResponse: mocks.stream };
 });
-vi.mock("@clerk/nextjs/server", () => ({ auth: async () => ({ userId: "u1" }) }));
+vi.mock("@clerk/nextjs/server", () => ({
+  auth: async () => ({ userId: "u1" }),
+}));
 vi.mock("@/lib/ai/rate-limit", () => ({
-  chatRateLimiter: { check: async () => ({ ok: true, retryAfter: 0 }), prune: () => {} },
+  chatRateLimiter: {
+    check: async () => ({ ok: true, retryAfter: 0 }),
+    prune: () => {},
+  },
 }));
 vi.mock("@/lib/ai/shopping-agent", () => ({
   createShoppingAgent: () => ({ tools: {}, instructions: "" }),
@@ -20,13 +25,18 @@ vi.mock("@/lib/ai/shopping-agent", () => ({
 
 import { POST } from "@/app/api/chat/route";
 
-const baseHeaders = { "content-type": "application/json", "content-length": "100" };
+const baseHeaders = {
+  "content-type": "application/json",
+  "content-length": "100",
+};
 
 describe("POST /api/chat — Context Manager integration", () => {
   const original = process.env.RAG_ENABLED;
   beforeEach(() => {
     mocks.assemble.mockReset();
-    mocks.stream.mockReset().mockReturnValue(new Response("ok", { status: 200 }));
+    mocks.stream
+      .mockReset()
+      .mockReturnValue(new Response("ok", { status: 200 }));
   });
   afterEach(() => {
     if (original === undefined) delete process.env.RAG_ENABLED;
@@ -49,7 +59,11 @@ describe("POST /api/chat — Context Manager integration", () => {
   it("DOES call assembleContext when flag is on, and uses its output", async () => {
     process.env.RAG_ENABLED = "true";
     const compacted = [{ role: "user", content: "compacted" }];
-    mocks.assemble.mockResolvedValueOnce({ messages: compacted, compacted: true, inputTokens: 1000 });
+    mocks.assemble.mockResolvedValueOnce({
+      messages: compacted,
+      compacted: true,
+      inputTokens: 1000,
+    });
     await POST(
       new Request("http://x", {
         method: "POST",
@@ -58,6 +72,8 @@ describe("POST /api/chat — Context Manager integration", () => {
       }),
     );
     expect(mocks.assemble).toHaveBeenCalled();
-    expect(mocks.stream).toHaveBeenCalledWith(expect.objectContaining({ messages: compacted }));
+    expect(mocks.stream).toHaveBeenCalledWith(
+      expect.objectContaining({ messages: compacted }),
+    );
   });
 });

@@ -1,7 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { z } from "zod";
-import { assembleContext, type Compactor, type ContextMessage } from "@/lib/ai/rag/context";
+import {
+  assembleContext,
+  type Compactor,
+  type ContextMessage,
+} from "@/lib/ai/rag/context";
 import { isRagEnabled } from "@/lib/ai/rag/flags";
 import { chatRateLimiter } from "@/lib/ai/rate-limit";
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
