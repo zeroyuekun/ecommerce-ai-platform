@@ -1,6 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { z } from "zod";
+import {
+  assembleContext,
+  type Compactor,
+  type ContextMessage,
+} from "@/lib/ai/rag/context";
+import { isRagEnabled } from "@/lib/ai/rag/flags";
 import { chatRateLimiter } from "@/lib/ai/rate-limit";
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
 
@@ -8,6 +14,25 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 256 * 1024;
+
+const RAG_HARD_CAP = Number(process.env.RAG_HARD_INPUT_TOKEN_CAP ?? 32_000);
+const RAG_SOFT_CAP = Number(process.env.RAG_SOFT_INPUT_TOKEN_CAP ?? 16_000);
+
+const haikuCompactor: Compactor = async (toCompact) => {
+  const { gateway, generateText } = await import("ai");
+  const result = await generateText({
+    model: gateway("anthropic/claude-haiku-4.5"),
+    prompt: `Summarize the conversation below in 6 sentences or fewer. Preserve user constraints, preferences, and named entities verbatim. Then list the most recent 6 messages unchanged.
+
+Conversation:
+${toCompact.map((m) => `${m.role}: ${typeof m.content === "string" ? m.content : JSON.stringify(m.content)}`).join("\n")}`,
+  });
+  return {
+    summary: result.text,
+    tokensSaved: 0,
+    preserved: toCompact.slice(-6),
+  };
+};
 
 const chatRequestSchema = z.object({
   messages: z
@@ -65,10 +90,21 @@ export async function POST(request: Request) {
 
   const messages = parsed.data.messages as unknown as UIMessage[];
 
+  let activeMessages = messages;
+  if (isRagEnabled()) {
+    const assembled = await assembleContext({
+      messages: messages as unknown as ContextMessage[],
+      hardCapTokens: RAG_HARD_CAP,
+      softCapTokens: RAG_SOFT_CAP,
+      compactor: haikuCompactor,
+    });
+    activeMessages = assembled.messages as unknown as typeof messages;
+  }
+
   const agent = createShoppingAgent({ userId });
 
   return createAgentUIStreamResponse({
     agent,
-    messages,
+    messages: activeMessages,
   });
 }

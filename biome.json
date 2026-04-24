@@ -15,7 +15,8 @@
       "!dist",
       "!build",
       "!playwright-report",
-      "!test-results"
+      "!test-results",
+      "!tests/load"
     ]
   },
   "formatter": {

@@ -1,0 +1,98 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const { mockRerank } = vi.hoisted(() => ({ mockRerank: vi.fn() }));
+vi.mock("@/lib/ai/rag/rerank", () => ({ rerankCandidates: mockRerank }));
+
+import { rerankAndDedupe } from "@/lib/ai/rag/query/rerank";
+import type { QueryMatch } from "@/lib/ai/rag/store";
+
+const makeMatch = (
+  id: string,
+  productId: string,
+  chunkType: "parent" | "description" | "qa" | "specs" | "care" = "parent",
+): QueryMatch => ({
+  id,
+  score: 0.5,
+  productId,
+  chunkType,
+  metadata: { product_id: productId, chunk_type: chunkType },
+});
+
+describe("rerankAndDedupe", () => {
+  const originalCohereKey = process.env.COHERE_API_KEY;
+  beforeEach(() => {
+    mockRerank.mockReset();
+    // The two existing tests exercise the Cohere path; set the key so the
+    // adapter doesn't short-circuit to the Pinecone-score fallback.
+    process.env.COHERE_API_KEY = "test-key";
+  });
+  afterEach(() => {
+    if (originalCohereKey === undefined) delete process.env.COHERE_API_KEY;
+    else process.env.COHERE_API_KEY = originalCohereKey;
+  });
+
+  it("dedupes by productId after rerank, keeping the highest-scoring chunk per product", async () => {
+    const candidates: QueryMatch[] = [
+      makeMatch("p1#parent", "p1", "parent"),
+      makeMatch("p1#description", "p1", "description"),
+      makeMatch("p2#parent", "p2", "parent"),
+      makeMatch("p3#qa_0", "p3", "qa"),
+    ];
+    mockRerank.mockResolvedValueOnce([
+      { id: "p1#description", text: "...", score: 0.95 },
+      { id: "p2#parent", text: "...", score: 0.9 },
+      { id: "p1#parent", text: "...", score: 0.85 },
+      { id: "p3#qa_0", text: "...", score: 0.8 },
+    ]);
+    const out = await rerankAndDedupe({
+      query: "q",
+      candidates,
+      candidateTexts: {
+        "p1#parent": "a",
+        "p1#description": "b",
+        "p2#parent": "c",
+        "p3#qa_0": "d",
+      },
+      topNAfterRerank: 10,
+      topProducts: 5,
+    });
+    expect(out.map((m) => m.productId)).toEqual(["p1", "p2", "p3"]);
+    expect(out[0].id).toBe("p1#description");
+  });
+
+  it("respects topProducts cap", async () => {
+    const candidates: QueryMatch[] = Array.from({ length: 8 }, (_, i) =>
+      makeMatch(`p${i}#parent`, `p${i}`),
+    );
+    mockRerank.mockResolvedValueOnce(
+      candidates.map((c, i) => ({ id: c.id, text: "x", score: 1 - i * 0.01 })),
+    );
+    const out = await rerankAndDedupe({
+      query: "q",
+      candidates,
+      candidateTexts: Object.fromEntries(candidates.map((c) => [c.id, "x"])),
+      topNAfterRerank: 8,
+      topProducts: 3,
+    });
+    expect(out).toHaveLength(3);
+  });
+
+  it("skips Cohere and preserves Pinecone scores when COHERE_API_KEY is missing", async () => {
+    delete process.env.COHERE_API_KEY;
+    const candidates: QueryMatch[] = [
+      { ...makeMatch("p1#parent", "p1"), score: 0.82 },
+      { ...makeMatch("p2#parent", "p2"), score: 0.9 },
+      { ...makeMatch("p3#parent", "p3"), score: 0.75 },
+    ];
+    const out = await rerankAndDedupe({
+      query: "q",
+      candidates,
+      candidateTexts: Object.fromEntries(candidates.map((c) => [c.id, "x"])),
+      topNAfterRerank: 10,
+      topProducts: 5,
+    });
+    expect(mockRerank).not.toHaveBeenCalled();
+    expect(out.map((m) => m.productId)).toEqual(["p2", "p1", "p3"]);
+    expect(out[0].score).toBe(0.9);
+  });
+});

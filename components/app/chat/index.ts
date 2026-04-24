@@ -1,4 +1,5 @@
 export * from "./CartAddedWidget";
+export * from "./FreshStartButton";
 export * from "./MessageBubble";
 export * from "./MessageContent";
 export * from "./OrderCardWidget";

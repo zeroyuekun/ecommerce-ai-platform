@@ -11,6 +11,7 @@ import {
 } from "@/lib/store/chat-store-provider";
 
 import {
+  FreshStartButton,
   getMessageText,
   getToolParts,
   MessageBubble,
@@ -31,7 +32,7 @@ export function ChatSheet() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { messages, sendMessage, status } = useChat();
+  const { messages, setMessages, sendMessage, status } = useChat();
   const isLoading = status === "streaming" || status === "submitted";
 
   // Auto-scroll to bottom when new messages arrive or streaming updates
@@ -103,13 +104,19 @@ export function ChatSheet() {
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100">
               Shopping Assistant
             </span>
-            <button
-              type="button"
-              onClick={closeChat}
-              className="text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
-            >
-              <XIcon className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <FreshStartButton
+                turnCount={messages.length}
+                onReset={() => setMessages([])}
+              />
+              <button
+                type="button"
+                onClick={closeChat}
+                className="text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </header>
 
