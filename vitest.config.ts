@@ -8,11 +8,7 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     include: ["tests/**/*.{test,spec}.{ts,tsx}"],
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "tests/e2e/**",
-    ],
+    exclude: ["**/node_modules/**", "**/dist/**", "tests/e2e/**"],
     setupFiles: ["tests/setup.ts"],
   },
   resolve: {

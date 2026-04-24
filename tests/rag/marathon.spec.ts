@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { describe, expect, it } from "vitest";
 import { assembleContext, type ContextMessage } from "@/lib/ai/rag/context";
 
 const LIVE = process.env.RAG_LIVE_TESTS === "1";
@@ -26,7 +26,10 @@ describe.runIf(LIVE)("Marathon multi-turn dialogues", () => {
       // works once Haiku is swapped in for real.
       const stub = async (msgs: ContextMessage[]) => ({
         summary: msgs
-          .map((m) => `${m.role}: ${typeof m.content === "string" ? m.content : ""}`)
+          .map(
+            (m) =>
+              `${m.role}: ${typeof m.content === "string" ? m.content : ""}`,
+          )
           .join(" | ")
           .slice(0, 4000),
         tokensSaved: 0,
