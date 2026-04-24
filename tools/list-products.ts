@@ -16,7 +16,14 @@ async function main() {
   );
   for (const r of rows) {
     console.log(
-      [r._id, r.name, `$${r.price}`, r.cat ?? "-", r.material ?? "-", r.color ?? "-"].join(" | "),
+      [
+        r._id,
+        r.name,
+        `$${r.price}`,
+        r.cat ?? "-",
+        r.material ?? "-",
+        r.color ?? "-",
+      ].join(" | "),
     );
   }
 }
