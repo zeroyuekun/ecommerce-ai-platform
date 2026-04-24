@@ -25,7 +25,9 @@ describe("createShoppingAgent — RAG flag wiring", () => {
     delete process.env.RAG_ENABLED;
     const agent = createShoppingAgent({ userId: null });
     const toolNames = Object.keys(agent.tools);
-    expect(toolNames).toEqual(expect.arrayContaining(["searchProducts", "addToCart"]));
+    expect(toolNames).toEqual(
+      expect.arrayContaining(["searchProducts", "addToCart"]),
+    );
     expect(toolNames).not.toContain("semanticSearch");
     expect(toolNames).not.toContain("getProductDetails");
     expect(toolNames).not.toContain("filterSearch");

@@ -1,11 +1,11 @@
 import { gateway, type Tool, ToolLoopAgent } from "ai";
+import { isRagEnabled } from "./rag/flags";
 import { addToCartTool } from "./tools/add-to-cart";
-import { createGetMyOrdersTool } from "./tools/get-my-orders";
 import { filterSearchTool } from "./tools/filter-search";
+import { createGetMyOrdersTool } from "./tools/get-my-orders";
 import { getProductDetailsTool } from "./tools/get-product-details";
 import { searchProductsTool } from "./tools/search-products";
 import { semanticSearchTool } from "./tools/semantic-search";
-import { isRagEnabled } from "./rag/flags";
 
 interface ShoppingAgentOptions {
   userId: string | null;
@@ -273,10 +273,12 @@ const ragInstructions = `
 export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
   const isAuthenticated = !!userId;
 
-  // Build RAG tools conditionally based on the feature flag
-  const ragTools = isRagEnabled()
+  // Build RAG tools conditionally based on the feature flag.
+  // semanticSearchTool uses a custom concrete execute type; cast to Tool for
+  // compatibility with the Record<string, Tool> tools map.
+  const ragTools: Record<string, Tool> = isRagEnabled()
     ? {
-        semanticSearch: semanticSearchTool,
+        semanticSearch: semanticSearchTool as unknown as Tool,
         filterSearch: filterSearchTool,
         getProductDetails: getProductDetailsTool,
       }
