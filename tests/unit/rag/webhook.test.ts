@@ -23,7 +23,9 @@ describe("POST /api/webhooks/sanity-rag", () => {
   });
 
   it("rejects without a matching shared secret header", async () => {
-    const res = await POST(makeRequest({ _id: "x", _rev: "1", _type: "product" }));
+    const res = await POST(
+      makeRequest({ _id: "x", _rev: "1", _type: "product" }),
+    );
     expect(res.status).toBe(401);
   });
 

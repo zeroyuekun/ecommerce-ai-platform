@@ -5,7 +5,9 @@ const { mockIndex, mockFetch } = vi.hoisted(() => ({
   mockFetch: vi.fn(),
 }));
 
-vi.mock("@/lib/ai/rag/indexer/index-product", () => ({ indexProduct: mockIndex }));
+vi.mock("@/lib/ai/rag/indexer/index-product", () => ({
+  indexProduct: mockIndex,
+}));
 vi.mock("@/sanity/lib/client", () => ({ client: { fetch: mockFetch } }));
 vi.mock("@upstash/qstash/nextjs", () => ({
   verifySignatureAppRouter: (handler: unknown) => handler,
@@ -23,7 +25,9 @@ function makeRequest(body: object) {
 
 describe("POST /api/jobs/reindex-product", () => {
   beforeEach(() => {
-    mockIndex.mockReset().mockResolvedValue({ productId: "p_001", chunksIndexed: 9 });
+    mockIndex
+      .mockReset()
+      .mockResolvedValue({ productId: "p_001", chunksIndexed: 9 });
     mockFetch.mockReset().mockResolvedValue({
       _id: "p_001",
       name: "X",

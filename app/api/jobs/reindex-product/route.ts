@@ -44,7 +44,9 @@ function toChunkable(p: SanityProduct): ChunkableProduct {
     id: p._id,
     name: p.name,
     description: p.description ?? "",
-    category: p.category ? { title: p.category.title, slug: p.category.slug.current } : null,
+    category: p.category
+      ? { title: p.category.title, slug: p.category.slug.current }
+      : null,
     productType: p.productType,
     material: p.material,
     color: p.color,
@@ -63,25 +65,38 @@ async function handler(request: Request) {
   try {
     raw = await request.json();
   } catch {
-    return new Response(JSON.stringify({ error: "invalid json" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "invalid json" }), {
+      status: 400,
+    });
   }
   const parsed = SCHEMA.safeParse(raw);
   if (!parsed.success) {
-    return new Response(JSON.stringify({ error: "invalid payload" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "invalid payload" }), {
+      status: 400,
+    });
   }
 
   try {
-    const product = (await sanityClient.fetch<SanityProduct | null>(PRODUCT_QUERY, {
-      id: parsed.data.productId,
-    })) ?? null;
+    const product =
+      (await sanityClient.fetch<SanityProduct | null>(PRODUCT_QUERY, {
+        id: parsed.data.productId,
+      })) ?? null;
     if (!product) {
-      return new Response(JSON.stringify({ error: "product not found" }), { status: 404 });
+      return new Response(JSON.stringify({ error: "product not found" }), {
+        status: 404,
+      });
     }
     const result = await indexProduct(toChunkable(product));
-    return new Response(JSON.stringify({ ok: true, ...result }), { status: 200 });
+    return new Response(JSON.stringify({ ok: true, ...result }), {
+      status: 200,
+    });
   } catch (err) {
-    captureException(err, { extra: { context: "rag-reindex-job", productId: parsed.data.productId } });
-    return new Response(JSON.stringify({ error: "reindex failed" }), { status: 500 });
+    captureException(err, {
+      extra: { context: "rag-reindex-job", productId: parsed.data.productId },
+    });
+    return new Response(JSON.stringify({ error: "reindex failed" }), {
+      status: 500,
+    });
   }
 }
 
