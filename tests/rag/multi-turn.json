@@ -1,0 +1,128 @@
+[
+  {
+    "id": "mt_001",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Looking for a sofa for my mother who has back pain"
+      },
+      {
+        "role": "assistant",
+        "content": "Sure — firm-back support is the key. Any preference on style or fabric?"
+      },
+      {
+        "role": "user",
+        "content": "She prefers light colours and easy-clean fabric"
+      },
+      {
+        "role": "assistant",
+        "content": "In that case the Minimalist White Linen Sofa could be a great fit — light tone and the linen wipes down easily. Would you like to see the full details?"
+      }
+    ],
+    "assertions": [
+      { "atTurn": 2, "type": "needle", "value": "back" },
+      { "atTurn": 4, "type": "needle", "value": "product-minimalist-white-sofa" }
+    ]
+  },
+  {
+    "id": "mt_002",
+    "turns": [
+      {
+        "role": "user",
+        "content": "I need a dining table"
+      },
+      {
+        "role": "assistant",
+        "content": "Happy to help! How many people do you usually seat, and do you have a preferred material — wood, glass, marble?"
+      },
+      {
+        "role": "user",
+        "content": "Up to 8 people, preferably walnut"
+      },
+      {
+        "role": "assistant",
+        "content": "The Walnut Extending Dining Table seats up to 8 when extended and has a beautiful warm walnut finish. It's £1,499. Shall I pull up matching chairs?"
+      },
+      {
+        "role": "user",
+        "content": "Yes please, and keep it under £300 per chair"
+      },
+      {
+        "role": "assistant",
+        "content": "The Solid Oak Dining Chair at £249.99 pairs nicely with the walnut table and comes in well within your budget."
+      }
+    ],
+    "assertions": [
+      { "atTurn": 4, "type": "needle", "value": "product-walnut-dining-table" },
+      { "atTurn": 6, "type": "needle", "value": "product-oak-dining-chair" },
+      { "atTurn": 6, "type": "input_tokens_below", "value": 4096 }
+    ]
+  },
+  {
+    "id": "mt_003",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What lighting do you have?"
+      },
+      {
+        "role": "assistant",
+        "content": "We carry floor lamps, pendant clusters, table lamps, and wall sconces. Any particular room or style in mind?"
+      },
+      {
+        "role": "user",
+        "content": "Something industrial for a home office"
+      },
+      {
+        "role": "assistant",
+        "content": "The Industrial Wall Sconce Pair would work well — raw metal finish, directional light, and it keeps your desk surface clear. Also worth considering: the Brass Arc Floor Lamp for ambient fill."
+      },
+      {
+        "role": "user",
+        "content": "How much is the wall sconce?"
+      },
+      {
+        "role": "assistant",
+        "content": "The Industrial Wall Sconce Pair is £199.99 for the pair."
+      }
+    ],
+    "assertions": [
+      { "atTurn": 4, "type": "needle", "value": "product-wall-sconce" },
+      { "atTurn": 6, "type": "needle", "value": "199" }
+    ]
+  },
+  {
+    "id": "mt_004",
+    "turns": [
+      {
+        "role": "user",
+        "content": "I'm setting up a bedroom — where should I start?"
+      },
+      {
+        "role": "assistant",
+        "content": "The bed frame is the anchor piece. Are you going for a specific aesthetic — minimalist, traditional, or somewhere in between?"
+      },
+      {
+        "role": "user",
+        "content": "Minimalist, I love clean lines and natural wood"
+      },
+      {
+        "role": "assistant",
+        "content": "The Japanese Oak Platform Bed is a perfect match — low profile, solid oak slat base, no box spring needed. Would you like storage suggestions to complete the room?"
+      },
+      {
+        "role": "user",
+        "content": "Yes, a wardrobe too please"
+      },
+      {
+        "role": "assistant",
+        "content": "The Scandinavian Oak Wardrobe at £1,199 complements the platform bed perfectly — same clean oak finish and simple hardware."
+      }
+    ],
+    "assertions": [
+      { "atTurn": 4, "type": "needle", "value": "product-oak-platform-bed" },
+      { "atTurn": 6, "type": "needle", "value": "product-oak-wardrobe" },
+      { "atTurn": 6, "type": "input_tokens_below", "value": 4096 }
+    ]
+  }
+]
