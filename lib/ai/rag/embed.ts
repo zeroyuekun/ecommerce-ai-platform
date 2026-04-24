@@ -1,10 +1,11 @@
 /**
- * Voyage embedding adapter. Wraps the Voyage REST API directly to avoid the
- * voyageai SDK's ESM packaging bug (0.2.1 ships unextensioned imports that
- * Next.js can't resolve). Defaults: voyage-3-large, 1024d, int8.
+ * Embedding adapter. Uses Pinecone Inference (multilingual-e5-large @ 1024d)
+ * so we don't need a separate embedding-vendor signup. The Pinecone free
+ * tier includes inference.
  *
- * Per spec §3 — Anthropic-recommended embedding partner. Matryoshka means
- * the dimension can be reduced later without re-embedding.
+ * Public interface (embedTexts, __resetEmbedClientForTests) is unchanged
+ * from the prior Voyage implementation — swap is one file by design
+ * (per ADR-0005 migration path).
  */
 export type EmbedKind = "document" | "query";
 
@@ -12,22 +13,25 @@ export interface EmbedOptions {
   kind: EmbedKind;
 }
 
-const ENDPOINT = "https://api.voyageai.com/v1/embeddings";
-const MODEL = "voyage-3-large";
-const DIMENSION = 1024;
-const DTYPE = "int8" as const;
+const ENDPOINT = "https://api.pinecone.io/embed";
+const MODEL = "multilingual-e5-large";
+const API_VERSION = "2024-10";
 
-interface VoyageResponse {
-  data?: Array<{ embedding?: number[] }>;
+interface PineconeEmbedResponse {
+  data?: Array<{ values?: number[] }>;
 }
 
 let cachedApiKey: string | null = null;
 function getApiKey(): string {
   if (cachedApiKey) return cachedApiKey;
-  const apiKey = process.env.VOYAGE_API_KEY;
-  if (!apiKey) throw new Error("VOYAGE_API_KEY is not set");
+  const apiKey = process.env.PINECONE_API_KEY;
+  if (!apiKey) throw new Error("PINECONE_API_KEY is not set");
   cachedApiKey = apiKey;
   return cachedApiKey;
+}
+
+function inputType(kind: EmbedKind): "passage" | "query" {
+  return kind === "document" ? "passage" : "query";
 }
 
 export async function embedTexts(
@@ -39,26 +43,28 @@ export async function embedTexts(
     const response = await fetch(ENDPOINT, {
       method: "POST",
       headers: {
+        "Api-Key": getApiKey(),
+        "X-Pinecone-API-Version": API_VERSION,
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getApiKey()}`,
       },
       body: JSON.stringify({
-        input: texts,
         model: MODEL,
-        input_type: kind,
-        output_dimension: DIMENSION,
-        output_dtype: DTYPE,
+        parameters: {
+          input_type: inputType(kind),
+          truncate: "END",
+        },
+        inputs: texts.map((text) => ({ text })),
       }),
     });
     if (!response.ok) {
       const text = await response.text().catch(() => "");
       throw new Error(`HTTP ${response.status}: ${text}`);
     }
-    const json = (await response.json()) as VoyageResponse;
-    return (json.data ?? []).map((row) => row.embedding ?? []);
+    const json = (await response.json()) as PineconeEmbedResponse;
+    return (json.data ?? []).map((row) => row.values ?? []);
   } catch (err) {
     throw new Error(
-      `Voyage embedding failed: ${err instanceof Error ? err.message : String(err)}`,
+      `Pinecone embedding failed: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 }
