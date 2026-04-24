@@ -13,6 +13,8 @@ import { Pinecone } from "@pinecone-database/pinecone";
 export type ChunkType = "care" | "description" | "parent" | "qa" | "specs";
 
 export interface ChunkMetadata {
+  // Index signature required to satisfy Pinecone SDK's RecordMetadata constraint
+  [key: string]: boolean | number | string | undefined;
   assembly_required?: boolean;
   category_slug?: string;
   chunk_type: ChunkType;
@@ -84,7 +86,9 @@ function ns() {
 
 export async function upsertChunks(records: ChunkRecord[]): Promise<void> {
   if (records.length === 0) return;
-  await ns().upsert(records as Parameters<ReturnType<typeof ns>["upsert"]>[0]);
+  await ns().upsert(
+    records as unknown as Parameters<ReturnType<typeof ns>["upsert"]>[0],
+  );
 }
 
 export async function hybridQuery(args: QueryArgs): Promise<QueryMatch[]> {
@@ -96,7 +100,7 @@ export async function hybridQuery(args: QueryArgs): Promise<QueryMatch[]> {
     vector: args.vector,
   });
   return (result.matches ?? []).map((m) => {
-    const meta = (m.metadata ?? {}) as ChunkMetadata;
+    const meta = (m.metadata ?? {}) as unknown as ChunkMetadata;
     return {
       chunkType: meta.chunk_type,
       id: m.id,
