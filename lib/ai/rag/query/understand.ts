@@ -5,10 +5,12 @@
  *   - filters:    extracted hard constraints (price, material, color, ...)
  *   - hyde:       optional hypothetical product description for short queries
  *
- * On any failure or schema violation we degrade to the identity rewrite +
- * empty filters so retrieval still happens.
+ * On any failure, schema violation, or values outside the catalog
+ * vocabulary we degrade to the identity rewrite + empty filters so
+ * retrieval still happens.
  */
 import { z } from "zod";
+import { COLOR_VALUES, MATERIAL_VALUES } from "@/lib/constants/filters";
 import { captureException } from "@/lib/monitoring";
 
 export interface QueryFilters {
@@ -42,6 +44,20 @@ export interface UnderstandArgs {
   understandingFn: UnderstandingFn;
 }
 
+/** Catalog category slugs. Keep in sync with the Sanity `category` schema. */
+const CATEGORY_SLUGS = [
+  "living-room",
+  "bedroom",
+  "dining-room",
+  "office-storage",
+  "lighting-decor",
+  "outdoor",
+  "kids",
+  "youth",
+  "baby",
+  "furniture-sets",
+] as const;
+
 const FILTERS_SCHEMA = z
   .object({
     maxPrice: z.number().positive().optional(),
@@ -59,6 +75,44 @@ const UNDERSTANDING_SCHEMA = z.object({
   hyde: z.string().nullable(),
 });
 
+/**
+ * Post-process extracted filters to drop any values that aren't in the
+ * catalog vocabulary. Haiku may produce plausible-sounding natural-language
+ * values ("chair", "coffee table", "oak" as material) that don't match our
+ * enum slugs — silently ignoring those is better than returning zero results.
+ */
+function sanitizeFilters(filters: QueryFilters): QueryFilters {
+  const out: QueryFilters = {};
+  if (typeof filters.maxPrice === "number" && filters.maxPrice > 0) {
+    out.maxPrice = filters.maxPrice;
+  }
+  if (typeof filters.minPrice === "number" && filters.minPrice >= 0) {
+    out.minPrice = filters.minPrice;
+  }
+  if (typeof filters.inStockOnly === "boolean") {
+    out.inStockOnly = filters.inStockOnly;
+  }
+  if (
+    filters.material &&
+    (MATERIAL_VALUES as readonly string[]).includes(filters.material)
+  ) {
+    out.material = filters.material;
+  }
+  if (
+    filters.color &&
+    (COLOR_VALUES as readonly string[]).includes(filters.color)
+  ) {
+    out.color = filters.color;
+  }
+  if (
+    filters.category &&
+    (CATEGORY_SLUGS as readonly string[]).includes(filters.category)
+  ) {
+    out.category = filters.category;
+  }
+  return out;
+}
+
 export async function understandQuery(
   args: UnderstandArgs,
 ): Promise<Understanding> {
@@ -67,7 +121,12 @@ export async function understandQuery(
       query: args.query,
       history: args.history,
     });
-    return UNDERSTANDING_SCHEMA.parse(raw);
+    const parsed = UNDERSTANDING_SCHEMA.parse(raw);
+    return {
+      rewritten: parsed.rewritten,
+      filters: sanitizeFilters(parsed.filters),
+      hyde: parsed.hyde,
+    };
   } catch (err) {
     captureException(err, {
       extra: { context: "query-understand", query: args.query },
@@ -96,9 +155,14 @@ ${recent || "(no prior turns)"}
 
 Current user query: "${query}"
 
+Catalog vocabulary (valid enum values — any extracted filter MUST be one of these or omitted):
+- material: ${MATERIAL_VALUES.join(", ")}
+- color:    ${COLOR_VALUES.join(", ")}  (note: oak and walnut are COLORS, not materials)
+- category: ${CATEGORY_SLUGS.join(", ")}
+
 Tasks:
 1. rewritten: rewrite the user's query as a standalone search query, resolving any pronouns or implicit references using the history. Keep it concise.
-2. filters: extract hard constraints from the query into the structured object. maxPrice/minPrice are AUD numbers. material/color/category match the catalog vocabulary. inStockOnly is true if the user implies they want it now.
+2. filters: extract hard constraints from the query. maxPrice/minPrice are AUD numbers. material/color/category MUST match the catalog vocabulary above — if the user's word doesn't map to any valid value, OMIT that filter entirely. Do NOT invent category names; "chair" is not a category (try to pick living-room / office-storage / outdoor based on context, or omit). inStockOnly is true if the user implies they want it now.
 3. hyde: if the query is shorter than 30 characters or very vague, write a one-paragraph hypothetical product description that would be a perfect match. Otherwise null.
 
 Return strict JSON matching the schema.`,

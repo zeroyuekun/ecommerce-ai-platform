@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockRerank } = vi.hoisted(() => ({ mockRerank: vi.fn() }));
 vi.mock("@/lib/ai/rag/rerank", () => ({ rerankCandidates: mockRerank }));
@@ -19,8 +19,16 @@ const makeMatch = (
 });
 
 describe("rerankAndDedupe", () => {
+  const originalCohereKey = process.env.COHERE_API_KEY;
   beforeEach(() => {
     mockRerank.mockReset();
+    // The two existing tests exercise the Cohere path; set the key so the
+    // adapter doesn't short-circuit to the Pinecone-score fallback.
+    process.env.COHERE_API_KEY = "test-key";
+  });
+  afterEach(() => {
+    if (originalCohereKey === undefined) delete process.env.COHERE_API_KEY;
+    else process.env.COHERE_API_KEY = originalCohereKey;
   });
 
   it("dedupes by productId after rerank, keeping the highest-scoring chunk per product", async () => {
@@ -67,5 +75,24 @@ describe("rerankAndDedupe", () => {
       topProducts: 3,
     });
     expect(out).toHaveLength(3);
+  });
+
+  it("skips Cohere and preserves Pinecone scores when COHERE_API_KEY is missing", async () => {
+    delete process.env.COHERE_API_KEY;
+    const candidates: QueryMatch[] = [
+      { ...makeMatch("p1#parent", "p1"), score: 0.82 },
+      { ...makeMatch("p2#parent", "p2"), score: 0.9 },
+      { ...makeMatch("p3#parent", "p3"), score: 0.75 },
+    ];
+    const out = await rerankAndDedupe({
+      query: "q",
+      candidates,
+      candidateTexts: Object.fromEntries(candidates.map((c) => [c.id, "x"])),
+      topNAfterRerank: 10,
+      topProducts: 5,
+    });
+    expect(mockRerank).not.toHaveBeenCalled();
+    expect(out.map((m) => m.productId)).toEqual(["p2", "p1", "p3"]);
+    expect(out[0].score).toBe(0.9);
   });
 });
