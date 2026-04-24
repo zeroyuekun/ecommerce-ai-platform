@@ -1,7 +1,11 @@
 import { gateway, type Tool, ToolLoopAgent } from "ai";
 import { addToCartTool } from "./tools/add-to-cart";
 import { createGetMyOrdersTool } from "./tools/get-my-orders";
+import { filterSearchTool } from "./tools/filter-search";
+import { getProductDetailsTool } from "./tools/get-product-details";
 import { searchProductsTool } from "./tools/search-products";
+import { semanticSearchTool } from "./tools/semantic-search";
+import { isRagEnabled } from "./rag/flags";
 
 interface ShoppingAgentOptions {
   userId: string | null;
@@ -255,16 +259,38 @@ const notAuthenticatedInstructions = `
 The user is not signed in. If they ask about orders, politely let them know they need to sign in to view their order history. You can say something like:
 "To check your orders, you'll need to sign in first. Click the user icon in the top right to sign in or create an account."`;
 
+const ragInstructions = `
+
+## RAG tooling (when enabled)
+- For open-ended descriptive queries (style, vibe, room context, use-case), call **semanticSearch**.
+- For queries that are pure constraint combinations (price, material, category), call **filterSearch**.
+- Before quoting any specific dimension, price, stock count, or shipping detail, call **getProductDetails(slug)** for that exact product. Never quote numbers from search results — they are summaries, not the source of truth.
+`;
+
 /**
  * Creates a shopping agent with tools based on user authentication status
  */
 export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
   const isAuthenticated = !!userId;
 
-  // Build instructions based on authentication
-  const instructions = isAuthenticated
-    ? baseInstructions + ordersInstructions
-    : baseInstructions + notAuthenticatedInstructions;
+  // Build RAG tools conditionally based on the feature flag
+  const ragTools = isRagEnabled()
+    ? {
+        semanticSearch: semanticSearchTool,
+        filterSearch: filterSearchTool,
+        getProductDetails: getProductDetailsTool,
+      }
+    : {};
+
+  // Build instructions based on authentication and RAG flag
+  const authInstructions = isAuthenticated
+    ? ordersInstructions
+    : notAuthenticatedInstructions;
+
+  const instructions =
+    baseInstructions +
+    authInstructions +
+    (isRagEnabled() ? ragInstructions : "");
 
   // Build tools - only include orders tool if authenticated
   const getMyOrdersTool = createGetMyOrdersTool(userId);
@@ -272,6 +298,7 @@ export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
   const tools: Record<string, Tool> = {
     searchProducts: searchProductsTool,
     addToCart: addToCartTool,
+    ...ragTools,
   };
 
   if (getMyOrdersTool) {
