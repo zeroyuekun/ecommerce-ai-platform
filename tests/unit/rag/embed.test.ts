@@ -20,10 +20,7 @@ describe("embedTexts (Pinecone Inference)", () => {
     mockFetch.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          data: [
-            { values: [0.1, 0.2, 0.3] },
-            { values: [0.4, 0.5, 0.6] },
-          ],
+          data: [{ values: [0.1, 0.2, 0.3] }, { values: [0.4, 0.5, 0.6] }],
         }),
         { status: 200, headers: { "content-type": "application/json" } },
       ),
