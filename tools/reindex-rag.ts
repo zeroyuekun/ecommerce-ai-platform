@@ -10,7 +10,10 @@
  *   pnpm reindex:rag --slug=foo-bar # single product by slug
  *   pnpm reindex:rag --since=2026-04-01  # touched since date
  */
-import "dotenv/config";
+// Env loading is handled by `dotenv-cli` in the package.json script
+// (`dotenv -e .env.local -- tsx ...`). We don't import dotenv here because
+// hoisted module imports (e.g. @/sanity/lib/client) run BEFORE any
+// top-level loadEnv() call, which would crash on missing env vars.
 import type { ChunkableProduct } from "@/lib/ai/rag/indexer/chunk";
 import { indexProduct } from "@/lib/ai/rag/indexer/index-product";
 import { client } from "@/sanity/lib/client";

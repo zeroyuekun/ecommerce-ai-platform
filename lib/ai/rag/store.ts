@@ -112,7 +112,15 @@ export async function hybridQuery(args: QueryArgs): Promise<QueryMatch[]> {
 }
 
 export async function deleteByProductId(productId: string): Promise<void> {
-  await ns().deleteMany({ product_id: { $eq: productId } });
+  try {
+    await ns().deleteMany({ product_id: { $eq: productId } });
+  } catch (err) {
+    // Pinecone returns 404 when the namespace has no vectors yet (first
+    // re-index of a product, or freshly-created index). Treat as a no-op
+    // so the upsert that follows still runs.
+    const message = err instanceof Error ? err.message : String(err);
+    if (!/404|not found/i.test(message)) throw err;
+  }
 }
 
 /** Test seam — resets the singleton so env vars are re-read. */
