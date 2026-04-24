@@ -82,7 +82,8 @@ export async function assembleContext(
     role: "system",
     content: `Conversation so far (compacted from ${head.length} earlier turns): ${compaction.summary}`,
   };
-  const preserved = compaction.preserved.length > 0 ? compaction.preserved : tail;
+  const preserved =
+    compaction.preserved.length > 0 ? compaction.preserved : tail;
   const next = [summaryMessage, ...preserved];
   const nextTokens = estimateMessageTokens(next);
 
