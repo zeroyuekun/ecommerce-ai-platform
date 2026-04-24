@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "lighthouse": "pnpm dlx @lhci/cli@0.15.0 autorun",
+    "reindex:rag": "tsx tools/reindex-rag.ts",
     "typegen": "sanity schema extract && sanity typegen generate --enforce-required-fields"
   },
   "dependencies": {
