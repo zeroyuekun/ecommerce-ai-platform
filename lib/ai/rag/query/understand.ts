@@ -59,7 +59,9 @@ const UNDERSTANDING_SCHEMA = z.object({
   hyde: z.string().nullable(),
 });
 
-export async function understandQuery(args: UnderstandArgs): Promise<Understanding> {
+export async function understandQuery(
+  args: UnderstandArgs,
+): Promise<Understanding> {
   try {
     const raw = await args.understandingFn({
       query: args.query,
@@ -67,15 +69,23 @@ export async function understandQuery(args: UnderstandArgs): Promise<Understandi
     });
     return UNDERSTANDING_SCHEMA.parse(raw);
   } catch (err) {
-    captureException(err, { extra: { context: "query-understand", query: args.query } });
+    captureException(err, {
+      extra: { context: "query-understand", query: args.query },
+    });
     return { rewritten: args.query, filters: {}, hyde: null };
   }
 }
 
 /** Default Haiku-backed implementation. */
-export const haikuUnderstandingFn: UnderstandingFn = async ({ query, history }) => {
+export const haikuUnderstandingFn: UnderstandingFn = async ({
+  query,
+  history,
+}) => {
   const { gateway, generateObject } = await import("ai");
-  const recent = history.slice(-3).map((t) => `${t.role}: ${t.content}`).join("\n");
+  const recent = history
+    .slice(-3)
+    .map((t) => `${t.role}: ${t.content}`)
+    .join("\n");
   const result = await generateObject({
     model: gateway("anthropic/claude-haiku-4.5"),
     schema: UNDERSTANDING_SCHEMA,

@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { understandQuery, type UnderstandingFn } from "@/lib/ai/rag/query/understand";
+import {
+  type UnderstandingFn,
+  understandQuery,
+} from "@/lib/ai/rag/query/understand";
 
 const goodFn: UnderstandingFn = vi.fn(async (args) => ({
   rewritten: `${args.query} (rewritten)`,
