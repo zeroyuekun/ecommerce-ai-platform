@@ -52,7 +52,9 @@ export async function generateSyntheticQa(
     const raw = await opts.generator({ product, count });
     return QA_SCHEMA.parse(raw);
   } catch (err) {
-    captureException(err, { extra: { context: "synthetic-qa", productName: product.name } });
+    captureException(err, {
+      extra: { context: "synthetic-qa", productName: product.name },
+    });
     return [];
   }
 }
