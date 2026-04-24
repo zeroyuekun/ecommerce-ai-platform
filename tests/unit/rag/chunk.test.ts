@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { type ChunkableProduct, chunkProduct } from "@/lib/ai/rag/indexer/chunk";
+import {
+  type ChunkableProduct,
+  chunkProduct,
+} from "@/lib/ai/rag/indexer/chunk";
 
 const sample: ChunkableProduct = {
   id: "p_001",
@@ -48,8 +51,15 @@ describe("chunkProduct", () => {
   it("appends one qa chunk per provided synthetic Q&A pair", () => {
     const chunks = chunkProduct(sample, {
       syntheticQa: [
-        { question: "Will this fit a 4 x 3 metre living room?", answer: "Yes — at 220 cm wide it leaves walking space on both sides." },
-        { question: "Is it pet-friendly?", answer: "The tight weave resists pet hair; spot-clean with mild soap." },
+        {
+          question: "Will this fit a 4 x 3 metre living room?",
+          answer: "Yes — at 220 cm wide it leaves walking space on both sides.",
+        },
+        {
+          question: "Is it pet-friendly?",
+          answer:
+            "The tight weave resists pet hair; spot-clean with mild soap.",
+        },
       ],
     });
     const qaChunks = chunks.filter((c) => c.type === "qa");
@@ -59,7 +69,9 @@ describe("chunkProduct", () => {
   });
 
   it("chunk ids follow the {productId}#{type}[index] pattern", () => {
-    const chunks = chunkProduct(sample, { syntheticQa: [{ question: "q", answer: "a" }] });
+    const chunks = chunkProduct(sample, {
+      syntheticQa: [{ question: "q", answer: "a" }],
+    });
     const ids = chunks.map((c) => c.id);
     expect(ids).toContain("p_001#parent");
     expect(ids).toContain("p_001#description");

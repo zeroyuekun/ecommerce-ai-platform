@@ -55,7 +55,10 @@ function baseMetadata(p: ChunkableProduct, type: ChunkType): ChunkMetadata {
   };
 }
 
-export function chunkProduct(p: ChunkableProduct, opts: ChunkOptions): RawChunk[] {
+export function chunkProduct(
+  p: ChunkableProduct,
+  opts: ChunkOptions,
+): RawChunk[] {
   const out: RawChunk[] = [];
 
   out.push({
@@ -99,7 +102,9 @@ export function chunkProduct(p: ChunkableProduct, opts: ChunkOptions): RawChunk[
     id: `${p.id}#care`,
     type: "care",
     text: `${p.name}. Care: spot-clean with a damp cloth; avoid harsh chemicals. ${
-      p.assemblyRequired ? "Assembly required at delivery." : "Arrives fully assembled."
+      p.assemblyRequired
+        ? "Assembly required at delivery."
+        : "Arrives fully assembled."
     } Ships across Australia.`,
     metadata: baseMetadata(p, "care"),
   });
