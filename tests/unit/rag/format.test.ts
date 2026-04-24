@@ -15,7 +15,10 @@ describe("formatToolResult", () => {
   });
 
   it("appends a sentinel when an array payload is truncated", () => {
-    const products = Array.from({ length: 8 }, (_, i) => ({ id: String(i), name: longText }));
+    const products = Array.from({ length: 8 }, (_, i) => ({
+      id: String(i),
+      name: longText,
+    }));
     const out = formatToolResult({
       toolName: "semanticSearch",
       payload: { products },
@@ -28,7 +31,10 @@ describe("formatToolResult", () => {
   });
 
   it("never returns more than the cap (or zero items if the first one already overflows)", () => {
-    const products = [{ id: "0", name: longText }, { id: "1", name: "small" }];
+    const products = [
+      { id: "0", name: longText },
+      { id: "1", name: "small" },
+    ];
     const out = formatToolResult({
       toolName: "semanticSearch",
       payload: { products },
