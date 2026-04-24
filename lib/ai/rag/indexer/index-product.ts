@@ -9,13 +9,20 @@
  * upgrade is purely additive.
  */
 import { embedTexts } from "@/lib/ai/rag/embed";
-import { type ChunkableProduct, chunkProduct } from "@/lib/ai/rag/indexer/chunk";
+import {
+  type ChunkableProduct,
+  chunkProduct,
+} from "@/lib/ai/rag/indexer/chunk";
 import {
   generateSyntheticQa,
   haikuQaGenerator,
   type QaGenerator,
 } from "@/lib/ai/rag/indexer/synthetic-qa";
-import { type ChunkRecord, deleteByProductId, upsertChunks } from "@/lib/ai/rag/store";
+import {
+  type ChunkRecord,
+  deleteByProductId,
+  upsertChunks,
+} from "@/lib/ai/rag/store";
 
 const SYNTHETIC_QA_COUNT = 5;
 

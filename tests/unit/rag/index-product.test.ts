@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockEmbed, mockUpsert, mockDelete } = vi.hoisted(() => ({
   mockEmbed: vi.fn(),
@@ -35,9 +35,11 @@ const product = {
 
 describe("indexProduct", () => {
   beforeEach(() => {
-    mockEmbed.mockReset().mockResolvedValue(
-      Array.from({ length: 9 }, () => Array(1024).fill(0.01)),
-    );
+    mockEmbed
+      .mockReset()
+      .mockResolvedValue(
+        Array.from({ length: 9 }, () => Array(1024).fill(0.01)),
+      );
     mockUpsert.mockReset().mockResolvedValue(undefined);
     mockDelete.mockReset().mockResolvedValue(undefined);
     mockGenerator.mockReset().mockResolvedValue([
@@ -63,7 +65,9 @@ describe("indexProduct", () => {
     expect(mockUpsert).toHaveBeenCalledTimes(1);
     const records = mockUpsert.mock.calls[0][0];
     expect(records).toHaveLength(9);
-    expect(records.every((r: { id: string }) => r.id.startsWith("p_001#"))).toBe(true);
+    expect(
+      records.every((r: { id: string }) => r.id.startsWith("p_001#")),
+    ).toBe(true);
   });
 
   it("returns the count of chunks indexed", async () => {
@@ -75,7 +79,9 @@ describe("indexProduct", () => {
     mockEmbed.mockResolvedValueOnce(
       Array.from({ length: 4 }, () => Array(1024).fill(0.01)),
     );
-    const failingGen = vi.fn(async () => { throw new Error("haiku down"); });
+    const failingGen = vi.fn(async () => {
+      throw new Error("haiku down");
+    });
     const result = await indexProduct(product, { qaGenerator: failingGen });
     expect(result.chunksIndexed).toBe(4);
   });
