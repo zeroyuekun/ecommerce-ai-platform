@@ -12,7 +12,7 @@ async function run(query: string) {
   });
   console.log(`  rewritten: ${u.rewritten}`);
   console.log(`  filters:   ${JSON.stringify(u.filters)}`);
-  console.log(`  hyde:      ${u.hyde ? u.hyde.slice(0, 80) + "..." : "null"}`);
+  console.log(`  hyde:      ${u.hyde ? `${u.hyde.slice(0, 80)}...` : "null"}`);
 }
 
 async function main() {
