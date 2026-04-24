@@ -3,7 +3,10 @@
     "id": "g_001",
     "bucket": "aesthetic",
     "query": "Japandi style for a small bedroom",
-    "expectedProductIds": ["product-oak-platform-bed", "product-four-poster-bed"],
+    "expectedProductIds": [
+      "product-oak-platform-bed",
+      "product-four-poster-bed"
+    ],
     "expectedFilters": { "category": "bedroom" },
     "expectedRefusal": false,
     "notes": "tests aesthetic-vocabulary recall — Japandi = Japanese + Scandinavian oak/minimal"
@@ -12,7 +15,10 @@
     "id": "g_002",
     "bucket": "aesthetic",
     "query": "Scandi minimalist living room in white and light oak",
-    "expectedProductIds": ["product-minimalist-white-sofa", "product-oak-dining-chair"],
+    "expectedProductIds": [
+      "product-minimalist-white-sofa",
+      "product-oak-dining-chair"
+    ],
     "expectedFilters": { "style": "scandinavian" },
     "expectedRefusal": false,
     "notes": "tests Scandinavian aesthetic keywords with colour cues"
@@ -39,7 +45,10 @@
     "id": "g_005",
     "bucket": "comparison",
     "query": "What is the difference between the marble coffee table and the glass side table?",
-    "expectedProductIds": ["product-marble-coffee-table", "product-glass-side-table"],
+    "expectedProductIds": [
+      "product-marble-coffee-table",
+      "product-glass-side-table"
+    ],
     "expectedFilters": {},
     "expectedRefusal": false,
     "notes": "tests comparison intent — both products should appear in results"
@@ -48,7 +57,10 @@
     "id": "g_006",
     "bucket": "comparison",
     "query": "Nordic grey sofa versus leather chesterfield — which is better for a family?",
-    "expectedProductIds": ["product-nordic-grey-sofa", "product-leather-chesterfield"],
+    "expectedProductIds": [
+      "product-nordic-grey-sofa",
+      "product-leather-chesterfield"
+    ],
     "expectedFilters": { "category": "sofas" },
     "expectedRefusal": false,
     "notes": "tests side-by-side sofa comparison"

@@ -21,7 +21,11 @@
     ],
     "assertions": [
       { "atTurn": 2, "type": "needle", "value": "back" },
-      { "atTurn": 4, "type": "needle", "value": "product-minimalist-white-sofa" }
+      {
+        "atTurn": 4,
+        "type": "needle",
+        "value": "product-minimalist-white-sofa"
+      }
     ]
   },
   {
