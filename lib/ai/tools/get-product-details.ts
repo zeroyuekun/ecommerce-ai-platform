@@ -28,7 +28,10 @@ export const getProductDetailsTool = tool({
     "Fetch the authoritative current details (price, stock, dimensions, materials, image) for one product by its slug. Always call this before quoting numbers to the customer.",
   inputSchema,
   execute: async ({ productSlug }) => {
-    const { data } = await sanityFetch({ query: QUERY, params: { slug: productSlug } });
+    const { data } = await sanityFetch({
+      query: QUERY,
+      params: { slug: productSlug },
+    });
     if (!data) {
       return {
         found: false,
@@ -49,16 +52,21 @@ export const getProductDetailsTool = tool({
         description: (data as { description?: string }).description ?? "",
         price,
         priceFormatted: formatPrice(price),
-        category: (data as { category?: { title?: string } | null }).category?.title ?? null,
+        category:
+          (data as { category?: { title?: string } | null }).category?.title ??
+          null,
         material: (data as { material?: string | null }).material ?? null,
         color: (data as { color?: string | null }).color ?? null,
         dimensions: (data as { dimensions?: string | null }).dimensions ?? null,
         stockCount: stock,
         stockStatus: getStockStatus(stock),
         stockMessage: getStockMessage(stock),
-        assemblyRequired: !!(data as { assemblyRequired?: boolean }).assemblyRequired,
+        assemblyRequired: !!(data as { assemblyRequired?: boolean })
+          .assemblyRequired,
         featured: !!(data as { featured?: boolean }).featured,
-        imageUrl: (data as { image?: { asset?: { url?: string } } | null }).image?.asset?.url ?? null,
+        imageUrl:
+          (data as { image?: { asset?: { url?: string } } | null }).image?.asset
+            ?.url ?? null,
         productUrl: `/products/${productSlug}`,
       },
     };

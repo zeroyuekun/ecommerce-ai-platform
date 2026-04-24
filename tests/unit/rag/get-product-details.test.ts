@@ -5,6 +5,12 @@ vi.mock("@/sanity/lib/live", () => ({ sanityFetch: mockFetch }));
 
 import { getProductDetailsTool } from "@/lib/ai/tools/get-product-details";
 
+type ToolResult = Awaited<
+  ReturnType<
+    typeof getProductDetailsTool.execute & ((...a: never[]) => unknown)
+  >
+>;
+
 describe("getProductDetailsTool", () => {
   beforeEach(() => {
     mockFetch.mockReset();
@@ -28,22 +34,32 @@ describe("getProductDetailsTool", () => {
         image: { asset: { url: "https://cdn/x.jpg" } },
       },
     });
-    const out = await getProductDetailsTool.execute(
-      { productSlug: "nordic-grey-3-seater-sofa" },
+    const out = (await getProductDetailsTool.execute?.(
+      {
+        productSlug: "nordic-grey-3-seater-sofa",
+      },
       { messages: [], toolCallId: "t1" } as never,
+    )) as ToolResult;
+    expect((out as { found: boolean }).found).toBe(true);
+    expect((out as { product?: { slug?: string } }).product?.slug).toBe(
+      "nordic-grey-3-seater-sofa",
     );
-    expect(out.found).toBe(true);
-    expect(out.product?.slug).toBe("nordic-grey-3-seater-sofa");
-    expect(out.product?.priceFormatted).toBeTruthy();
+    expect(
+      (out as { product?: { priceFormatted?: string } }).product
+        ?.priceFormatted,
+    ).toBeTruthy();
   });
 
   it("returns found:false when slug is missing", async () => {
     mockFetch.mockResolvedValueOnce({ data: null });
-    const out = await getProductDetailsTool.execute(
+    const out = (await getProductDetailsTool.execute?.(
       { productSlug: "nope" },
-      { messages: [], toolCallId: "t1" } as never,
-    );
-    expect(out.found).toBe(false);
-    expect(out.product).toBeNull();
+      {
+        messages: [],
+        toolCallId: "t1",
+      } as never,
+    )) as ToolResult;
+    expect((out as { found: boolean }).found).toBe(false);
+    expect((out as { product: null }).product).toBeNull();
   });
 });
