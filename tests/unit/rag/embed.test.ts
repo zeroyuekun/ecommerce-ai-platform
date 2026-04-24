@@ -5,7 +5,7 @@ vi.mock("voyageai", () => ({
   VoyageAIClient: vi.fn().mockImplementation(() => ({ embed: mockEmbed })),
 }));
 
-import { embedTexts, __resetEmbedClientForTests } from "@/lib/ai/rag/embed";
+import { __resetEmbedClientForTests, embedTexts } from "@/lib/ai/rag/embed";
 
 describe("embedTexts", () => {
   beforeEach(() => {
