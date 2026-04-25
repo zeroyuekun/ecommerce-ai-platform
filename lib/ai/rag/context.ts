@@ -19,8 +19,6 @@ export interface CompactionResult {
   summary: string;
   /** Estimated tokens removed (informational, used by callers for logging). */
   tokensSaved: number;
-  /** The messages to keep verbatim (typically the last 6 turns). */
-  preserved: ContextMessage[];
 }
 
 export type Compactor = (
@@ -82,9 +80,10 @@ export async function assembleContext(
     role: "system",
     content: `Conversation so far (compacted from ${head.length} earlier turns): ${compaction.summary}`,
   };
-  const preserved =
-    compaction.preserved.length > 0 ? compaction.preserved : tail;
-  const next = [summaryMessage, ...preserved];
+  // The recent `tail` is held by assembleContext directly — the compactor only
+  // owns the summary. This avoids a class of bugs where the compactor returns
+  // the wrong slice (e.g. last-N-of-head instead of last-N-of-original).
+  const next = [summaryMessage, ...tail];
   const nextTokens = estimateMessageTokens(next);
 
   if (nextTokens > hardCapTokens) {

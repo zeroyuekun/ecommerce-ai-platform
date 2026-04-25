@@ -14,7 +14,7 @@ const reportOnlyCsp = [
   // down in prod is a separate exercise (requires nonces via middleware).
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://*.clerk.accounts.dev https://clerk.*.dev https://us-assets.i.posthog.com https://eu-assets.i.posthog.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "img-src 'self' data: blob: https://cdn.sanity.io https://images.unsplash.com https://images.listonce.com.au https://content.api.news https://cdn.decorilla.com https://www.decorilla.com https://cdn-bnokp.nitrocdn.com https://img.clerk.com",
+  "img-src 'self' data: blob: https://cdn.sanity.io https://images.unsplash.com https://images.listonce.com.au https://content.api.news https://cdn.decorilla.com https://www.decorilla.com https://img.clerk.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "connect-src 'self' https://*.sanity.io https://api.stripe.com https://*.clerk.accounts.dev https://clerk.*.dev https://api.openai.com https://api.anthropic.com https://ai-gateway.vercel.sh https://us.i.posthog.com https://eu.i.posthog.com",
   "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
@@ -59,7 +59,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "content.api.news" },
       { protocol: "https", hostname: "cdn.decorilla.com" },
       { protocol: "https", hostname: "www.decorilla.com" },
-      { protocol: "https", hostname: "cdn-bnokp.nitrocdn.com" },
     ],
   },
   async headers() {

@@ -10,19 +10,19 @@ const originalGalleryImages = [
     alt: "High end brands furniture - Cameron Design House",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Amelia-R-750x.jpeg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Amelia-R.jpeg",
     alt: "High end brands furniture - Amelia R",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-companies-in-a-contemporary-dining-room-Katerina-P-750x.jpeg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-companies-in-a-contemporary-dining-room-Katerina-P.jpeg",
     alt: "High end furniture in a contemporary dining room - Katerina P",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Meral-Y-750x.jpeg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-brands-furniture-Meral-Y.jpeg",
     alt: "High end brands furniture - Meral Y",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-websites-Dina-H-750x.jpeg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-websites-Dina-H.jpeg",
     alt: "High end furniture - Dina H",
   },
   {
@@ -30,35 +30,35 @@ const originalGalleryImages = [
     alt: "Serene boho modern bedroom interior by Decorilla",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Sonia-C-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Sonia-C.jpg",
     alt: "High end furniture retailers - Sonia C",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Kelly-Wearstler-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Kelly-Wearstler.jpg",
     alt: "High end furniture - Kelly Wearstler",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-outlet-Nathalie-I-750x.jpeg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-outlet-Nathalie-I.jpeg",
     alt: "High end furniture outlet - Nathalie I",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Tov-Furniture-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Tov-Furniture.jpg",
     alt: "Best high end furniture stores - Tov Furniture",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-Erin-R-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-Erin-R.jpg",
     alt: "Best high end furniture - Erin R",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Natuzzi-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-retailers-Natuzzi.jpg",
     alt: "High end furniture retailers - Natuzzi",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Arlen-A-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/High-end-furniture-stores-near-me-Arlen-A.jpg",
     alt: "High end furniture stores - Arlen A",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Vitra-750x.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2022/07/Best-high-end-furniture-stores-Vitra.jpg",
     alt: "Best high end furniture stores - Vitra",
   },
 ];
@@ -73,11 +73,11 @@ const craftmanshipImages = [
     alt: "Bohemian bedroom interior by Decorilla",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2024/02/Organic-open-plan-living-room-with-furnishings-from-Black-owned-furniture-stores-by-Decorilla-designer-Leanna-S-2048x1362.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2024/02/Organic-open-plan-living-room-with-furnishings-from-Black-owned-furniture-stores-by-Decorilla-designer-Leanna-S-2048x1362.jpg",
     alt: "Organic open plan living room by Decorilla designer Leanna S",
   },
   {
-    src: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-a662fd0/www.decorilla.com/online-decorating/wp-content/uploads/2024/02/Curated-living-room-with-furnishings-from-Black-owned-furniture-stores-by-Decorilla-designer-Catherine-W-2048x2048.jpg",
+    src: "https://www.decorilla.com/online-decorating/wp-content/uploads/2024/02/Curated-living-room-with-furnishings-from-Black-owned-furniture-stores-by-Decorilla-designer-Catherine-W-2048x2048.jpg",
     alt: "Curated living room by Decorilla designer Catherine W",
   },
 ];

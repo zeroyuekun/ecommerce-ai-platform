@@ -1,13 +1,12 @@
 import { embedTexts } from "@/lib/ai/rag/embed";
-import { hybridQuery } from "@/lib/ai/rag/store";
+import { hybridQuery, type QueryFilter } from "@/lib/ai/rag/store";
 
-async function run(label: string, filter?: Record<string, unknown>) {
+async function run(label: string, filter?: QueryFilter) {
   const [vec] = await embedTexts(["cozy reading chair"], { kind: "query" });
-  // biome-ignore lint/suspicious/noExplicitAny: probing filter shapes
   const out = await hybridQuery({
     vector: vec,
     topK: 3,
-    filter: filter as any,
+    filter,
   });
   console.log(label, "→", out.length, "matches");
   for (const m of out.slice(0, 2)) {

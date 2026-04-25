@@ -37,10 +37,13 @@ export function formatToolResult<T extends Record<string, unknown>>(
   }
 
   if (!arrayKey) {
+    // No array we can trim from — the cap MUST still hold. Drop the payload
+    // and surface a notice so the caller can communicate the failure to the
+    // LLM without poisoning context with the oversized blob.
     return {
-      payload,
+      payload: {} as T,
       truncated: true,
-      notice: `[${toolName}] result exceeds ${capTokens}-token cap; consider refining`,
+      notice: `[${toolName}] result exceeds ${capTokens}-token cap and was dropped; refine inputs and retry`,
     };
   }
 

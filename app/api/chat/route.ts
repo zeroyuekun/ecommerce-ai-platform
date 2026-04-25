@@ -1,5 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
-import { createAgentUIStreamResponse, type UIMessage } from "ai";
+import {
+  createAgentUIStreamResponse,
+  gateway,
+  generateText,
+  type UIMessage,
+} from "ai";
 import { z } from "zod";
 import {
   assembleContext,
@@ -9,20 +14,23 @@ import {
 import { isRagEnabled } from "@/lib/ai/rag/flags";
 import { chatRateLimiter } from "@/lib/ai/rate-limit";
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
+import { captureServerEvent } from "@/lib/analytics/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 256 * 1024;
 
-const RAG_HARD_CAP = Number(process.env.RAG_HARD_INPUT_TOKEN_CAP ?? 32_000);
-const RAG_SOFT_CAP = Number(process.env.RAG_SOFT_INPUT_TOKEN_CAP ?? 16_000);
+// `??` only catches null/undefined — empty-string env values fall through to
+// `Number("") === 0`, which would zero the caps and 500 every request. Use
+// `||` so any falsy env (unset, empty, "0") falls back to the default.
+const RAG_HARD_CAP = Number(process.env.RAG_HARD_INPUT_TOKEN_CAP) || 32_000;
+const RAG_SOFT_CAP = Number(process.env.RAG_SOFT_INPUT_TOKEN_CAP) || 16_000;
 
 const haikuCompactor: Compactor = async (toCompact) => {
-  const { gateway, generateText } = await import("ai");
   const result = await generateText({
     model: gateway("anthropic/claude-haiku-4.5"),
-    prompt: `Summarize the conversation below in 6 sentences or fewer. Preserve user constraints, preferences, and named entities verbatim. Then list the most recent 6 messages unchanged.
+    prompt: `Summarize the conversation below in 6 sentences or fewer. Preserve user constraints, preferences, and named entities verbatim.
 
 Conversation:
 ${toCompact.map((m) => `${m.role}: ${typeof m.content === "string" ? m.content : JSON.stringify(m.content)}`).join("\n")}`,
@@ -30,7 +38,6 @@ ${toCompact.map((m) => `${m.role}: ${typeof m.content === "string" ? m.content :
   return {
     summary: result.text,
     tokensSaved: 0,
-    preserved: toCompact.slice(-6),
   };
 };
 
@@ -92,13 +99,45 @@ export async function POST(request: Request) {
 
   let activeMessages = messages;
   if (isRagEnabled()) {
-    const assembled = await assembleContext({
-      messages: messages as unknown as ContextMessage[],
-      hardCapTokens: RAG_HARD_CAP,
-      softCapTokens: RAG_SOFT_CAP,
-      compactor: haikuCompactor,
-    });
-    activeMessages = assembled.messages as unknown as typeof messages;
+    try {
+      const assembled = await assembleContext({
+        messages: messages as unknown as ContextMessage[],
+        hardCapTokens: RAG_HARD_CAP,
+        softCapTokens: RAG_SOFT_CAP,
+        compactor: haikuCompactor,
+      });
+      activeMessages = assembled.messages as unknown as typeof messages;
+
+      // Spec §8 observability — fire-and-forget so telemetry latency never
+      // blocks the user response.
+      void captureServerEvent({
+        distinctId: userId,
+        event: "rag.turn.input_tokens",
+        properties: {
+          inputTokens: assembled.inputTokens,
+          compacted: assembled.compacted,
+        },
+      });
+      if (assembled.compacted) {
+        void captureServerEvent({
+          distinctId: userId,
+          event: "rag.compaction.triggered",
+          properties: {
+            inputTokens: assembled.inputTokens,
+            summaryPresent: typeof assembled.summary === "string",
+          },
+        });
+      }
+    } catch (err) {
+      // Compaction failure must not 500 the user mid-conversation. Fall back
+      // to the raw recent tail and log so we can triage.
+      const { captureException } = await import("@/lib/monitoring");
+      captureException(err, {
+        extra: { context: "rag.assembleContext", userId },
+      });
+      const TAIL = 12;
+      activeMessages = messages.slice(-TAIL);
+    }
   }
 
   const agent = createShoppingAgent({ userId });

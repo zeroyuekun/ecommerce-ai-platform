@@ -1,0 +1,67 @@
+name: RAG eval
+
+# Spec §9 — `pnpm eval:rag` runs nightly + on PRs that touch the RAG layer.
+# The eval calls live Pinecone, AI Gateway (Haiku), and optionally Cohere,
+# so it requires real secrets. Gated behind `vars.ENABLE_INTEGRATION_CI`
+# (same convention as the e2e + lighthouse jobs in ci.yml) — opt in by
+# setting the repo variable to `true` and populating the secrets.
+
+on:
+  schedule:
+    # 03:17 UTC every day. Off-peak vs prod traffic so a nightly miss
+    # doesn't compete with morning AU shoppers.
+    - cron: "17 3 * * *"
+  pull_request:
+    paths:
+      - "lib/ai/rag/**"
+      - "lib/ai/tools/semantic-search.ts"
+      - "lib/ai/tools/filter-search.ts"
+      - "lib/ai/tools/get-product-details.ts"
+      - "tests/rag/**"
+      - "tools/rag-eval.ts"
+      - ".github/workflows/eval-rag.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    name: pnpm eval:rag (golden set + CI gates)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: vars.ENABLE_INTEGRATION_CI == 'true'
+    env:
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+      SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+      PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+      PINECONE_INDEX_NAME: ${{ secrets.PINECONE_INDEX_NAME }}
+      PINECONE_NAMESPACE: ${{ secrets.PINECONE_NAMESPACE }}
+      COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+      RAG_ENABLED: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Sanity types
+        run: pnpm typegen
+
+      - name: Run RAG eval (recall@k, MRR, NDCG, latency)
+        run: pnpm eval:rag

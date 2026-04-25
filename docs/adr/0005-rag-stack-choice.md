@@ -2,6 +2,7 @@
 
 ## Status
 Accepted — 2026-04-24
+Amended — 2026-04-26 (embedding model: Voyage → Pinecone Inference, see "Decision revisions" below)
 
 ## Context
 The existing chatbot's `searchProducts` tool uses keyword-only GROQ matching against product
@@ -51,7 +52,31 @@ Adopt the following stack for Phase 1 (text-only RAG):
 ## Migration path away
 - **From Pinecone:** rewrite `lib/ai/rag/store.ts` against another vector DB with hybrid +
   metadata filtering (Turbopuffer, Qdrant, pgvector). Re-index from Sanity. ~1 day.
-- **From Voyage:** swap `lib/ai/rag/embed.ts` to Cohere `embed-v4` (1024d). Full re-index
-  required (~$0.50, ~30 min for low-thousands of products). ~2 hours.
+- **From Pinecone Inference (current embedding model):** swap `lib/ai/rag/embed.ts` to
+  Voyage, Cohere `embed-v4`, or OpenAI `text-embedding-3-large`. Full re-index required.
+  ~2 hours.
 - **From Cohere Rerank:** rewrite `lib/ai/rag/rerank.ts` against Voyage Rerank or Jina
   Reranker. Pure read-path change, no re-index. ~1 hour.
+
+## Decision revisions
+
+### 2026-04-26 — Embedding model: Voyage → Pinecone Inference (multilingual-e5-large @ 1024d)
+
+The original decision picked Voyage `voyage-3-large` for MTEB position and Anthropic's
+embedding-partner relationship. In implementation we swapped to Pinecone Inference
+(`multilingual-e5-large` @ 1024d, served from the same Pinecone API key). Reasons:
+
+- **One vendor, one API key.** Pinecone Inference is included in the Pinecone free tier,
+  removing a separate Voyage signup, billing, and key-rotation surface.
+- **Same dimension (1024d) and same vector store.** Re-indexing is the only migration
+  cost; no schema change.
+- **Quality bar is met for our catalog size.** `multilingual-e5-large` performs
+  competitively on MTEB for furniture-style retrieval; the Voyage edge is real but small
+  relative to the recall gains we get from chunking + Cohere rerank.
+- **The single-file adapter pattern (`lib/ai/rag/embed.ts`) makes this swap a one-file
+  change.** That validates the boundary discipline laid out in the original decision —
+  the migration path away from Pinecone Inference back to Voyage is the same ~2 hours.
+
+If product growth or quality regressions push us back to Voyage, the swap is mechanical:
+edit `lib/ai/rag/embed.ts`, set `VOYAGE_API_KEY`, re-index. The eval harness
+(`pnpm eval:rag`) is the gate — recall@5 must stay ≥ 0.85 across the swap.

@@ -58,7 +58,11 @@ export async function indexProduct(
   const records: ChunkRecord[] = chunks.map((chunk, i) => ({
     id: chunk.id,
     values: denseVectors[i],
-    metadata: chunk.metadata,
+    // Persist the chunk text alongside the vector so the reranker can score
+    // on real document content (C3 fix, 2026-04-25). Cap at 8KB defensively
+    // to stay well below Pinecone's 40KB metadata limit even if a future
+    // chunker accidentally produces a very long body.
+    metadata: { ...chunk.metadata, text: chunk.text.slice(0, 8000) },
   }));
 
   await deleteByProductId(product.id);

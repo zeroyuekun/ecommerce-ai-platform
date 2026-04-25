@@ -2,6 +2,10 @@
  * semanticSearch tool — runs the full RAG pipeline:
  *   understand → retrieve → rerank+dedupe → hydrate → format.
  * Returns at most 5 products via formatToolResult to enforce context budget.
+ *
+ * Pulls conversation history from the AI SDK ToolCallOptions so that
+ * Haiku query-understanding can resolve anaphora ("the blue one",
+ * "show me more like the second one"). Spec §4 step [2].
  */
 import { tool } from "ai";
 import { z } from "zod";
@@ -10,6 +14,7 @@ import type { FormattedProduct } from "@/lib/ai/rag/query/format";
 import { formatPipelineResults } from "@/lib/ai/rag/query/format";
 import { rerankAndDedupe } from "@/lib/ai/rag/query/rerank";
 import { retrieve } from "@/lib/ai/rag/query/retrieve";
+import type { ConversationTurn } from "@/lib/ai/rag/query/understand";
 import {
   haikuUnderstandingFn,
   understandQuery,
@@ -23,11 +28,22 @@ export type SemanticSearchResult = {
   message: string | null;
 };
 
+/**
+ * Subset of the AI SDK's ToolCallOptions we actually consume. Kept narrow
+ * (rather than `never`) so we can read `messages` and so the test ergonomics
+ * stay reasonable. See node_modules/@ai-sdk/provider-utils ToolExecutionOptions.
+ */
+export interface SemanticSearchToolOptions {
+  toolCallId: string;
+  messages?: unknown[];
+  abortSignal?: AbortSignal;
+}
+
 /** Concrete tool type with a non-optional, non-streaming execute signature. */
 type ConcreteSemanticSearchTool = Omit<ReturnType<typeof tool>, "execute"> & {
   execute: (
     input: z.infer<typeof inputSchema>,
-    options: never,
+    options: SemanticSearchToolOptions,
   ) => Promise<SemanticSearchResult>;
 };
 
@@ -35,6 +51,34 @@ const TOP_K_RETRIEVE = 30;
 const TOP_N_RERANK = 10;
 const TOP_PRODUCTS = 5;
 const RESULT_TOKEN_CAP = 1200;
+/** Spec §8.3 — Haiku rewrite only needs the last few turns for anaphora. */
+const HISTORY_TURNS_FOR_REWRITE = 6;
+
+function flattenContent(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+  return content
+    .map((part) => {
+      if (!part || typeof part !== "object") return "";
+      const p = part as { type?: string; text?: string };
+      return p.type === "text" && typeof p.text === "string" ? p.text : "";
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
+export function extractHistory(messages: unknown): ConversationTurn[] {
+  if (!Array.isArray(messages)) return [];
+  const out: ConversationTurn[] = [];
+  for (const m of messages.slice(-HISTORY_TURNS_FOR_REWRITE)) {
+    if (!m || typeof m !== "object") continue;
+    const role = (m as { role?: unknown }).role;
+    if (role !== "user" && role !== "assistant") continue;
+    const text = flattenContent((m as { content?: unknown }).content);
+    if (text) out.push({ role, content: text });
+  }
+  return out;
+}
 
 const inputSchema = z.object({
   query: z
@@ -61,10 +105,16 @@ const _semanticSearchTool = tool({
   description:
     "Open-ended product discovery. Use for queries about style, vibe, room context, or use-case (e.g. 'cozy reading nook'). Returns up to 5 best-matching products via the RAG pipeline. For queries that are pure filter combinations (e.g. 'oak coffee tables under $400'), prefer filterSearch instead.",
   inputSchema,
-  execute: async ({ query, filters }): Promise<SemanticSearchResult> => {
+  execute: async (
+    { query, filters },
+    options,
+  ): Promise<SemanticSearchResult> => {
+    const history = extractHistory(
+      (options as SemanticSearchToolOptions | undefined)?.messages,
+    );
     const understanding = await understandQuery({
       query,
-      history: [],
+      history,
       understandingFn: haikuUnderstandingFn,
     });
 
@@ -93,8 +143,14 @@ const _semanticSearchTool = tool({
       };
     }
 
+    // Use the actual chunk text persisted in metadata (C3 fix, 2026-04-25).
+    // Pre-fix records may not carry `text` — fall back to the chunk-id stub
+    // so the pipeline still functions before the next reindex completes.
     const candidateTexts: Record<string, string> = Object.fromEntries(
-      candidates.map((c) => [c.id, `${c.metadata.chunk_type}:${c.id}`]),
+      candidates.map((c) => [
+        c.id,
+        c.metadata.text ?? `${c.metadata.chunk_type}:${c.id}`,
+      ]),
     );
 
     const reranked = await rerankAndDedupe({

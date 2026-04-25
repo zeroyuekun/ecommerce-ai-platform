@@ -55,4 +55,20 @@ describe("formatToolResult", () => {
     expect(out.payload.filters).toEqual({ maxPrice: 500 });
     expect(out.payload.totalResults).toBe(0);
   });
+
+  it("hard-drops the payload when no arrayKey is given and cap is exceeded (C5)", () => {
+    // Regression for C5 (2026-04-25): the no-arrayKey branch used to return
+    // the full uncapped payload with just a notice — silently violating the
+    // per-tool token budget. The cap MUST be enforced, even at the cost of
+    // dropping the result entirely.
+    const oversize = { description: "x".repeat(20_000), price: 499 };
+    const out = formatToolResult({
+      toolName: "getProductDetails",
+      payload: oversize,
+      capTokens: 200,
+    });
+    expect(out.truncated).toBe(true);
+    expect(out.payload).toEqual({});
+    expect(out.notice).toMatch(/dropped/i);
+  });
 });

@@ -1,14 +1,28 @@
 /**
- * Sanity → RAG re-index webhook. Validates shared secret, filters to
- * product mutations, and enqueues a reindex job to Upstash QStash. The
- * QStash deduplicationId guarantees we only process each (_id, _rev) once
- * even if Sanity retries the webhook.
+ * Sanity → RAG re-index webhook. Validates shared secret in constant time,
+ * filters to product mutations, and enqueues a reindex job to Upstash
+ * QStash. The QStash deduplicationId guarantees we only process each
+ * (_id, _rev) once even if Sanity retries the webhook.
  */
+import { timingSafeEqual } from "node:crypto";
 import { Client } from "@upstash/qstash";
 import { z } from "zod";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
+
+function constantTimeEqual(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a, "utf8");
+  const bBuf = Buffer.from(b, "utf8");
+  if (aBuf.length !== bBuf.length) {
+    // Run a same-length compare against `b` to keep timing flat regardless
+    // of input length, then return false. The lengths themselves leak, but
+    // an attacker already knows the secret length once they pick one.
+    timingSafeEqual(bBuf, bBuf);
+    return false;
+  }
+  return timingSafeEqual(aBuf, bBuf);
+}
 
 const SCHEMA = z.object({
   _id: z.string().min(1),
@@ -35,7 +49,8 @@ function workerUrl(): string {
 
 export async function POST(request: Request) {
   const expected = process.env.SANITY_RAG_WEBHOOK_SECRET;
-  if (!expected || request.headers.get("x-sanity-rag-secret") !== expected) {
+  const provided = request.headers.get("x-sanity-rag-secret") ?? "";
+  if (!expected || !constantTimeEqual(provided, expected)) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,
       headers: { "content-type": "application/json" },

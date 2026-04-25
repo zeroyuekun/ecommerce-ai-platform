@@ -32,7 +32,11 @@ describe("semanticSearchTool", () => {
         score: 0.9,
         productId: "p1",
         chunkType: "parent",
-        metadata: { product_id: "p1", chunk_type: "parent" },
+        metadata: {
+          product_id: "p1",
+          chunk_type: "parent",
+          text: "Walnut coffee table · Material: walnut · Price: AUD 100",
+        },
       },
     ]);
     mocks.rerank.mockReset().mockResolvedValue([
@@ -41,7 +45,11 @@ describe("semanticSearchTool", () => {
         score: 0.95,
         productId: "p1",
         chunkType: "parent",
-        metadata: { product_id: "p1", chunk_type: "parent" },
+        metadata: {
+          product_id: "p1",
+          chunk_type: "parent",
+          text: "Walnut coffee table · Material: walnut · Price: AUD 100",
+        },
       },
     ]);
     mocks.hydrate.mockReset().mockResolvedValue({
@@ -88,5 +96,96 @@ describe("semanticSearchTool", () => {
     } as never);
     expect(out.found).toBe(false);
     expect(out.products).toEqual([]);
+  });
+
+  it("hands the reranker the chunk text from metadata, not the chunk id (C3)", async () => {
+    await semanticSearchTool.execute({ query: "cozy reading chair" }, {
+      messages: [],
+      toolCallId: "t1",
+    } as never);
+    const rerankArgs = mocks.rerank.mock.calls[0][0];
+    // candidateTexts must come from metadata.text — the pre-fix bug used
+    // `${chunk_type}:${id}` which destroyed Cohere's signal entirely.
+    expect(rerankArgs.candidateTexts["p1#parent"]).toContain("walnut");
+    expect(rerankArgs.candidateTexts["p1#parent"]).not.toMatch(/^parent:/);
+  });
+
+  it("threads conversation history into understandQuery for anaphora resolution", async () => {
+    // Spec §4 step [2]: query understanding needs the last few turns to
+    // resolve "the blue one"-style references. Regression for the
+    // history=[] hardcode that lived in this tool before 2026-04-26.
+    await semanticSearchTool.execute({ query: "show me more like that" }, {
+      messages: [
+        { role: "user", content: "I want a walnut sofa" },
+        { role: "assistant", content: "Here are walnut sofas under $1500." },
+      ],
+      toolCallId: "t1",
+    } as never);
+    const args = mocks.understand.mock.calls.at(-1)?.[0];
+    expect(args.history).toHaveLength(2);
+    expect(args.history[0]).toEqual({
+      role: "user",
+      content: "I want a walnut sofa",
+    });
+    expect(args.history[1].role).toBe("assistant");
+  });
+
+  it("ignores non-string content parts and clamps history to the recent window", async () => {
+    const longHistory = Array.from({ length: 20 }, (_, i) => ({
+      role: i % 2 === 0 ? "user" : "assistant",
+      content: `turn-${i}`,
+    }));
+    await semanticSearchTool.execute({ query: "anything" }, {
+      messages: longHistory,
+      toolCallId: "t1",
+    } as never);
+    const args = mocks.understand.mock.calls.at(-1)?.[0];
+    // HISTORY_TURNS_FOR_REWRITE = 6; only the last 6 turns enter the rewrite.
+    expect(args.history.length).toBeLessThanOrEqual(6);
+    expect(args.history.at(-1).content).toBe("turn-19");
+  });
+
+  it("falls back to chunk-id stub when metadata.text is missing (pre-reindex safety)", async () => {
+    mocks.retrieve.mockResolvedValueOnce([
+      {
+        id: "p9#description",
+        score: 0.7,
+        productId: "p9",
+        chunkType: "description",
+        metadata: { product_id: "p9", chunk_type: "description" }, // no text
+      },
+    ]);
+    mocks.rerank.mockResolvedValueOnce([
+      {
+        id: "p9#description",
+        score: 0.8,
+        productId: "p9",
+        chunkType: "description",
+        metadata: { product_id: "p9", chunk_type: "description" },
+      },
+    ]);
+    mocks.hydrate.mockResolvedValueOnce({
+      p9: {
+        id: "p9",
+        slug: "x",
+        name: "X",
+        oneLine: "x.",
+        price: 100,
+        priceFormatted: "$100",
+        keyMaterials: "oak",
+        stockStatus: "in_stock",
+        imageUrl: null,
+        productUrl: "/products/x",
+      },
+    });
+    const out = await semanticSearchTool.execute({ query: "x" }, {
+      messages: [],
+      toolCallId: "t1",
+    } as never);
+    expect(out.found).toBe(true);
+    const rerankArgs = mocks.rerank.mock.calls.at(-1)?.[0];
+    expect(rerankArgs.candidateTexts["p9#description"]).toMatch(
+      /^description:p9#description$/,
+    );
   });
 });

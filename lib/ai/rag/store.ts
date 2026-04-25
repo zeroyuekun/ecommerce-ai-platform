@@ -25,6 +25,15 @@ export interface ChunkMetadata {
   price?: number;
   product_id: string;
   ships_to_au?: boolean;
+  /**
+   * The chunk's text content. Stored on the record so the reranker can
+   * receive real document text rather than chunk IDs (regression fix for
+   * C3, 2026-04-25). Optional so vectors indexed before that fix continue
+   * to work — the reranker falls back to a less informative score path
+   * when this is missing. Pinecone metadata cap is 40KB/record; chunk
+   * text is bounded by the chunker design (<2KB in practice).
+   */
+  text?: string;
 }
 
 export interface ChunkRecord {

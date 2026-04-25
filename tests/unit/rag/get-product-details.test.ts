@@ -62,4 +62,33 @@ describe("getProductDetailsTool", () => {
     expect((out as { found: boolean }).found).toBe(false);
     expect((out as { product: null }).product).toBeNull();
   });
+
+  it("drops the payload with a notice when the description blows the 500-token cap (spec §7)", async () => {
+    // Oversized description (~6000 chars ≈ 1500 tokens) — must not silently
+    // ship to the LLM and trash the per-turn token budget.
+    mockFetch.mockResolvedValueOnce({
+      data: {
+        _id: "p_002",
+        name: "Verbose Wardrobe",
+        slug: { current: "verbose-wardrobe" },
+        description: "lorem ipsum ".repeat(500),
+        price: 1999,
+        category: { title: "Bedroom", slug: { current: "bedroom" } },
+        material: "wood",
+        color: "oak",
+        dimensions: "200cm x 60cm x 220cm",
+        stock: 2,
+        featured: false,
+        assemblyRequired: true,
+        image: { asset: { url: "https://cdn/x.jpg" } },
+      },
+    });
+    const out = (await getProductDetailsTool.execute?.(
+      { productSlug: "verbose-wardrobe" },
+      { messages: [], toolCallId: "t1" } as never,
+    )) as ToolResult;
+    expect((out as { found: boolean }).found).toBe(false);
+    expect((out as { product: null }).product).toBeNull();
+    expect((out as { message?: string }).message).toBeTruthy();
+  });
 });

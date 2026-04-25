@@ -11,7 +11,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 // Types
@@ -92,9 +92,16 @@ export async function createCheckoutSession(
       return { success: false, error: validationErrors.join(". ") };
     }
 
-    // 5. Create Stripe line items with validated prices
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-      validatedItems.map(({ product, quantity }) => ({
+    // 5. Create Stripe line items with validated prices.
+    // Stripe v22 flattened the SessionCreateParams namespace into a type
+    // alias (no longer a namespace); use indexed access on the params type
+    // to recover the LineItem element type without depending on internal
+    // module paths.
+    type LineItem = NonNullable<
+      Stripe.Checkout.SessionCreateParams["line_items"]
+    >[number];
+    const lineItems: LineItem[] = validatedItems.map(
+      ({ product, quantity }) => ({
         price_data: {
           currency: "aud",
           product_data: {
@@ -107,7 +114,8 @@ export async function createCheckoutSession(
           unit_amount: Math.round((product.price ?? 0) * 100), // Convert to pence
         },
         quantity,
-      }));
+      }),
+    );
 
     // 6. Get or create Stripe customer
     const userEmail = user.emailAddresses[0]?.emailAddress ?? "";

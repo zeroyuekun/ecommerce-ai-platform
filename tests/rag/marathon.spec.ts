@@ -33,7 +33,6 @@ describe.runIf(LIVE)("Marathon multi-turn dialogues", () => {
           .join(" | ")
           .slice(0, 4000),
         tokensSaved: 0,
-        preserved: msgs.slice(-6),
       });
 
       let history: ContextMessage[] = [];

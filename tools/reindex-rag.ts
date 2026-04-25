@@ -45,11 +45,30 @@ interface CliArgs {
   since?: string;
 }
 
-function buildExtras(args: CliArgs): string {
+interface ExtrasResult {
+  clause: string;
+  params: Record<string, string>;
+}
+
+/**
+ * Build the GROQ filter extension and params separately so user-provided
+ * CLI arguments are parameterised (`$slug`, `$since`) rather than spliced
+ * into the query string. A slug containing `"` or `\` would otherwise
+ * break out of the literal — small blast radius (developer CLI), but
+ * literal interpolation has no upside.
+ */
+function buildExtras(args: CliArgs): ExtrasResult {
   const parts: string[] = [];
-  if (args.slug) parts.push(`&& slug.current == "${args.slug}"`);
-  if (args.since) parts.push(`&& _updatedAt >= "${args.since}"`);
-  return parts.join(" ");
+  const params: Record<string, string> = {};
+  if (args.slug) {
+    parts.push("&& slug.current == $slug");
+    params.slug = args.slug;
+  }
+  if (args.since) {
+    parts.push("&& _updatedAt >= $since");
+    params.since = args.since;
+  }
+  return { clause: parts.join(" "), params };
 }
 
 function parseArgs(): CliArgs {
@@ -84,9 +103,9 @@ function toChunkable(p: SanityProduct): ChunkableProduct {
 
 async function main(): Promise<void> {
   const args = parseArgs();
-  const extra = buildExtras(args);
-  const query = QUERY.replace("$extra", extra);
-  const products = (await client.fetch<SanityProduct[]>(query)) ?? [];
+  const { clause, params } = buildExtras(args);
+  const query = QUERY.replace("$extra", clause);
+  const products = (await client.fetch<SanityProduct[]>(query, params)) ?? [];
   console.log(`[reindex] fetched ${products.length} product(s)`);
 
   if (products.length === 0) {

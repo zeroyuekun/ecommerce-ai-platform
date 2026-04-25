@@ -15,14 +15,15 @@ vi.mock("@/lib/ai/tools/semantic-search-hydrate", () => ({
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
 
 describe("createShoppingAgent — RAG flag wiring", () => {
-  const original = process.env.RAG_ENABLED;
+  // vi.stubEnv records the prior value; vi.unstubAllEnvs restores it. Avoids
+  // the manual save-and-restore pattern and cleans up correctly even if a
+  // test throws mid-assertion.
   afterEach(() => {
-    if (original === undefined) delete process.env.RAG_ENABLED;
-    else process.env.RAG_ENABLED = original;
+    vi.unstubAllEnvs();
   });
 
-  it("does NOT expose RAG tools when flag is off", () => {
-    delete process.env.RAG_ENABLED;
+  it("exposes only the legacy keyword tool when RAG flag is off", () => {
+    vi.stubEnv("RAG_ENABLED", "");
     const agent = createShoppingAgent({ userId: null });
     const toolNames = Object.keys(agent.tools);
     expect(toolNames).toEqual(
@@ -33,23 +34,27 @@ describe("createShoppingAgent — RAG flag wiring", () => {
     expect(toolNames).not.toContain("filterSearch");
   });
 
-  it("DOES expose RAG tools when flag is on", () => {
-    process.env.RAG_ENABLED = "true";
+  it("REMOVES legacy searchProducts and exposes only RAG tools when flag is on (C4)", () => {
+    // Regression for C4 (2026-04-25): the legacy `searchProducts` tool used
+    // to coexist with the new RAG tools, leaking price/dimensions/stock
+    // straight to the LLM and bypassing the getProductDetails-only-truth
+    // guardrail. The new contract: when RAG is on, searchProducts is gone.
+    vi.stubEnv("RAG_ENABLED", "true");
     const agent = createShoppingAgent({ userId: null });
     const toolNames = Object.keys(agent.tools);
     expect(toolNames).toEqual(
       expect.arrayContaining([
-        "searchProducts",
-        "addToCart",
+        "filterSearch",
         "semanticSearch",
         "getProductDetails",
-        "filterSearch",
+        "addToCart",
       ]),
     );
+    expect(toolNames).not.toContain("searchProducts");
   });
 
   it("includes getMyOrders only when authenticated", () => {
-    process.env.RAG_ENABLED = "true";
+    vi.stubEnv("RAG_ENABLED", "true");
     const guest = createShoppingAgent({ userId: null });
     const member = createShoppingAgent({ userId: "user_123" });
     expect(Object.keys(guest.tools)).not.toContain("getMyOrders");

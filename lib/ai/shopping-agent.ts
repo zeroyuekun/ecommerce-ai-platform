@@ -261,28 +261,63 @@ The user is not signed in. If they ask about orders, politely let them know they
 
 const ragInstructions = `
 
-## RAG tooling (when enabled)
-- For open-ended descriptive queries (style, vibe, room context, use-case), call **semanticSearch**.
-- For queries that are pure constraint combinations (price, material, category), call **filterSearch**.
-- Before quoting any specific dimension, price, stock count, or shipping detail, call **getProductDetails(slug)** for that exact product. Never quote numbers from search results — they are summaries, not the source of truth.
+## CRITICAL — Search tool override (RAG mode)
+
+The "## searchProducts Tool Usage" section above documents parameter schemas
+and behavioural rules. In RAG mode the tool named \`searchProducts\` is
+**unavailable**. Apply those same parameter rules to the new tools below.
+
+### Tools available in this mode
+
+- **filterSearch(query, category, material, color, minPrice, maxPrice)** —
+  same parameters as the documented searchProducts. Use for hard-constraint
+  queries: "oak coffee tables under $400", "everything in walnut".
+- **semanticSearch(query, filters?)** — natural-language style/vibe/use-case
+  queries: "cozy reading nook", "minimalist Japandi for a 12m² bedroom".
+- **getProductDetails(slug)** — the only authoritative source for price,
+  dimensions, and exact stock count.
+
+### Contract changes from the legacy tool
+
+filterSearch and semanticSearch deliberately return SUMMARIES ONLY. Their
+results do NOT include \`price\`, \`priceFormatted\`, \`dimensions\`,
+\`stockCount\`, or \`stockMessage\`. They include \`stockStatus\` (a coarse
+"in_stock" / "low_stock" / "out_of_stock" badge) which you may use for
+availability cues only.
+
+### Hard rules
+
+1. Before quoting ANY price, dimension, or exact stock count to the
+   customer, you MUST call **getProductDetails(slug)** for that exact
+   product in the current turn — even if you just retrieved it via search.
+2. Before calling **addToCart**, you MUST call **getProductDetails** for
+   that product first so you can confirm the current price.
+3. The presentation style in the section above still applies, but OMIT
+   prices/dimensions in the initial result list. Add them only after a
+   getProductDetails call.
+
+### Decision rule
+
+- "Show me oak coffee tables under $400" → filterSearch
+- "Something cozy for a small reading corner" → semanticSearch
+- "How much is the Osaka Buffet?" → getProductDetails (no re-search)
+- "Add the Osaka Buffet to my cart" → getProductDetails, then addToCart
 `;
 
 /**
  * Creates a shopping agent with tools based on user authentication status
+ * and the RAG feature flag.
+ *
+ * RAG mode (RAG_ENABLED=true) — the legacy `searchProducts` tool is
+ * REMOVED and replaced by `filterSearch` (stripped-payload), `semanticSearch`
+ * (vector retrieval), and `getProductDetails` (authoritative truth). This
+ * is the cutover spec'd in §7 of the RAG design doc — the two tools must
+ * not coexist or the LLM gets conflicting guidance and may bypass the
+ * anti-hallucination guardrail.
  */
 export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
   const isAuthenticated = !!userId;
-
-  // Build RAG tools conditionally based on the feature flag.
-  // semanticSearchTool uses a custom concrete execute type; cast to Tool for
-  // compatibility with the Record<string, Tool> tools map.
-  const ragTools: Record<string, Tool> = isRagEnabled()
-    ? {
-        semanticSearch: semanticSearchTool as unknown as Tool,
-        filterSearch: filterSearchTool,
-        getProductDetails: getProductDetailsTool,
-      }
-    : {};
+  const ragOn = isRagEnabled();
 
   // Build instructions based on authentication and RAG flag
   const authInstructions = isAuthenticated
@@ -290,19 +325,29 @@ export function createShoppingAgent({ userId }: ShoppingAgentOptions) {
     : notAuthenticatedInstructions;
 
   const instructions =
-    baseInstructions +
-    authInstructions +
-    (isRagEnabled() ? ragInstructions : "");
+    baseInstructions + authInstructions + (ragOn ? ragInstructions : "");
 
-  // Build tools - only include orders tool if authenticated
+  // Build the tools map. In RAG mode the legacy searchProducts is removed
+  // entirely — filterSearch is the keyword-search replacement and returns
+  // a stripped payload to keep numeric truth flowing only through
+  // getProductDetails.
+  // Both filterSearch and semanticSearch use a concrete (non-streaming)
+  // execute signature for stronger callsite typing, which is narrower than
+  // the AI SDK's general Tool union — cast at registration to satisfy the
+  // Record<string, Tool> shape.
+  const tools: Record<string, Tool> = ragOn
+    ? {
+        filterSearch: filterSearchTool as unknown as Tool,
+        semanticSearch: semanticSearchTool as unknown as Tool,
+        getProductDetails: getProductDetailsTool,
+        addToCart: addToCartTool,
+      }
+    : {
+        searchProducts: searchProductsTool,
+        addToCart: addToCartTool,
+      };
+
   const getMyOrdersTool = createGetMyOrdersTool(userId);
-
-  const tools: Record<string, Tool> = {
-    searchProducts: searchProductsTool,
-    addToCart: addToCartTool,
-    ...ragTools,
-  };
-
   if (getMyOrdersTool) {
     tools.getMyOrders = getMyOrdersTool;
   }

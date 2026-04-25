@@ -85,4 +85,23 @@ describe("indexProduct", () => {
     const result = await indexProduct(product, { qaGenerator: failingGen });
     expect(result.chunksIndexed).toBe(4);
   });
+
+  it("persists chunk text in Pinecone metadata so the reranker has real content (C3)", async () => {
+    await indexProduct(product, { qaGenerator: mockGenerator });
+    const records = mockUpsert.mock.calls[0][0] as Array<{
+      id: string;
+      metadata: { text?: string; chunk_type: string };
+    }>;
+    // Every record carries a non-empty text field.
+    for (const r of records) {
+      expect(typeof r.metadata.text).toBe("string");
+      expect((r.metadata.text ?? "").length).toBeGreaterThan(0);
+      // And it always begins with the product name (chunker convention).
+      expect(r.metadata.text).toContain("Nordic Grey 3-Seater Sofa");
+    }
+    // Defensive cap: nothing exceeds 8KB.
+    for (const r of records) {
+      expect((r.metadata.text ?? "").length).toBeLessThanOrEqual(8000);
+    }
+  });
 });
