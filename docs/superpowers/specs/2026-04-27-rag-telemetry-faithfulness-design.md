@@ -394,3 +394,61 @@ The three decisions in this spec where I'd most expect a reviewer to push back, 
 - Should the heuristic also score *citation correctness* (i.e., the answer mentions a product that didn't actually score in the top-5)? Useful, but redundant with the answer-attribution telemetry once §3's `picked.productIds` are logged. Defer.
 - When (if ever) to flip `FAITHFULNESS_BACKEND=llm`? Trigger: heuristic plateaus at >0.95 for 2+ weeks despite real production complaints. Until then, no.
 - Cost defense for the deployed Sonnet chatbot. Existing protections (Clerk auth required + 20 req/min/user via `lib/ai/rate-limit.ts`) cap burst abuse; the residual gap is a single authenticated user sustaining 20 RPM for hours (~$24/hour). A per-user daily cap (~100 turns/day) closes the sustained-abuse window for ~15 lines on top of `chatRateLimiter`. Out of scope for Phase 1.6; tracked as a separate small spec (`rag-cost-defense`).
+
+---
+
+## Appendix A — No-LLM baseline (2026-04-28)
+
+**Why this appendix exists.** The Phase 1.6 ship gate is a faithfulness floor of 0.85 measured by the heuristic checker on the 50-case golden set, with the agent-driven eval (`pnpm eval:rag --yes`). When the baseline run was attempted, the Vercel AI Gateway free tier returned `GatewayRateLimitError 429` on the agent's Sonnet hop and the run could not complete without paid credits. The retrieval pipeline (Pinecone + Cohere) is on free tiers and *can* be exercised end-to-end at $0; only the agent-reasoning step is gated.
+
+To unblock baselining the *retrieval* half of the system, `tools/rag-eval-cheap.ts` (`pnpm eval:rag-cheap`) was added: it drives the same `understand → retrieve → rerank` pipeline the production agent uses, but swaps the Haiku-backed query-understanding pass for a stub that passes the raw query straight through (no rewrite, no HyDE, no filter extraction). All retrieval metrics are therefore **real** on the full 50-case set. Faithfulness in this mode is a wiring check (synthesizes an answer from the top-3 candidate chunks → score ≈ 1.0 by construction) and is not the Phase 1.6 ship-gate signal.
+
+### Run
+
+```
+$ pnpm eval:rag-cheap
+
+==== RAG eval (no-LLM) ====
+queries:           50
+refusal-bucket:    9 (skipped from recall mean — agent required)
+recall@1:          0.669
+recall@5:          0.894
+recall@10:         0.894
+MRR:               0.884
+NDCG@10:           0.855
+faithfulness:      0.995 (synthetic answer)
+p50 latency ms:    581
+p95 latency ms:    843
+
+---- per bucket ----
+aesthetic            n= 3  recall@5=1.000
+ambiguous-routing    n= 5  recall@5=1.000
+multi-constraint     n=10  recall@5=1.000
+out-of-vocabulary    n= 5  recall@5=n/a    (refusals — agent required)
+specific             n=12  recall@5=1.000
+synonym              n=10  recall@5=0.722
+vague-style          n= 5  recall@5=0.467
+```
+
+### Reading the numbers
+
+- **`specific` / `aesthetic` / `multi-constraint` / `ambiguous-routing` at perfect 1.000** — Pinecone's multilingual-e5-large embedding is strong on direct lexical / aesthetic cues and on queries with explicit constraints (material, color, price). The reranker holds the right product in the top-5 with no help from query rewriting.
+- **`synonym` at 0.722** — the harder synonym cases are the ones where the user's word choice doesn't share many tokens with the catalog text (e.g. "credenza" vs. "buffet"). HyDE specifically targets this gap by generating a hypothetical answer using catalog vocabulary; the no-LLM run confirms it's the right gap to invest in.
+- **`vague-style` at 0.467** — short, atmosphere-only queries ("japandi vibe", "scandi minimal") have the least lexical overlap with product specs. HyDE plus filter extraction (the agent inferring a category/material/style from context) are both expected to help here. This is the bucket Phase 1.7+ should still keep an eye on.
+- **`out-of-vocabulary` (n=9) skipped from recall mean** — these are intentional refusal probes ("treadmill", "lawnmower"); retrieval always returns 30 candidates, so recall@k is 0 by construction without an agent that can refuse.
+
+### What this baseline proves and does not prove
+
+**Proven at $0:**
+- Eval harness wiring is intact end-to-end on 50 cases (read → retrieve → rerank → score).
+- Retrieval recall on the full set: the Phase 1 headline (recall@5 = 1.000 on 15 cases) re-baselines to **0.894 on 41 non-refusal cases** of the harder set. Specific/aesthetic/multi-constraint/ambiguous-routing remain perfect; the gap is concentrated in `synonym` and `vague-style`.
+- Per-bucket signal is sharp enough to direct Phase 1.7 work without paying for a single LLM call.
+- Latency profile: p50 = 581 ms, p95 = 843 ms — well inside the 2000 ms budget for retrieve+rerank.
+
+**Not proven by this run (still requires `pnpm eval:rag --yes` once credits are available):**
+- The agent's prompt picks the right tool per query (router accuracy).
+- The agent's answer is faithful to the retrieved chunks — the heuristic floor of 0.85 is the ship gate, and the synthesized answer in this run can't drive it.
+- Filter F1 — the no-LLM stub doesn't extract filters, so the filter-precision metric is undefined here.
+- HyDE's actual lift — confirmed where to look (`synonym` and `vague-style`), but the agent run is what measures it.
+
+The full agent-driven run replaces this appendix with Appendix B once the gateway block is cleared.

@@ -197,7 +197,11 @@ Phase 1 left two named gaps: no per-query observability into what retrieval pick
 
 **Production reindex (2026-04-28).** Discovered during verification that the production Pinecone namespace predated the 2026-04-25 C3 fix that puts chunk text in `metadata.text` — every retrieved candidate's `text` field was the placeholder `${chunkType}:${id}`. Added `pnpm reindex:rag --no-qa` flag (skips the Haiku-backed synthetic-Q&A pass) so chunk text could be refreshed at $0. Ran on all 57 products, 0 failures. Faithfulness on the truthful verify case immediately rose 0.000 → 0.750. Synthetic-Q&A chunks will backfill on the next full re-index.
 
-**Honest carry-forward.** T10 smoke run + T18 baseline-appendix paste **remain pending** on the gateway free-tier abuse block. The first eval trace fires clean (proving infra is correct); the agent's Sonnet hop returns 429. Resolution is paid credits. Documented in CHANGELOG with the exact unblock command (`pnpm eval:rag --yes`).
+**No-LLM retrieval baseline (`pnpm eval:rag-cheap`).** Same constraint that produced `verify:rag`: drove broader infra than the spec asked for. `tools/rag-eval-cheap.ts` runs all 50 golden cases through the real `understand → retrieve → rerank` pipeline with a stub query-understanding function — same harness, same Pinecone + Cohere code paths, $0 cost, ~30s. Reports recall@1/5/10, MRR, NDCG@10, per-bucket breakdown, and a "lowest-recall non-refusal cases" diagnostic. Faithfulness in this mode is a wiring check (synthesized answer ≈ 1.0 by construction); retrieval metrics are real on the full set. Captured as **Appendix A** in the Phase 1.6 spec.
+
+**Baseline numbers (2026-04-28).** Recall@5 = **0.894** across 41 non-refusal cases (recall@1 = 0.669, MRR = 0.884, NDCG@10 = 0.855, p50 latency 581 ms). `specific` / `aesthetic` / `multi-constraint` / `ambiguous-routing` all at perfect 1.000 — Pinecone's multilingual-e5-large is strong on direct cues and explicit constraints. The gap is concentrated in `synonym` (0.722) and `vague-style` (0.467), which is exactly where HyDE — temporarily off in this stub run — should help. The number directs Phase 1.7 work without paying for a single LLM call.
+
+**Honest carry-forward.** T10 smoke run + T18 final-appendix paste **remain pending** on the gateway free-tier abuse block. The first eval trace fires clean (proving infra is correct); the agent's Sonnet hop returns 429. Resolution is paid credits. Documented in CHANGELOG with the exact unblock command (`pnpm eval:rag --yes`). The no-LLM baseline above already proves the harness wiring + retrieval quality on the full 50-case set.
 
 **Why this stage matters.** Phase 1.6 is the discipline of going back to close named gaps instead of moving on to the next feature. The cost-free verify path, the reindex `--no-qa` flag, and the two heuristic substring fixes were all reactions to the gateway block — they wouldn't have existed if credits had been there. Constraint-driven engineering produces broader infra than the original spec asked for.
 
@@ -527,6 +531,7 @@ pnpm build                      # Next.js production build
 pnpm test:e2e                   # Playwright (needs real Sanity / Clerk / Stripe creds)
 pnpm test:rag                   # RAG_LIVE_TESTS=1 — runs eval / marathon / adversarial
 pnpm eval:rag                   # CLI eval against the golden set (~$0.15, on-demand)
+pnpm eval:rag-cheap             # No-LLM retrieval baseline on 50 cases (Pinecone only, $0)
 pnpm verify:rag                 # Cost-free Phase 1.6 verification (Pinecone only, $0)
 pnpm trace:tail                 # Inspect .tmp/rag-traces.jsonl with --bucket / --since
 pnpm reindex:rag                # Bulk reindex from Sanity (uses Haiku for synthetic Q&A)
