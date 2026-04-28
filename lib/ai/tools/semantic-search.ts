@@ -126,6 +126,8 @@ const _semanticSearchTool = tool({
       builder.setUnderstand({
         rewritten: understanding.rewritten,
         hyde: understanding.hyde,
+        // QueryFilters is a narrow concrete type; trace.understand.filters is
+        // deliberately wide (Record<string, unknown>) for forward compatibility.
         filters: understanding.filters as Record<string, unknown>,
         fellBack: understanding.fellBack,
         durationMs: Date.now() - tUnderstand,
@@ -236,6 +238,8 @@ const _semanticSearchTool = tool({
         message: capped.notice ?? null,
       };
     } finally {
+      // Fire-and-forget by design: emitTrace handles its own errors via
+      // captureException, so trace failures never surface to the chat path.
       void emitTrace(builder.build());
     }
   },

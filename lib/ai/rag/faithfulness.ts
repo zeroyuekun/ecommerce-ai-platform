@@ -165,9 +165,10 @@ export async function checkFaithfulnessLLM(
 }
 
 /**
- * Default-export: dispatches to heuristic or LLM based on
- * FAITHFULNESS_BACKEND. The async signature is preserved so call sites
- * (eval harness) stay identical across the upgrade.
+ * Public dispatcher: routes to heuristic or LLM based on
+ * `FAITHFULNESS_BACKEND` (default = heuristic; "llm" = stub). The async
+ * signature is preserved so call sites (eval harness) stay identical
+ * across the upgrade.
  */
 export async function checkFaithfulness(
   input: CheckFaithfulnessInput,
