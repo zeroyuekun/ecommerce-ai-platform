@@ -136,5 +136,114 @@
     "expectedFilters": { "category": "living-room", "material": "fabric" },
     "expectedRefusal": false,
     "notes": "Boucle Occasional Chair - Beige"
+  },
+  {
+    "id": "g_synonym_01",
+    "bucket": "synonym",
+    "query": "nightstand for a small bedroom",
+    "expectedProductIds": [
+      "product-blair-bedside-table",
+      "product-osaka-bedside-table",
+      "product-maisie-bedside-table",
+      "product-maisie-bedside-table-pink",
+      "b7a174ce-064c-42ab-a1bf-6d90169d3efe",
+      "5ec1acd4-dcc4-441e-8329-06bd8bbee69c"
+    ],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'bedside table'; query uses synonym 'nightstand'. Six bedsides available."
+  },
+  {
+    "id": "g_synonym_02",
+    "bucket": "synonym",
+    "query": "comfy couch for the patio",
+    "expectedProductIds": ["0dcced62-6073-45d4-b11c-211ded717b8a"],
+    "expectedFilters": { "category": "outdoor" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'sofa'; query uses synonym 'couch'. Sorrento Outdoor 3-seater is the only patio sofa."
+  },
+  {
+    "id": "g_synonym_03",
+    "bucket": "synonym",
+    "query": "carpet for the living room",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "living-room" },
+    "expectedRefusal": true,
+    "notes": "Catalog uses 'rug' as a category but stocks none — and 'carpet' is the synonym probe. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_04",
+    "bucket": "synonym",
+    "query": "task lamp for my desk",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "lighting-decor" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'desk lamp'. Catalog has no lamps in lighting-decor — only Lena mirror. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_05",
+    "bucket": "synonym",
+    "query": "loveseat in beige",
+    "expectedProductIds": ["6252e463-7b7a-4ef3-86a9-9b9b09dc3d13"],
+    "expectedFilters": {},
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'two-seater'; 'loveseat' is the synonym. Mini Roo Two Seater is the only match. 'beige' is out-of-vocab for COLOR_VALUES so no filter extraction expected."
+  },
+  {
+    "id": "g_synonym_06",
+    "bucket": "synonym",
+    "query": "wardrobe for hanging clothes",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'armoire'. Catalog has no wardrobes (Aspen 3-piece is storage, not a wardrobe). Agent should refuse."
+  },
+  {
+    "id": "g_synonym_07",
+    "bucket": "synonym",
+    "query": "ottoman for the living room",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "living-room" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'footstool'. No ottomans in catalog. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_08",
+    "bucket": "synonym",
+    "query": "drinks cabinet in walnut",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'buffet'; query uses synonym 'cabinet'. Two walnut buffets available."
+  },
+  {
+    "id": "g_synonym_09",
+    "bucket": "synonym",
+    "query": "study chair for a teenage room",
+    "expectedProductIds": [
+      "product-amour-desk-chair",
+      "product-asher-rattan-chair",
+      "product-luca-chrome-chair",
+      "product-nolan-chair-olive"
+    ],
+    "expectedFilters": { "category": "office-storage" },
+    "expectedRefusal": false,
+    "notes": "'study chair' is a synonym for 'office chair'. Four office chairs available."
+  },
+  {
+    "id": "g_synonym_10",
+    "bucket": "synonym",
+    "query": "dresser for the bedroom",
+    "expectedProductIds": [
+      "product-blair-six-drawer",
+      "product-osaka-six-drawer-natural",
+      "product-osaka-six-drawer"
+    ],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": false,
+    "notes": "'dresser' is a synonym for 'six drawer'. Three available."
   }
 ]
