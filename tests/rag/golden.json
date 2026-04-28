@@ -245,5 +245,107 @@
     "expectedFilters": { "category": "bedroom" },
     "expectedRefusal": false,
     "notes": "'dresser' is a synonym for 'six drawer'. Three available."
+  },
+  {
+    "id": "g_multi_01",
+    "bucket": "multi-constraint",
+    "query": "natural wood queen bed under $700",
+    "expectedProductIds": ["dd845ff5-be1c-4be0-add9-6cf33b5b5776"],
+    "expectedFilters": { "category": "bedroom", "color": "natural", "material": "wood", "maxPrice": 700 },
+    "expectedRefusal": false,
+    "notes": "Four constraints: category, color, material, price ceiling. Quinn Queen Bed - Natural at $699.99 is the only match."
+  },
+  {
+    "id": "g_multi_02",
+    "bucket": "multi-constraint",
+    "query": "outdoor dining table for 4 under $300",
+    "expectedProductIds": ["f1e63d21-0edc-4c74-b11e-84635da145a3"],
+    "expectedFilters": { "category": "outdoor", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "Category + price + seat-count. Ravello Outdoor Four Seater Dining Table - Beige at $249.99."
+  },
+  {
+    "id": "g_multi_03",
+    "bucket": "multi-constraint",
+    "query": "walnut buffet under $500",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut", "maxPrice": 500 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Deven ($499.99) and Osaka Walnut ($469.99) both qualify."
+  },
+  {
+    "id": "g_multi_04",
+    "bucket": "multi-constraint",
+    "query": "white desk under $300",
+    "expectedProductIds": [
+      "43a175bf-0805-4c81-bdf6-e03828a5342b",
+      "product-maisie-desk-white"
+    ],
+    "expectedFilters": { "color": "white", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Urban Desk ($249.99) and Maisie White Desk ($269.99) qualify; Aspen Desk ($314.99) is over."
+  },
+  {
+    "id": "g_multi_05",
+    "bucket": "multi-constraint",
+    "query": "round dining table in natural wood under $500",
+    "expectedProductIds": [
+      "product-kyoto-dining-table",
+      "90f1be95-f86a-4587-8b2a-0414fc868437"
+    ],
+    "expectedFilters": { "category": "dining-room", "color": "natural", "material": "wood", "maxPrice": 500 },
+    "expectedRefusal": false,
+    "notes": "Category + color + material + price + shape ('round'). Kyoto ($249.99) and Ora ($449.99) both round and natural wood."
+  },
+  {
+    "id": "g_multi_06",
+    "bucket": "multi-constraint",
+    "query": "fabric office chair under $150",
+    "expectedProductIds": [
+      "product-amour-desk-chair",
+      "product-nolan-chair-olive"
+    ],
+    "expectedFilters": { "category": "office-storage", "material": "fabric", "maxPrice": 150 },
+    "expectedRefusal": false,
+    "notes": "Category + material + price. Amour ($74.99) and Nolan Olive ($139.99) qualify."
+  },
+  {
+    "id": "g_multi_07",
+    "bucket": "multi-constraint",
+    "query": "outdoor sofa with metal frame",
+    "expectedProductIds": ["0dcced62-6073-45d4-b11c-211ded717b8a"],
+    "expectedFilters": { "category": "outdoor", "material": "metal" },
+    "expectedRefusal": false,
+    "notes": "Category + material. Sorrento Outdoor 3-Seater Sofa is the only outdoor sofa, and it's metal."
+  },
+  {
+    "id": "g_multi_08",
+    "bucket": "multi-constraint",
+    "query": "white entertainment unit under $400",
+    "expectedProductIds": ["product-sadie-entertainment-unit"],
+    "expectedFilters": { "category": "living-room", "color": "white", "maxPrice": 400 },
+    "expectedRefusal": false,
+    "notes": "Category + color + price + product-class. Sadie ($373.99) qualifies; Canyon Large is natural and over $500."
+  },
+  {
+    "id": "g_multi_09",
+    "bucket": "multi-constraint",
+    "query": "leather two seater for kids",
+    "expectedProductIds": ["6252e463-7b7a-4ef3-86a9-9b9b09dc3d13"],
+    "expectedFilters": { "material": "leather" },
+    "expectedRefusal": false,
+    "notes": "Material + audience hint. Mini Roo + Mini Moo Two Seater is the only leather product. Category not added (Mini Roo is in furniture-sets, agent might extract 'kids' which would over-filter)."
+  },
+  {
+    "id": "g_multi_10",
+    "bucket": "multi-constraint",
+    "query": "oak shelf under $200",
+    "expectedProductIds": ["product-eden-corner-shelf"],
+    "expectedFilters": { "color": "oak", "maxPrice": 200 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Eden Corner Shelf ($149.99) qualifies; Eden Tall ($249.99) is over."
   }
 ]
