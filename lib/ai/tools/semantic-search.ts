@@ -9,8 +9,6 @@
  */
 import { tool } from "ai";
 import { z } from "zod";
-import { emitTrace, TraceBuilder } from "@/lib/ai/rag/trace";
-import { redactPII } from "@/lib/monitoring";
 import { formatToolResult } from "@/lib/ai/rag/format";
 import type { FormattedProduct } from "@/lib/ai/rag/query/format";
 import { formatPipelineResults } from "@/lib/ai/rag/query/format";
@@ -21,7 +19,9 @@ import {
   haikuUnderstandingFn,
   understandQuery,
 } from "@/lib/ai/rag/query/understand";
+import { emitTrace, TraceBuilder } from "@/lib/ai/rag/trace";
 import { hydrateProductSummaries } from "@/lib/ai/tools/semantic-search-hydrate";
+import { redactPII } from "@/lib/monitoring";
 
 export type SemanticSearchResult = {
   found: boolean;
@@ -143,18 +143,18 @@ const _semanticSearchTool = tool({
       };
 
       const tRetrieve = Date.now();
-      let candidates;
-      try {
-        candidates = await retrieve({
-          rewritten: understanding.rewritten,
-          hyde: understanding.hyde,
-          filters: mergedFilters,
-          topK: TOP_K_RETRIEVE,
-        });
-      } catch (err) {
-        builder.setError("retrieve", err instanceof Error ? err.message : String(err));
+      const candidates = await retrieve({
+        rewritten: understanding.rewritten,
+        hyde: understanding.hyde,
+        filters: mergedFilters,
+        topK: TOP_K_RETRIEVE,
+      }).catch((err: unknown) => {
+        builder.setError(
+          "retrieve",
+          err instanceof Error ? err.message : String(err),
+        );
         throw err;
-      }
+      });
       builder.setRetrieve({
         topK: TOP_K_RETRIEVE,
         candidateCount: candidates.length,
@@ -169,7 +169,12 @@ const _semanticSearchTool = tool({
       });
 
       if (candidates.length === 0) {
-        builder.setRerank({ backend: "fallback", topN: 0, results: [], durationMs: 0 });
+        builder.setRerank({
+          backend: "fallback",
+          topN: 0,
+          results: [],
+          durationMs: 0,
+        });
         builder.setPicked({ productIds: [] });
         return {
           found: false,
@@ -187,25 +192,26 @@ const _semanticSearchTool = tool({
       );
 
       const tRerank = Date.now();
-      let reranked;
-      try {
-        reranked = await rerankAndDedupe({
-          query: understanding.rewritten,
-          candidates,
-          candidateTexts,
-          topNAfterRerank: TOP_N_RERANK,
-          topProducts: TOP_PRODUCTS,
-        });
-      } catch (err) {
-        builder.setError("rerank", err instanceof Error ? err.message : String(err));
+      const reranked = await rerankAndDedupe({
+        query: understanding.rewritten,
+        candidates,
+        candidateTexts,
+        topNAfterRerank: TOP_N_RERANK,
+        topProducts: TOP_PRODUCTS,
+      }).catch((err: unknown) => {
+        builder.setError(
+          "rerank",
+          err instanceof Error ? err.message : String(err),
+        );
         throw err;
-      }
+      });
       const rerankBackend: "cohere" | "fallback" = process.env.COHERE_API_KEY
         ? "cohere"
         : "fallback";
       const rerankResults = reranked.map((r) => {
-        const id = (r as { chunkId?: string; productId?: string }).chunkId
-          ?? (r as { productId: string }).productId;
+        const id =
+          (r as { chunkId?: string; productId?: string }).chunkId ??
+          (r as { productId: string }).productId;
         return { id, score: r.score };
       });
       builder.setRerank({

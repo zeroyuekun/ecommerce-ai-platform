@@ -16,7 +16,10 @@ import { argv } from "node:process";
 
 const args = argv.slice(2);
 
-function flagValue(name: string, fallback: string | null = null): string | null {
+function flagValue(
+  name: string,
+  fallback: string | null = null,
+): string | null {
   const idx = args.indexOf(name);
   if (idx < 0) return fallback;
   const next = args[idx + 1];

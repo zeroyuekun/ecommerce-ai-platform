@@ -7,8 +7,8 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import type { ChunkType } from "@/lib/ai/rag/store";
-import { captureException } from "@/lib/monitoring";
 import { captureServerEvent } from "@/lib/analytics/server";
+import { captureException } from "@/lib/monitoring";
 
 export interface RetrievalTrace {
   traceId: string;
@@ -162,7 +162,10 @@ export async function emitTrace(trace: RetrievalTrace): Promise<void> {
   } catch (err) {
     captureException(err, { extra: { context: "rag.trace.serialize" } });
     // eslint-disable-next-line no-console
-    console.log("[rag.trace]", `{"error":"serialize-failed","traceId":"${trace.traceId ?? "unknown"}"}`);
+    console.log(
+      "[rag.trace]",
+      `{"error":"serialize-failed","traceId":"${trace.traceId ?? "unknown"}"}`,
+    );
     return;
   }
 
@@ -177,7 +180,7 @@ export async function emitTrace(trace: RetrievalTrace): Promise<void> {
     });
 
     if (process.env.RAG_TRACE_FILE === "1") {
-      writeTraceLine(trace, serialized);
+      writeTraceLine(serialized);
     }
 
     collector?.push(trace);
@@ -186,7 +189,7 @@ export async function emitTrace(trace: RetrievalTrace): Promise<void> {
   }
 }
 
-function writeTraceLine(trace: RetrievalTrace, serialized: string): void {
+function writeTraceLine(serialized: string): void {
   if (!existsSync(TRACE_FILE_DIR)) {
     mkdirSync(TRACE_FILE_DIR, { recursive: true });
   }

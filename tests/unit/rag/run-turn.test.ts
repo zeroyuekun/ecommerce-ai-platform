@@ -46,7 +46,13 @@ describe("runAgentTurn", () => {
         timestamp: new Date().toISOString(),
         durationMs: 1,
         query: { raw: "oak", historyTurns: 0 },
-        understand: { rewritten: "oak", hyde: null, filters: {}, fellBack: false, durationMs: 1 },
+        understand: {
+          rewritten: "oak",
+          hyde: null,
+          filters: {},
+          fellBack: false,
+          durationMs: 1,
+        },
         retrieve: {
           topK: 30,
           candidateCount: 1,

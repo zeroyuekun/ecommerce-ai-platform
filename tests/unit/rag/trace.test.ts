@@ -1,8 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { TraceBuilder, emitTrace, startCollecting, stopCollecting } from "@/lib/ai/rag/trace";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  emitTrace,
+  startCollecting,
+  stopCollecting,
+  TraceBuilder,
+} from "@/lib/ai/rag/trace";
 
 vi.mock("@/lib/analytics/server", () => ({
   captureServerEvent: vi.fn().mockResolvedValue(undefined),
@@ -88,7 +93,10 @@ describe("TraceBuilder", () => {
     expect(trace.retrieve).toMatchObject({ candidateCount: 0, candidates: [] });
     expect(trace.rerank).toMatchObject({ backend: "fallback", topN: 0 });
     expect(trace.picked).toEqual({ productIds: [] });
-    expect(trace.error).toEqual({ stage: "retrieve", message: "Pinecone timeout" });
+    expect(trace.error).toEqual({
+      stage: "retrieve",
+      message: "Pinecone timeout",
+    });
     expect(trace.traceId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 });
@@ -164,9 +172,7 @@ describe("emitTrace", () => {
     process.env.RAG_TRACE_FILE_MAX_MB = "0"; // force rotation on every write past the first
     await emitTrace(sampleTrace());
     await emitTrace(sampleTrace());
-    expect(
-      existsSync(join(tmp, ".tmp", "rag-traces.1.jsonl")),
-    ).toBe(true);
+    expect(existsSync(join(tmp, ".tmp", "rag-traces.1.jsonl"))).toBe(true);
     delete process.env.RAG_TRACE_FILE_MAX_MB;
   });
 
@@ -193,7 +199,6 @@ describe("emitTrace", () => {
   });
 
   it("swallows post-serialize sink errors without throwing", async () => {
-    const { captureException } = await import("@/lib/monitoring");
     const { captureServerEvent } = await import("@/lib/analytics/server");
     (captureServerEvent as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("posthog down"),

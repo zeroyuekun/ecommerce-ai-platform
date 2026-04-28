@@ -251,7 +251,12 @@
     "bucket": "multi-constraint",
     "query": "natural wood queen bed under $700",
     "expectedProductIds": ["dd845ff5-be1c-4be0-add9-6cf33b5b5776"],
-    "expectedFilters": { "category": "bedroom", "color": "natural", "material": "wood", "maxPrice": 700 },
+    "expectedFilters": {
+      "category": "bedroom",
+      "color": "natural",
+      "material": "wood",
+      "maxPrice": 700
+    },
     "expectedRefusal": false,
     "notes": "Four constraints: category, color, material, price ceiling. Quinn Queen Bed - Natural at $699.99 is the only match."
   },
@@ -296,7 +301,12 @@
       "product-kyoto-dining-table",
       "90f1be95-f86a-4587-8b2a-0414fc868437"
     ],
-    "expectedFilters": { "category": "dining-room", "color": "natural", "material": "wood", "maxPrice": 500 },
+    "expectedFilters": {
+      "category": "dining-room",
+      "color": "natural",
+      "material": "wood",
+      "maxPrice": 500
+    },
     "expectedRefusal": false,
     "notes": "Category + color + material + price + shape ('round'). Kyoto ($249.99) and Ora ($449.99) both round and natural wood."
   },
@@ -308,7 +318,11 @@
       "product-amour-desk-chair",
       "product-nolan-chair-olive"
     ],
-    "expectedFilters": { "category": "office-storage", "material": "fabric", "maxPrice": 150 },
+    "expectedFilters": {
+      "category": "office-storage",
+      "material": "fabric",
+      "maxPrice": 150
+    },
     "expectedRefusal": false,
     "notes": "Category + material + price. Amour ($74.99) and Nolan Olive ($139.99) qualify."
   },
@@ -326,7 +340,11 @@
     "bucket": "multi-constraint",
     "query": "white entertainment unit under $400",
     "expectedProductIds": ["product-sadie-entertainment-unit"],
-    "expectedFilters": { "category": "living-room", "color": "white", "maxPrice": 400 },
+    "expectedFilters": {
+      "category": "living-room",
+      "color": "white",
+      "maxPrice": 400
+    },
     "expectedRefusal": false,
     "notes": "Category + color + price + product-class. Sadie ($373.99) qualifies; Canyon Large is natural and over $500."
   },
@@ -472,7 +490,11 @@
       "product-avalon-dining-table",
       "90f1be95-f86a-4587-8b2a-0414fc868437"
     ],
-    "expectedFilters": { "category": "dining-room", "color": "natural", "material": "wood" },
+    "expectedFilters": {
+      "category": "dining-room",
+      "color": "natural",
+      "material": "wood"
+    },
     "expectedRefusal": false,
     "notes": "Filter-friendly wording with seat-count hint. Avalon 4-Seater ($199.99) and Ora 4-Seater Round ($449.99) both natural wood. Routing could go either way."
   },

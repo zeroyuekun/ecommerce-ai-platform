@@ -157,11 +157,19 @@ async function main() {
 
   console.log("\n==== RAG eval ====");
   console.log(`queries: ${results.length}`);
-  console.log(`recall@1:        ${mean(results.map((r) => r.recall1)).toFixed(3)}`);
-  console.log(`recall@5:        ${mean(results.map((r) => r.recall5)).toFixed(3)}`);
-  console.log(`recall@10:       ${mean(results.map((r) => r.recall10)).toFixed(3)}`);
+  console.log(
+    `recall@1:        ${mean(results.map((r) => r.recall1)).toFixed(3)}`,
+  );
+  console.log(
+    `recall@5:        ${mean(results.map((r) => r.recall5)).toFixed(3)}`,
+  );
+  console.log(
+    `recall@10:       ${mean(results.map((r) => r.recall10)).toFixed(3)}`,
+  );
   console.log(`MRR:             ${mean(results.map((r) => r.mrr)).toFixed(3)}`);
-  console.log(`NDCG@10:         ${mean(results.map((r) => r.ndcg10)).toFixed(3)}`);
+  console.log(
+    `NDCG@10:         ${mean(results.map((r) => r.ndcg10)).toFixed(3)}`,
+  );
   console.log(`faithfulness:    ${mean(faiths).toFixed(3)}`);
   console.log(`unsupported_rate ${unsupportedRate.toFixed(3)}`);
   console.log(`p50 ms:          ${p(latencies, 0.5).toFixed(0)}`);

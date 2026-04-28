@@ -24,7 +24,8 @@ export interface CheckFaithfulnessInput {
 
 const PRICE_RE = /\$\s?(\d{1,3}(?:,\d{3})*)(?:\.\d{2})?/g;
 const DIM_RE = /\b(\d+(?:\.\d+)?)\s?(cm|m|mm|inches?|")(?=\s|$|[^a-zA-Z0-9])/gi;
-const STOCK_RE = /\b(in stock|out of stock|low stock|available|unavailable)\b/gi;
+const STOCK_RE =
+  /\b(in stock|out of stock|low stock|available|unavailable)\b/gi;
 const SHIPPING_RE = /\bships?\s+to\s+([A-Za-z]+)/gi;
 
 function uniqueNonEmpty(values: string[]): string[] {
@@ -121,9 +122,7 @@ export function checkFaithfulnessHeuristic(
   for (const m of input.answer.matchAll(SHIPPING_RE)) {
     const where = m[1].toLowerCase();
     if (where.startsWith("austral")) {
-      const ok = input.candidates.some(
-        (c) => c.metadata?.ships_to_au === true,
-      );
+      const ok = input.candidates.some((c) => c.metadata?.ships_to_au === true);
       if (ok) supported.push(`ships:${where}`);
       else unsupported.push(`ships:${where}`);
     }

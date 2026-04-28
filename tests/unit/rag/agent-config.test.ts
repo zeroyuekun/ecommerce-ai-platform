@@ -33,7 +33,9 @@ describe("buildAgentConfig — RAG on", () => {
     // The instruction content is covered by the separate instruction-assembly
     // tests on buildAgentConfig itself.
     const agentTools = agent.tools as Record<string, unknown>;
-    expect(Object.keys(agentTools).sort()).toEqual(Object.keys(cfg.tools).sort());
+    expect(Object.keys(agentTools).sort()).toEqual(
+      Object.keys(cfg.tools).sort(),
+    );
   });
 
   it("anonymous users get no getMyOrders tool", () => {

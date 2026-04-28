@@ -29,7 +29,9 @@ describe("redactPII", () => {
   });
 
   it("does not redact order numbers prefixed with #", () => {
-    expect(redactPII("order #12345678 shipped")).toBe("order #12345678 shipped");
+    expect(redactPII("order #12345678 shipped")).toBe(
+      "order #12345678 shipped",
+    );
   });
 
   it("redacts multiple PII items in one string", () => {

@@ -1,9 +1,9 @@
-import { generateText, stepCountIs, type ModelMessage } from "ai";
+import { generateText, type ModelMessage, stepCountIs } from "ai";
 import { buildAgentConfig } from "@/lib/ai/agent/config";
 import {
+  type RetrievalTrace,
   startCollecting,
   stopCollecting,
-  type RetrievalTrace,
 } from "@/lib/ai/rag/trace";
 
 export interface RunTurnInput {

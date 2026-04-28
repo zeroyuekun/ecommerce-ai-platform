@@ -205,17 +205,19 @@ describe("semanticSearch trace emission", () => {
   });
 
   it("emits exactly one trace per execute call, with full pipeline fields", async () => {
-    await semanticSearchTool.execute(
-      { query: "oak bedside table" },
-      { toolCallId: "t1", messages: [] } as never,
-    );
+    await semanticSearchTool.execute({ query: "oak bedside table" }, {
+      toolCallId: "t1",
+      messages: [],
+    } as never);
     expect(mocks.emitTrace).toHaveBeenCalledTimes(1);
     const [trace] = mocks.emitTrace.mock.calls[0];
     expect(trace).toMatchObject({
       query: { raw: "oak bedside table" },
       understand: expect.objectContaining({ rewritten: expect.any(String) }),
       retrieve: expect.objectContaining({ topK: 30 }),
-      rerank: expect.objectContaining({ backend: expect.stringMatching(/cohere|fallback/) }),
+      rerank: expect.objectContaining({
+        backend: expect.stringMatching(/cohere|fallback/),
+      }),
       picked: expect.objectContaining({ productIds: expect.any(Array) }),
     });
   });
@@ -223,10 +225,10 @@ describe("semanticSearch trace emission", () => {
   it("emits a trace with error.stage='retrieve' when retrieve throws", async () => {
     mocks.retrieve.mockRejectedValueOnce(new Error("Pinecone timeout"));
     await expect(
-      semanticSearchTool.execute(
-        { query: "x" },
-        { toolCallId: "t2", messages: [] } as never,
-      ),
+      semanticSearchTool.execute({ query: "x" }, {
+        toolCallId: "t2",
+        messages: [],
+      } as never),
     ).rejects.toThrow();
     const last = mocks.emitTrace.mock.calls.at(-1);
     expect(last?.[0]).toMatchObject({

@@ -1,7 +1,7 @@
-import { describe, expect, it, afterEach } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
-  checkFaithfulnessHeuristic,
   checkFaithfulness,
+  checkFaithfulnessHeuristic,
   checkFaithfulnessLLM,
   type FaithfulnessCandidate,
 } from "@/lib/ai/rag/faithfulness";
