@@ -7,6 +7,7 @@
     "build": "next build",
     "build:analyze": "cross-env ANALYZE=true next build",
     "eval:rag": "dotenv -e .env.local -- tsx --tsconfig tsconfig.eval.json tools/rag-eval.ts",
+    "eval:rag-cheap": "dotenv -e .env.local -- tsx --tsconfig tsconfig.eval.json tools/rag-eval-cheap.ts",
     "trace:tail": "tsx tools/trace-tail.ts",
     "verify:rag": "dotenv -e .env.local -- tsx --tsconfig tsconfig.eval.json tools/verify-phase-1-6.ts",
     "start": "next start",
