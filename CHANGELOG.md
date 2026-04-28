@@ -17,6 +17,9 @@ All notable changes to this project are documented here, in reverse chronologica
 - CI hygiene: `eval-rag.yml` workflow dropped (eval is on-demand only); Phase 1 spec amended to match shipped reality (LLM-judge ship gate walked back to heuristic 0.85 floor; nightly CI gate replaced with manual `pnpm eval:rag` before merges into `lib/ai/rag/**`; turn-level token *alerts* deferred to Phase 1.7 — events themselves shipped in Phase 1)
 - Golden set grew 15 → 50 across 7 buckets — synonym (10), multi-constraint (10), vague-style (5), out-of-vocabulary (5), ambiguous-routing (5) — every product ID grounded in the live Sanity catalog (no fabrication)
 - Pre-rollback git tag `pre-phase-1-6` set
+- **Cost-free verification path** (`pnpm verify:rag` → `tools/verify-phase-1-6.ts`): drives the real Pinecone + Cohere pipeline with a stub query-understanding function, so trace + faithfulness checker code paths can be exercised end-to-end without burning AI Gateway credits. Surfaces a per-claim `score / supported / unsupported / reasoning` block over real catalog data.
+- **Heuristic checker fix** (surfaced by the verification): price comparator no longer false-matches embedded substrings — `$99.99` no longer matches inside `$179.99`, `$200` no longer matches inside `$2,000.00`. Now uses canonical numeric form (integer + optional `.NN`) with non-digit/non-dot boundaries.
+- **Reindex `--no-qa` mode**: `pnpm reindex:rag --no-qa` refreshes the 4 base chunks per product (parent/description/specs/care) using only Pinecone Inference (free). Skips the Haiku-backed synthetic Q&A pass. Useful for picking up the 2026-04-25 C3 chunk-text fix without paying for Q&A regeneration.
 - **Pending:** T10 smoke run + T18 baseline appendix — both blocked on Vercel AI Gateway free-tier abuse limit (resolution: top up credits, then `pnpm eval:rag --yes`)
 
 ## 2026-04-25
