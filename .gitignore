@@ -48,3 +48,7 @@ next-env.d.ts
 # Sanity generated types — regenerate via `pnpm typegen`
 sanity.types.ts
 schema.json
+
+# Disposable processing files (CLAUDE.md §"File Structure"): scraped data,
+# intermediate exports, RAG trace logs, agent session transcripts.
+.tmp/
