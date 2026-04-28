@@ -74,14 +74,41 @@ export class TraceBuilder {
     this.trace.picked = p;
     return this;
   }
+
+  // Intentional flat-args signature: callers pass the two scalars at the throw site
+  // without constructing an intermediate object. Error details are minimal by design.
   setError(stage: string, message: string): this {
     this.trace.error = { stage, message };
     return this;
   }
+
   build(): RetrievalTrace {
     return {
-      ...(this.trace as RetrievalTrace),
+      traceId: this.trace.traceId as string,
+      timestamp: this.trace.timestamp as string,
       durationMs: Date.now() - this.startedAt,
+      query: this.trace.query as RetrievalTrace["query"],
+      understand: this.trace.understand ?? {
+        rewritten: "",
+        hyde: null,
+        filters: {},
+        fellBack: false,
+        durationMs: 0,
+      },
+      retrieve: this.trace.retrieve ?? {
+        topK: 0,
+        candidateCount: 0,
+        candidates: [],
+        durationMs: 0,
+      },
+      rerank: this.trace.rerank ?? {
+        backend: "fallback",
+        topN: 0,
+        results: [],
+        durationMs: 0,
+      },
+      picked: this.trace.picked ?? { productIds: [] },
+      ...(this.trace.error ? { error: this.trace.error } : {}),
     };
   }
 }

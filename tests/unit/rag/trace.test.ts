@@ -64,4 +64,20 @@ describe("TraceBuilder", () => {
       message: "Pinecone timeout",
     });
   });
+
+  it("build() returns valid defaults for sections that were never set (error path)", () => {
+    const b = new TraceBuilder("q", 0);
+    b.setError("retrieve", "Pinecone timeout");
+    const trace = b.build();
+
+    // The error path: only setError was called. build() must still produce
+    // a structurally valid RetrievalTrace so downstream emitters and
+    // consumers don't trip over undefined fields.
+    expect(trace.understand).toMatchObject({ rewritten: "", durationMs: 0 });
+    expect(trace.retrieve).toMatchObject({ candidateCount: 0, candidates: [] });
+    expect(trace.rerank).toMatchObject({ backend: "fallback", topN: 0 });
+    expect(trace.picked).toEqual({ productIds: [] });
+    expect(trace.error).toEqual({ stage: "retrieve", message: "Pinecone timeout" });
+    expect(trace.traceId).toMatch(/^[0-9a-f-]{36}$/i);
+  });
 });
