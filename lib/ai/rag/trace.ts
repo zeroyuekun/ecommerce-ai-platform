@@ -7,6 +7,8 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import type { ChunkType } from "@/lib/ai/rag/store";
+import { captureException } from "@/lib/monitoring";
+import { captureServerEvent } from "@/lib/analytics/server";
 
 export interface RetrievalTrace {
   traceId: string;
@@ -152,35 +154,45 @@ export function stopCollecting(): RetrievalTrace[] {
 }
 
 export async function emitTrace(trace: RetrievalTrace): Promise<void> {
+  // Pre-stringify so a JSON failure (e.g. circular ref) is caught here
+  // and stdout still gets a "broken-trace" line — the always-log contract.
+  let serialized: string;
   try {
+    serialized = JSON.stringify(trace);
+  } catch (err) {
+    captureException(err, { extra: { context: "rag.trace.serialize" } });
     // eslint-disable-next-line no-console
-    console.log("[rag.trace]", JSON.stringify(trace));
+    console.log("[rag.trace]", `{"error":"serialize-failed","traceId":"${trace.traceId ?? "unknown"}"}`);
+    return;
+  }
 
-    const { captureServerEvent } = await import("@/lib/analytics/server");
-    void captureServerEvent({
+  // eslint-disable-next-line no-console
+  console.log("[rag.trace]", serialized);
+
+  try {
+    await captureServerEvent({
       distinctId: trace.traceId,
       event: "rag.retrieval.completed",
       properties: trace as unknown as Record<string, unknown>,
     });
 
     if (process.env.RAG_TRACE_FILE === "1") {
-      writeTraceLine(trace);
+      writeTraceLine(trace, serialized);
     }
 
     collector?.push(trace);
   } catch (err) {
-    const { captureException } = await import("@/lib/monitoring");
     captureException(err, { extra: { context: "rag.trace.emit" } });
   }
 }
 
-function writeTraceLine(trace: RetrievalTrace): void {
+function writeTraceLine(trace: RetrievalTrace, serialized: string): void {
   if (!existsSync(TRACE_FILE_DIR)) {
     mkdirSync(TRACE_FILE_DIR, { recursive: true });
   }
   const path = join(TRACE_FILE_DIR, TRACE_FILE_NAME);
   rotateIfTooBig(path);
-  appendFileSync(path, `${JSON.stringify(trace)}\n`);
+  appendFileSync(path, `${serialized}\n`);
 }
 
 function rotateIfTooBig(path: string): void {

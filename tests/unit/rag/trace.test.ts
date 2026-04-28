@@ -179,12 +179,26 @@ describe("emitTrace", () => {
     expect(drained).toHaveLength(2);
   });
 
-  it("swallows emit errors via captureException", async () => {
+  it("swallows serialize errors via captureException and still logs to stdout", async () => {
     const { captureException } = await import("@/lib/monitoring");
     const trace = sampleTrace();
     // Force JSON.stringify to throw by adding a circular ref AFTER build
     (trace as unknown as { self: unknown }).self = trace;
     await emitTrace(trace);
     expect(captureException).toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalledWith(
+      "[rag.trace]",
+      expect.stringContaining("serialize-failed"),
+    );
+  });
+
+  it("swallows post-serialize sink errors without throwing", async () => {
+    const { captureException } = await import("@/lib/monitoring");
+    const { captureServerEvent } = await import("@/lib/analytics/server");
+    (captureServerEvent as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("posthog down"),
+    );
+    // emitTrace must not throw even though one sink rejected
+    await expect(emitTrace(sampleTrace())).resolves.toBeUndefined();
   });
 });
