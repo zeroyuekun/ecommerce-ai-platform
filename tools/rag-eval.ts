@@ -119,8 +119,30 @@ async function main() {
   // budget. Default 0 (no throttle) for the paid Sonnet/gateway path.
   const throttleMs = Number(process.env.RAG_EVAL_THROTTLE_MS ?? 0);
 
+  // Optional stratified subset, e.g. `--per-bucket 3`. Picks the first N
+  // cases from each bucket so the result still covers all buckets.
+  // Useful when free-tier daily quota can't fit the full 50 cases.
+  const perBucketArg = args.find((a) => a.startsWith("--per-bucket="));
+  const perBucket = perBucketArg
+    ? Number(perBucketArg.split("=")[1])
+    : Number.POSITIVE_INFINITY;
+
   const goldenPath = path.resolve("tests/rag/golden.json");
-  const golden: GoldenEntry[] = JSON.parse(await readFile(goldenPath, "utf8"));
+  const fullGolden: GoldenEntry[] = JSON.parse(
+    await readFile(goldenPath, "utf8"),
+  );
+  const seen = new Map<string, number>();
+  const golden: GoldenEntry[] = fullGolden.filter((e) => {
+    const n = seen.get(e.bucket) ?? 0;
+    if (n >= perBucket) return false;
+    seen.set(e.bucket, n + 1);
+    return true;
+  });
+  if (golden.length < fullGolden.length) {
+    console.log(
+      `Subset: ${golden.length}/${fullGolden.length} cases (${perBucket} per bucket).`,
+    );
+  }
   const results: Row[] = [];
 
   for (const [i, entry] of golden.entries()) {
