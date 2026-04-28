@@ -22,7 +22,7 @@ vi.mock("@/lib/ai/rag/flags", () => ({ isRagEnabled: () => true }));
 import { buildAgentConfig } from "@/lib/ai/agent/config";
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
 
-describe("buildAgentConfig parity", () => {
+describe("buildAgentConfig — RAG on", () => {
   it("createShoppingAgent uses buildAgentConfig output", () => {
     const cfg = buildAgentConfig({ userId: "u1" });
     const agent = createShoppingAgent({ userId: "u1" });
@@ -52,5 +52,24 @@ describe("buildAgentConfig parity", () => {
       modelOverride: "anthropic/claude-haiku-4.5",
     });
     expect(cfg.modelId).toContain("haiku");
+  });
+});
+
+describe("buildAgentConfig — RAG off", () => {
+  it("legacy path exposes searchProducts and hides RAG tools", async () => {
+    vi.resetModules();
+    vi.doMock("@/lib/ai/rag/flags", () => ({ isRagEnabled: () => false }));
+    const { buildAgentConfig: buildAgentConfigOff } = await import(
+      "@/lib/ai/agent/config"
+    );
+    const cfg = buildAgentConfigOff({ userId: "u1" });
+    expect(cfg.tools.searchProducts).toBeDefined();
+    expect(cfg.tools.semanticSearch).toBeUndefined();
+    expect(cfg.tools.filterSearch).toBeUndefined();
+    expect(cfg.tools.getProductDetails).toBeUndefined();
+    expect(cfg.tools.addToCart).toBeDefined();
+    expect(cfg.tools.getMyOrders).toBeDefined();
+    vi.doUnmock("@/lib/ai/rag/flags");
+    vi.resetModules();
   });
 });

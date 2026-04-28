@@ -18,6 +18,11 @@ export interface AgentConfigOptions {
 }
 
 export interface AgentConfig {
+  /**
+   * Readable string identifier for the model in use. Mirrors what was
+   * passed to gateway() — the opaque gateway object doesn't expose this,
+   * so we keep it alongside for telemetry, debug logging, and tests.
+   */
   modelId: string;
   model: ReturnType<typeof gateway>;
   instructions: string;
