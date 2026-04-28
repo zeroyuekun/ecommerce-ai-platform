@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:analyze": "cross-env ANALYZE=true next build",
-    "eval:rag": "dotenv -e .env.local -- tsx tools/rag-eval.ts",
+    "eval:rag": "dotenv -e .env.local -- tsx --tsconfig tsconfig.eval.json tools/rag-eval.ts",
     "trace:tail": "tsx tools/trace-tail.ts",
     "start": "next start",
     "lint": "biome check",
