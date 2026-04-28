@@ -488,6 +488,12 @@ Each eval case fires 2-4 Gemini calls (initial response + tool result + occasion
 3. **Distribute across separate Google Cloud projects** — each project has its own 20-RPD bucket per model. Three projects + token rotation = 60 RPD ≈ one full sweep. Significant operational overhead for what should be a one-shot baseline.
 4. **Top up Google billing** — converts the project from free tier to pay-as-you-go pricing; gemini-2.5-flash is ~$0.075/M input tokens, ~$0.30/M output. A 50-case eval is well under $0.10 on paid Gemini.
 
+### Daily capture log
+
+Path 2 from the list above is being executed by a daily cron (job `72f6ea2c`, fires 19:13 local until 2026-05-05 auto-expiry). Each firing records the case IDs that completed in this subsection; cumulative is dedup'd across days.
+
+- 2026-04-28 (flash-lite): captured 1 case — g_001 (cumulative 1 of 50, Δ 1). Daily quota for flash and flash-lite was already exhausted earlier the same day from interactive eval attempts; the cron firing got 1 case in before the next quota gate. Tomorrow's firing should land on a fresh per-day bucket.
+
 ### Engineering takeaways recorded for posterity
 
 1. **Free-tier daily caps stack with provider-side bursts.** A single 503 from Google triggers the AI SDK's 3-attempt retry loop; the throttle on the harness only spaces *cases*, not the SDK's internal retries. Even a 30-second per-case throttle blew past the 20 RPD ceiling once retries fired.
