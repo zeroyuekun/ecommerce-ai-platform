@@ -43,13 +43,18 @@ export function checkFaithfulnessHeuristic(
   const supported: string[] = [];
   const unsupported: string[] = [];
 
-  // Price claims
+  // Price claims. Compare canonical numeric form (integer + optional .NN)
+  // with non-digit/non-dot boundaries so '$99.99' doesn't false-match
+  // inside '$179.99', and '$200' doesn't false-match inside '$2,000.00'.
+  const haystackDigits = haystack.replace(/,/g, "");
   for (const m of input.answer.matchAll(PRICE_RE)) {
     const claim = m[0];
-    const num = m[1].replace(/,/g, "");
-    // Match against the haystack with comma stripped too
-    const haystackDigits = haystack.replace(/,/g, "");
-    if (haystackDigits.includes(num)) {
+    const integer = m[1].replace(/,/g, "");
+    const centsMatch = claim.match(/\.\d{2}$/);
+    const fullNum = integer + (centsMatch ? centsMatch[0] : "");
+    const escaped = fullNum.replace(/\./g, "\\.");
+    const re = new RegExp(`(?<![\\d.])${escaped}(?![\\d])`);
+    if (re.test(haystackDigits)) {
       supported.push(`price:${claim}`);
     } else {
       unsupported.push(`price:${claim}`);

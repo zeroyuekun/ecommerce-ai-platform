@@ -15,17 +15,20 @@
  * Cost: $0 (Pinecone Inference + free-tier Cohere).
  */
 import { existsSync, readFileSync } from "node:fs";
+
+// trace.ts reads RAG_TRACE_FILE at emit time (not module-load), so anywhere
+// before the first emitTrace call works — keeping it up here makes intent
+// obvious to a reader.
 process.env.RAG_TRACE_FILE = "1";
 
-// Import after setting env so the recorder picks it up.
 import { checkFaithfulnessHeuristic } from "@/lib/ai/rag/faithfulness";
-import { retrieve } from "@/lib/ai/rag/query/retrieve";
 import { rerankAndDedupe } from "@/lib/ai/rag/query/rerank";
+import { retrieve } from "@/lib/ai/rag/query/retrieve";
 import {
-  understandQuery,
   type UnderstandingFn,
+  understandQuery,
 } from "@/lib/ai/rag/query/understand";
-import { TraceBuilder, emitTrace } from "@/lib/ai/rag/trace";
+import { emitTrace, TraceBuilder } from "@/lib/ai/rag/trace";
 
 const TRACE_FILE = ".tmp/rag-traces.jsonl";
 
@@ -171,7 +174,9 @@ async function main() {
   console.log(
     `Cohere: ${process.env.COHERE_API_KEY ? "wired (will rerank)" : "not set (fallback to Pinecone scores)"}`,
   );
-  console.log(`Pinecone: ${process.env.PINECONE_API_KEY ? "wired" : "MISSING — script will fail"}`);
+  console.log(
+    `Pinecone: ${process.env.PINECONE_API_KEY ? "wired" : "MISSING — script will fail"}`,
+  );
   console.log(`Trace sink: stdout + ${TRACE_FILE}\n`);
 
   for (const c of CASES) {
@@ -186,9 +191,7 @@ async function main() {
   printDivider("═");
   console.log("Persisted traces:");
   if (existsSync(TRACE_FILE)) {
-    const lines = readFileSync(TRACE_FILE, "utf8")
-      .split("\n")
-      .filter(Boolean);
+    const lines = readFileSync(TRACE_FILE, "utf8").split("\n").filter(Boolean);
     console.log(`  ${TRACE_FILE} — ${lines.length} record(s) total`);
     console.log(`  (last record below)\n`);
     const last = JSON.parse(lines[lines.length - 1]);
@@ -211,7 +214,9 @@ async function main() {
       ),
     );
   } else {
-    console.log(`  ${TRACE_FILE} — NOT created (RAG_TRACE_FILE wiring broken!)`);
+    console.log(
+      `  ${TRACE_FILE} — NOT created (RAG_TRACE_FILE wiring broken!)`,
+    );
   }
 
   console.log(
@@ -236,7 +241,8 @@ async function main() {
     },
   ];
 
-  const truthful = "The Blair Bedside Table in oak is $179.99 and 45 cm wide. In stock.";
+  const truthful =
+    "The Blair Bedside Table in oak is $179.99 and 45 cm wide. In stock.";
   const halfTruthful =
     "The Blair Bedside Table in oak is $179.99 and 60 cm wide. Out of stock.";
   const hallucinated =
@@ -255,8 +261,12 @@ async function main() {
     console.log(
       `${label}  score=${r.score.toFixed(2)}  totalClaims=${r.totalClaims}`,
     );
-    console.log(`             supported   ${JSON.stringify(r.supportedClaims)}`);
-    console.log(`             unsupported ${JSON.stringify(r.unsupportedClaims)}`);
+    console.log(
+      `             supported   ${JSON.stringify(r.supportedClaims)}`,
+    );
+    console.log(
+      `             unsupported ${JSON.stringify(r.unsupportedClaims)}`,
+    );
   }
 
   printDivider();

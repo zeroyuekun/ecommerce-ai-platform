@@ -123,6 +123,44 @@ describe("checkFaithfulnessHeuristic — edge cases", () => {
     });
     expect(r.supportedClaims.some((c) => c.startsWith("dim"))).toBe(true);
   });
+
+  it("does NOT false-match a price embedded inside another price", () => {
+    // Surfaced by tools/verify-phase-1-6.ts: hallucinated $99.99 was being
+    // marked supported because '99' appears as a substring of '179.99'.
+    // The fix uses non-digit boundaries so the price must be a standalone
+    // number in the haystack — not a fragment of a larger one.
+    const r = checkFaithfulnessHeuristic({
+      query: "blair bedside",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: "Blair Bedside Table — solid oak — $179.99. In stock.",
+        },
+      ],
+      answer: "The Blair Bedside Table in oak is $99.99.",
+    });
+    expect(r.unsupportedClaims).toContain("price:$99.99");
+    expect(r.supportedClaims).not.toContain("price:$99.99");
+  });
+
+  it("matches prices with cents exactly, not on integer-prefix substring", () => {
+    // The previous heuristic stripped cents and matched only the integer
+    // part — '$200' would falsely match '$2,000.00'. The fix compares the
+    // full canonical numeric form (integer + optional .NN).
+    const r = checkFaithfulnessHeuristic({
+      query: "x",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: "This product is $2,000.00.",
+        },
+      ],
+      answer: "This is $200.",
+    });
+    expect(r.unsupportedClaims).toContain("price:$200");
+  });
 });
 
 describe("checkFaithfulness — backend switch", () => {
