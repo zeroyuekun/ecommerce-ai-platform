@@ -155,7 +155,9 @@ async function main() {
     try {
       turn = await runAgentTurn({ query: entry.query });
     } catch (err) {
-      console.log(`FAIL (${err instanceof Error ? err.message.slice(0, 80) : err})`);
+      console.log(
+        `FAIL (${err instanceof Error ? err.message.slice(0, 80) : err})`,
+      );
       throw err;
     }
     const latencyMs = Date.now() - start;

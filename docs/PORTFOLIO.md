@@ -201,7 +201,11 @@ Phase 1 left two named gaps: no per-query observability into what retrieval pick
 
 **Baseline numbers (2026-04-28).** Recall@5 = **0.894** across 41 non-refusal cases (recall@1 = 0.669, MRR = 0.884, NDCG@10 = 0.855, p50 latency 581 ms). `specific` / `aesthetic` / `multi-constraint` / `ambiguous-routing` all at perfect 1.000 — Pinecone's multilingual-e5-large is strong on direct cues and explicit constraints. The gap is concentrated in `synonym` (0.722) and `vague-style` (0.467), which is exactly where HyDE — temporarily off in this stub run — should help. The number directs Phase 1.7 work without paying for a single LLM call.
 
-**Honest carry-forward.** T10 smoke run + T18 final-appendix paste **remain pending** on the gateway free-tier abuse block. The first eval trace fires clean (proving infra is correct); the agent's Sonnet hop returns 429. Resolution is paid credits. Documented in CHANGELOG with the exact unblock command (`pnpm eval:rag --yes`). The no-LLM baseline above already proves the harness wiring + retrieval quality on the full 50-case set.
+**Direct-Gemini escape hatch (`RAG_EVAL_AGENT_MODEL=google/gemini-2.5-flash`).** When AI Gateway free credits abuse-locked us out and the user explicitly didn't want to top up, I wired `@ai-sdk/google` as a direct-provider escape — bypasses the gateway entirely, routes through Google's free Generative Language API. Same `runAgentTurn`, same harness, same tool set. Production paths untouched (`buildAgentConfig` only swaps providers when `modelId` starts with `google/`). The escape hatch needed a Gemini-compatible `filterSearchToolGemini` variant because Google's API rejects the empty-string enum sentinel that the production schema uses for "no filter" — production Sonnet path stays on the original schema.
+
+**Direct-Gemini proof-of-life (n=6 successful cases).** Two manual smokes (`oak bedside table` → filterSearch + correct slug; `cozy reading nook` → semanticSearch + 5 reasonable candidates + correct product mentions) plus four golden-set cases (g_001–g_004) all ran end-to-end. Trace recorder fired, agent picked the right tool per query, faithfulness scorer ran over real candidate text. Captured as **Appendix B** in the Phase 1.6 spec.
+
+**Honest carry-forward — Google daily quotas.** Google's newly minted free-tier keys cap at **20 RPD per model**; a single eval case is 2-4 Gemini calls (including AI SDK retry bursts on transient 503s), so the cap fits ~5-7 cases per project per day. Both `gemini-2.5-flash` and `gemini-2.5-flash-lite` quotas were exhausted in one session. Four paths to a full 50-case Appendix B (paid AI Gateway, paid Gemini, distribute across days, distribute across Google projects) are documented in the spec — none requires the original Vercel AI Gateway top-up the user wanted to avoid. The retrieval half of the baseline (Appendix A: recall@5 = 0.894 on the full 50-case set) carries the retrieval story regardless.
 
 **Why this stage matters.** Phase 1.6 is the discipline of going back to close named gaps instead of moving on to the next feature. The cost-free verify path, the reindex `--no-qa` flag, and the two heuristic substring fixes were all reactions to the gateway block — they wouldn't have existed if credits had been there. Constraint-driven engineering produces broader infra than the original spec asked for.
 
@@ -532,6 +536,7 @@ pnpm test:e2e                   # Playwright (needs real Sanity / Clerk / Stripe
 pnpm test:rag                   # RAG_LIVE_TESTS=1 — runs eval / marathon / adversarial
 pnpm eval:rag                   # CLI eval against the golden set (~$0.15, on-demand)
 pnpm eval:rag-cheap             # No-LLM retrieval baseline on 50 cases (Pinecone only, $0)
+RAG_EVAL_AGENT_MODEL=google/gemini-2.5-flash pnpm eval:rag --yes  # Direct-Gemini escape hatch ($0, RPD-limited)
 pnpm verify:rag                 # Cost-free Phase 1.6 verification (Pinecone only, $0)
 pnpm trace:tail                 # Inspect .tmp/rag-traces.jsonl with --bucket / --since
 pnpm reindex:rag                # Bulk reindex from Sanity (uses Haiku for synthetic Q&A)

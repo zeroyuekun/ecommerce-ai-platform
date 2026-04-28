@@ -452,3 +452,45 @@ vague-style          n= 5  recall@5=0.467
 - HyDE's actual lift — confirmed where to look (`synonym` and `vague-style`), but the agent run is what measures it.
 
 The full agent-driven run replaces this appendix with Appendix B once the gateway block is cleared.
+
+---
+
+## Appendix B — Direct-Gemini agent proof-of-life (2026-04-28)
+
+**Why this appendix exists.** Appendix A baselined retrieval at $0; the agent-reasoning + faithfulness half still needed an LLM in the loop to drive the eval harness's full code path. With Vercel AI Gateway abuse-blocked on free credits, the workaround was to wire `@ai-sdk/google` as a direct-provider escape hatch (`RAG_EVAL_AGENT_MODEL=google/gemini-2.5-flash` bypasses the gateway entirely; see `lib/ai/agent/config.ts:resolveModel`). Google Gen-AI Studio gives any account a free key, so the eval can in principle run at $0 even when AI Gateway is locked out.
+
+**What the wiring proved.** End-to-end agent loop on Gemini works correctly. Two manual smoke runs and four eval-harness runs all completed and produced sensible results:
+
+| query | tool picked | candidates | answer mentions |
+|---|---|---|---|
+| "oak bedside table" (smoke) | filterSearch | n/a (filter path) | Blair Bedside Table - Oak ✓ |
+| "something cozy for a small reading nook" (smoke) | semanticSearch | 5 (Boucle, Blair, Alfie, Sadie, Eve) | Boucle Occasional Chair, Blair Coffee Tables ✓ |
+| g_001 — eval | (agent loop) | recorded | ok, 18.5s |
+| g_002 — eval | (agent loop) | recorded | ok, 3.2s |
+| g_003 — eval | (agent loop) | recorded | ok, 3.6s |
+| g_004 — eval | (agent loop) | recorded | ok, 2.9s |
+
+The trace recorder fires correctly (full `understand → retrieve → rerank → picked` records emitted), the heuristic faithfulness scorer runs over the candidate text, and the agent picks `filterSearch` vs `semanticSearch` correctly per the system prompt's decision rule (specific/hard-constraint queries → filter; vibe/style queries → semantic). The Gemini-specific schema rewrite (`filterSearchToolGemini` in `lib/ai/tools/filter-search.ts`) was needed because Google's API rejects empty-string enum values that the production schema uses as a "no filter" sentinel — the production Sonnet path keeps the original schema unchanged.
+
+**What blocked the full 50-case run: Google's free-tier daily request cap.**
+
+| model | daily cap (newly minted free key) | per-minute cap |
+|---|---:|---:|
+| `gemini-2.5-flash` | 20 RPD | 5 RPM |
+| `gemini-2.5-flash-lite` | 20 RPD | 10 RPM |
+
+Each eval case fires 2-4 Gemini calls (initial response + tool result + occasional retry burst from the AI SDK's exponential backoff on 503s). 33 stratified cases × ~3 calls = ~100 calls — needs ~5x the daily cap. Both `gemini-2.5-flash` and `gemini-2.5-flash-lite` quotas were exhausted in this session. Daily quotas reset at midnight Pacific.
+
+**Paths to a complete 50-case Appendix B baseline (none required at $0):**
+
+1. **Pay $5+ for AI Gateway credits** and run `pnpm eval:rag --yes` — original plan, ~$0.15/run with Sonnet, ~$0.05/run with Haiku.
+2. **Distribute across days** — `pnpm eval:rag --yes --per-bucket=2` runs ~14 cases/day; full 50-case sweep over ~4 days. Stratification preserved.
+3. **Distribute across separate Google Cloud projects** — each project has its own 20-RPD bucket per model. Three projects + token rotation = 60 RPD ≈ one full sweep. Significant operational overhead for what should be a one-shot baseline.
+4. **Top up Google billing** — converts the project from free tier to pay-as-you-go pricing; gemini-2.5-flash is ~$0.075/M input tokens, ~$0.30/M output. A 50-case eval is well under $0.10 on paid Gemini.
+
+### Engineering takeaways recorded for posterity
+
+1. **Free-tier daily caps stack with provider-side bursts.** A single 503 from Google triggers the AI SDK's 3-attempt retry loop; the throttle on the harness only spaces *cases*, not the SDK's internal retries. Even a 30-second per-case throttle blew past the 20 RPD ceiling once retries fired.
+2. **The escape hatch is still right.** Wiring direct-provider access bypasses the gateway's abuse filter cleanly. The wiring is reusable for any future LLM swap — Groq, Together, OpenRouter — without touching `runAgentTurn`.
+3. **The cheap-eval is the carrying baseline.** Appendix A's 0.894 recall@5 is a real, complete number derived from real Pinecone retrieval over real catalog data. The agent-driven baseline would refine it with router/faithfulness signal but would not change the retrieval story.
+4. **Tool routing is correct on a small Gemini sample.** g_001-g_004 + the two smokes show the agent correctly picks `filterSearch` for hard-constraint queries and `semanticSearch` for vibe queries. Quality on the 50-case scale awaits one of the four paths above.
