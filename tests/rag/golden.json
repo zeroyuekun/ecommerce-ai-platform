@@ -409,5 +409,50 @@
     "expectedFilters": {},
     "expectedRefusal": false,
     "notes": "Eve Console Table (entryway-staple), Lena Arch Mirror (visual focal point), Eros Sage Buffet (statement color)."
+  },
+  {
+    "id": "g_oov_01",
+    "bucket": "out-of-vocabulary",
+    "query": "treadmill",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Furniture-only catalog; agent should refuse rather than surface the closest furniture."
+  },
+  {
+    "id": "g_oov_02",
+    "bucket": "out-of-vocabulary",
+    "query": "blender for the kitchen",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Small appliance, not furniture. Agent should refuse."
+  },
+  {
+    "id": "g_oov_03",
+    "bucket": "out-of-vocabulary",
+    "query": "PS5 stand",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Probe: agent might be tempted to surface entertainment units. Tests refusal discipline — Kozy doesn't sell gaming-specific furniture."
+  },
+  {
+    "id": "g_oov_04",
+    "bucket": "out-of-vocabulary",
+    "query": "smartwatch",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Wearable electronics. Agent should refuse."
+  },
+  {
+    "id": "g_oov_05",
+    "bucket": "out-of-vocabulary",
+    "query": "garden hose",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Outdoor utility. Probe: catalog has 'outdoor' category but it's furniture — agent should refuse rather than reach."
   }
 ]
