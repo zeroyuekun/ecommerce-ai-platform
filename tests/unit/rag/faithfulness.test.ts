@@ -161,6 +161,43 @@ describe("checkFaithfulnessHeuristic — edge cases", () => {
     });
     expect(r.unsupportedClaims).toContain("price:$200");
   });
+
+  it("does NOT false-match a dimension embedded inside a longer one", () => {
+    // Same class of bug as the price substring fix. Without a leading
+    // non-digit boundary, the claim '45 cm' would match inside '245 cm'
+    // because the regex ${value}\\s?${unit} has no anchor.
+    const r = checkFaithfulnessHeuristic({
+      query: "tall shelf",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: "Tall Shelf. Dimensions: 245 cm height.",
+        },
+      ],
+      answer: "This shelf is 45 cm tall.",
+    });
+    expect(r.unsupportedClaims).toContain("dim:45 cm");
+    expect(r.supportedClaims).not.toContain("dim:45 cm");
+  });
+
+  it("matches a dimension exactly when the full number appears", () => {
+    // The boundary fix must not regress the happy path: claim '45 cm'
+    // should still match haystack '45 cm' (and '45cm' without the space).
+    const r = checkFaithfulnessHeuristic({
+      query: "shelf",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: "Shelf. Width 45 cm. Height 90cm.",
+        },
+      ],
+      answer: "It is 45 cm wide and 90 cm tall.",
+    });
+    expect(r.supportedClaims).toContain("dim:45 cm");
+    expect(r.supportedClaims).toContain("dim:90 cm");
+  });
 });
 
 describe("checkFaithfulness — backend switch", () => {

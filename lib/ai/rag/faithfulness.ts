@@ -61,12 +61,20 @@ export function checkFaithfulnessHeuristic(
     }
   }
 
-  // Dimension claims
+  // Dimension claims. Use non-digit/non-dot leading boundary so '45 cm'
+  // doesn't false-match inside '245 cm' (same class as the price fix).
+  // Trailing boundary mirrors DIM_RE's own (?=\s|$|[^a-zA-Z0-9]) so a
+  // unit like 'cm' doesn't match the start of 'cm-something'.
   for (const m of input.answer.matchAll(DIM_RE)) {
     const value = m[1];
     const unit = m[2].toLowerCase();
     const claim = `${value} ${unit}`;
-    const re = new RegExp(`${value}\\s?${unit}`, "i");
+    const escapedValue = value.replace(/\./g, "\\.");
+    const escapedUnit = unit.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(
+      `(?<![\\d.])${escapedValue}\\s?${escapedUnit}(?![a-zA-Z0-9])`,
+      "i",
+    );
     if (re.test(haystack)) {
       supported.push(`dim:${claim}`);
     } else {
