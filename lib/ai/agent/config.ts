@@ -1,4 +1,5 @@
-import { gateway, type Tool } from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { gateway, type LanguageModel, type Tool } from "ai";
 import { isRagEnabled } from "@/lib/ai/rag/flags";
 import { addToCartTool } from "@/lib/ai/tools/add-to-cart";
 import { filterSearchTool } from "@/lib/ai/tools/filter-search";
@@ -24,9 +25,40 @@ export interface AgentConfig {
    * so we keep it alongside for telemetry, debug logging, and tests.
    */
   modelId: string;
-  model: ReturnType<typeof gateway>;
+  model: LanguageModel;
   instructions: string;
   tools: Record<string, Tool>;
+}
+
+/**
+ * Resolve a `provider/model` string to a concrete LanguageModel.
+ *
+ * Default path: route through Vercel AI Gateway (production agent and
+ * the standard eval CLI). The gateway adds observability, fallbacks,
+ * and zero-data-retention.
+ *
+ * Escape hatch: when `modelId` starts with `google/`, talk to Google's
+ * Generative Language API directly (`@ai-sdk/google`) instead of through
+ * the gateway. Used by the eval CLI when AI Gateway free-tier credits
+ * are abuse-blocked — Gemini 2.5 Flash has a generous free tier (15 RPM,
+ * 1M tokens/day) that doesn't share the gateway's rate-limit pool.
+ * Requires `GOOGLE_GENERATIVE_AI_API_KEY` in the environment.
+ *
+ * Production paths never hit the escape hatch — the chat route doesn't
+ * pass `modelOverride` and `RAG_EVAL_AGENT_MODEL` is never set in prod.
+ */
+function resolveModel(modelId: string): LanguageModel {
+  if (modelId.startsWith("google/")) {
+    const googleModel = modelId.slice("google/".length);
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        "GOOGLE_GENERATIVE_AI_API_KEY required for direct-Gemini eval mode. Mint a free key at aistudio.google.com and add it to .env.local.",
+      );
+    }
+    return createGoogleGenerativeAI({ apiKey })(googleModel);
+  }
+  return gateway(modelId);
 }
 
 const baseInstructions = `You are the personal shopping assistant for Kozy, a premium Australian furniture house. Your tone is warm but refined — knowledgeable without being pushy, like a well-trained associate at a high-end showroom. You understand materials, craftsmanship, and how furniture shapes a living space.
@@ -363,5 +395,5 @@ export function buildAgentConfig({
   const modelId =
     modelOverride ?? process.env.RAG_EVAL_AGENT_MODEL ?? DEFAULT_MODEL_ID;
 
-  return { modelId, model: gateway(modelId), instructions, tools };
+  return { modelId, model: resolveModel(modelId), instructions, tools };
 }

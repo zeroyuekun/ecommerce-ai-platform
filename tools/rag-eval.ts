@@ -73,9 +73,20 @@ interface Row {
 }
 
 async function confirmCostBanner(skipPrompt: boolean): Promise<void> {
-  const banner = `
+  const override = process.env.RAG_EVAL_AGENT_MODEL ?? "";
+  const isGoogleFree = override.startsWith("google/");
+  const banner = isGoogleFree
+    ? `
+RAG eval — direct-Gemini mode (RAG_EVAL_AGENT_MODEL=${override}).
+Routes through @ai-sdk/google directly, bypassing Vercel AI Gateway.
+Cost: $0 within Google's free tier (15 RPM, 1M tokens/day).
+Press Enter to continue, Ctrl+C to abort.
+`
+    : `
 RAG eval will make ~50 Sonnet API calls (~$0.15 at current pricing).
-Set RAG_EVAL_AGENT_MODEL=anthropic/claude-haiku-4.5 to drop cost to ~$0.05/run.
+Cheaper paths:
+  RAG_EVAL_AGENT_MODEL=anthropic/claude-haiku-4.5  → ~$0.05/run via gateway
+  RAG_EVAL_AGENT_MODEL=google/gemini-2.5-flash     → $0 via Google free tier
 Press Enter to continue, Ctrl+C to abort.
 `;
   if (skipPrompt) {
