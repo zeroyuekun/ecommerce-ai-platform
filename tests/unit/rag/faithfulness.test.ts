@@ -89,3 +89,36 @@ describe("checkFaithfulnessHeuristic — worked examples", () => {
     expect(r.reasoning).toMatch(/no factual claims/i);
   });
 });
+
+describe("checkFaithfulnessHeuristic — edge cases", () => {
+  it("treats string 'true' as in_stock equivalent (Sanity quirk)", () => {
+    const r = checkFaithfulnessHeuristic({
+      query: "x",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: "Test product",
+          metadata: { in_stock: "true" },
+        },
+      ],
+      answer: "It's in stock.",
+    });
+    expect(r.supportedClaims.some((c) => c.startsWith("stock"))).toBe(true);
+  });
+
+  it('extracts inches-shorthand 45" from the answer', () => {
+    const r = checkFaithfulnessHeuristic({
+      query: "tv",
+      candidates: [
+        {
+          id: "c",
+          productId: "p",
+          text: 'TV stand fits up to 45" screens',
+        },
+      ],
+      answer: 'This stand supports a 45" TV.',
+    });
+    expect(r.supportedClaims.some((c) => c.startsWith("dim"))).toBe(true);
+  });
+});

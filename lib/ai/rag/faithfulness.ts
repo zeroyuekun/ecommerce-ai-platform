@@ -23,11 +23,13 @@ export interface CheckFaithfulnessInput {
 }
 
 const PRICE_RE = /\$\s?(\d{1,3}(?:,\d{3})*)(?:\.\d{2})?/g;
-const DIM_RE = /\b(\d+(?:\.\d+)?)\s?(cm|m|mm|inches?|")\b/gi;
+const DIM_RE = /\b(\d+(?:\.\d+)?)\s?(cm|m|mm|inches?|")(?=\s|$|[^a-zA-Z0-9])/gi;
 const STOCK_RE = /\b(in stock|out of stock|low stock|available|unavailable)\b/gi;
 const SHIPPING_RE = /\bships?\s+to\s+([A-Za-z]+)/gi;
 
 function uniqueNonEmpty(values: string[]): string[] {
+  // filter(Boolean) is defensive — current extractors don't emit empty strings,
+  // but a future extractor that did would silently drop them otherwise.
   return [...new Set(values.filter(Boolean))];
 }
 
@@ -97,15 +99,19 @@ export function checkFaithfulnessHeuristic(
   }
 
   // Stock claims
+  const isInStock = (c: FaithfulnessCandidate) => {
+    const v = c.metadata?.in_stock;
+    return v === true || v === 1 || v === "true";
+  };
+  const isOOS = (c: FaithfulnessCandidate) => {
+    const v = c.metadata?.in_stock;
+    return v === false || v === 0 || v === "false";
+  };
   for (const m of input.answer.matchAll(STOCK_RE)) {
     const claim = m[1].toLowerCase();
     const wantsOOS = claim.includes("out") || claim.includes("unavail");
-    const haveInStock = input.candidates.some(
-      (c) => c.metadata?.in_stock === true,
-    );
-    const haveOOS = input.candidates.some(
-      (c) => c.metadata?.in_stock === false,
-    );
+    const haveInStock = input.candidates.some(isInStock);
+    const haveOOS = input.candidates.some(isOOS);
     if (wantsOOS && haveOOS) supported.push(`stock:${claim}`);
     else if (!wantsOOS && haveInStock) supported.push(`stock:${claim}`);
     else unsupported.push(`stock:${claim}`);
