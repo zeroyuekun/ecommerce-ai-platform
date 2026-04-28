@@ -521,13 +521,16 @@ docs/
 ```bash
 pnpm install
 pnpm typecheck                  # strict TypeScript — exit 0
-pnpm lint                       # Biome — exit 0 across 262 files
-pnpm test                       # Vitest — 127 passing
+pnpm lint                       # Biome — exit 0 across 276 files
+pnpm test                       # Vitest — 166 passing
 pnpm build                      # Next.js production build
 pnpm test:e2e                   # Playwright (needs real Sanity / Clerk / Stripe creds)
 pnpm test:rag                   # RAG_LIVE_TESTS=1 — runs eval / marathon / adversarial
-pnpm eval:rag                   # CLI eval against the golden set
-pnpm reindex:rag                # Bulk reindex from Sanity
+pnpm eval:rag                   # CLI eval against the golden set (~$0.15, on-demand)
+pnpm verify:rag                 # Cost-free Phase 1.6 verification (Pinecone only, $0)
+pnpm trace:tail                 # Inspect .tmp/rag-traces.jsonl with --bucket / --since
+pnpm reindex:rag                # Bulk reindex from Sanity (uses Haiku for synthetic Q&A)
+pnpm reindex:rag --no-qa        # Same, but skip Q&A pass — no LLM, no gateway, $0
 ```
 
 ### Local dev
