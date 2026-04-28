@@ -490,7 +490,7 @@ Each eval case fires 2-4 Gemini calls (initial response + tool result + occasion
 
 ### Daily capture log
 
-Path 2 from the list above is being executed by a daily cron (job `72f6ea2c`, fires 19:13 local until 2026-05-05 auto-expiry). Each firing records the case IDs that completed in this subsection; cumulative is dedup'd across days.
+Two days were attempted. The cron (job `72f6ea2c`) ran on 2026-04-28 and was cancelled 2026-04-29 after the rolling-24h reset finding made the day-by-day strategy unviable. Final cumulative below; the rest of the 50-case baseline is deferred to a paid run (Path 1 or 4).
 
 - 2026-04-28 (flash-lite): captured 1 case — g_001 (cumulative 1 of 50, Δ 1). Daily quota for flash and flash-lite was already exhausted earlier the same day from interactive eval attempts; the cron firing got 1 case in before the next quota gate. Tomorrow's firing should land on a fresh per-day bucket.
 - 2026-04-29 (manual, flash-lite + 2.0-flash): captured **0 cases** (cumulative 1 of 50, Δ 0). Manual `--per-bucket=2` retried at the start of the new local day; flash-lite returned `quotaValue: 20` already-exhausted on the very first request, and a fallback to `gemini-2.0-flash` returned `limit: 0` (not enabled on this free-tier account). **Finding:** Google's free-tier daily quota does NOT reset cleanly at local midnight — the practical reset window is closer to a rolling 24h tied to first-call-of-the-window, which means consecutive-day batching is unreliable on a single project's free tier. Path 2 in the four-paths list above is therefore not realistic without either multi-project rotation (Path 3) or paid tiers (Paths 1/4).
