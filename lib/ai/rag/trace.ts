@@ -1,3 +1,11 @@
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  renameSync,
+  statSync,
+} from "node:fs";
+import { join } from "node:path";
 import type { ChunkType } from "@/lib/ai/rag/store";
 
 export interface RetrievalTrace {
@@ -111,4 +119,80 @@ export class TraceBuilder {
       ...(this.trace.error ? { error: this.trace.error } : {}),
     };
   }
+}
+
+// ---------------------------------------------------------------------------
+// Emitter
+// ---------------------------------------------------------------------------
+
+const TRACE_FILE_DIR = ".tmp";
+const TRACE_FILE_NAME = "rag-traces.jsonl";
+const TRACE_FILE_ROTATED = "rag-traces.1.jsonl";
+const DEFAULT_MAX_MB = 5;
+
+let collector: RetrievalTrace[] | null = null;
+
+/**
+ * Begin collecting traces in-process. Used by the eval CLI to retrieve
+ * candidates from semanticSearch calls without parsing logs.
+ *
+ * NOT concurrent-safe — callers must run sequentially. Eval is sequential
+ * by construction; production paths never call this. AsyncLocalStorage is
+ * the rigorous fix and is deferred to §8.
+ */
+export function startCollecting(): RetrievalTrace[] {
+  collector = [];
+  return collector;
+}
+
+export function stopCollecting(): RetrievalTrace[] {
+  const drained = collector ?? [];
+  collector = null;
+  return drained;
+}
+
+export async function emitTrace(trace: RetrievalTrace): Promise<void> {
+  try {
+    // eslint-disable-next-line no-console
+    console.log("[rag.trace]", JSON.stringify(trace));
+
+    const { captureServerEvent } = await import("@/lib/analytics/server");
+    void captureServerEvent({
+      distinctId: trace.traceId,
+      event: "rag.retrieval.completed",
+      properties: trace as unknown as Record<string, unknown>,
+    });
+
+    if (process.env.RAG_TRACE_FILE === "1") {
+      writeTraceLine(trace);
+    }
+
+    collector?.push(trace);
+  } catch (err) {
+    const { captureException } = await import("@/lib/monitoring");
+    captureException(err, { extra: { context: "rag.trace.emit" } });
+  }
+}
+
+function writeTraceLine(trace: RetrievalTrace): void {
+  if (!existsSync(TRACE_FILE_DIR)) {
+    mkdirSync(TRACE_FILE_DIR, { recursive: true });
+  }
+  const path = join(TRACE_FILE_DIR, TRACE_FILE_NAME);
+  rotateIfTooBig(path);
+  appendFileSync(path, `${JSON.stringify(trace)}\n`);
+}
+
+function rotateIfTooBig(path: string): void {
+  if (!existsSync(path)) return;
+  const envVal = process.env.RAG_TRACE_FILE_MAX_MB;
+  const cap = envVal !== undefined ? Number(envVal) : DEFAULT_MAX_MB;
+  const maxBytes = cap * 1024 * 1024;
+  if (statSync(path).size <= maxBytes) return;
+  const rotated = join(TRACE_FILE_DIR, TRACE_FILE_ROTATED);
+  if (existsSync(rotated)) {
+    // Drop the older rotation; we keep just one previous file.
+    renameSync(rotated, `${rotated}.bak`);
+  }
+  renameSync(path, rotated);
 }
