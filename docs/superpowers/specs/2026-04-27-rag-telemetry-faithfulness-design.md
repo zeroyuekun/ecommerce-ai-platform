@@ -119,6 +119,11 @@ export interface RetrievalTrace {
       productId: string;
       score: number;         // Pinecone similarity
       chunkType: ChunkType;
+      text: string;          // chunk text (already on Pinecone metadata.text);
+                             // included so the on-demand faithfulness checker
+                             // (§4) can match claims against actual chunk
+                             // content. Size impact at portfolio scale is
+                             // negligible (~30 candidates × ~500 chars/turn).
     }>;
     durationMs: number;
   };
@@ -145,8 +150,9 @@ A single `TraceBuilder` accumulates fields across the existing stage calls in `l
 ### Sinks
 
 - **Always:** `console.log("[rag.trace]", JSON.stringify(trace))` — captured by Vercel Logs in production, by stderr in CI.
+- **Always (when PostHog is wired):** `captureServerEvent({ event: "rag.retrieval.completed", properties: trace })` via `lib/analytics/server.ts`. Fire-and-forget; the helper no-ops when `NEXT_PUBLIC_POSTHOG_KEY` is unset so dev/CI without PostHog stays silent. PostHog free tier (1M events/month) exceeds portfolio traffic by orders of magnitude. Reuses the same plumbing as the existing `rag.turn.input_tokens` and `rag.compaction.triggered` events at `app/api/chat/route.ts:113-130`.
 - **Opt-in:** when `process.env.RAG_TRACE_FILE === "1"`, append a line to `.tmp/rag-traces.jsonl`. Used by the trace-tail CLI; never enabled in deployed environments.
-- **No persistent store.** Production durable storage is the §8 extension.
+- **No durable warehouse.** PostHog gives queryable Insights up to its retention window but isn't a long-retention warehouse; the §8 Postgres/Upstash extension is still the path for that.
 
 ### PII scrub
 
@@ -317,10 +323,9 @@ These edits are part of this spec's deliverables, not a separate task.
 
 Sketched here so reviewers can see the full design surface without us building it:
 
-- **Durable trace store.** Replace stdout-only with a write to a Postgres table (`rag_traces` — Vercel Marketplace Neon would be the natural pick) or an Upstash Redis hash with a 7-day TTL. Keep stdout for redundancy.
+- **Durable trace store.** Add a long-retention sink on top of v1's stdout + PostHog: a Postgres table (`rag_traces` — Vercel Marketplace Neon would be the natural pick) or an Upstash Redis hash with a 7-day TTL. Keep stdout + PostHog for redundancy.
 - **Sampling.** Honor `RAG_TRACE_SAMPLE_RATE` (already a recorder hook); default 1.0 in dev, 0.1 in prod. Never sample cases tagged `error`.
-- **Dashboard.** PostHog event `rag.retrieval.completed` with the trace as properties; Insights for p95 retrieve-stage latency, faithfulness-gate violations per day, top-K hit-rate per bucket.
-- **Alerting.** PostHog Insight → Slack webhook on faithfulness-mean 7-day drop > 2% or trace-error-rate > 1%.
+- **Dashboards & alerting.** v1 already emits `rag.retrieval.completed` to PostHog (see §3); the §8 extension is to build the Insights on top — p95 retrieve-stage latency, faithfulness-gate violations per day, top-K hit-rate per bucket — and a Slack-webhook alert on faithfulness-mean 7-day drop > 2% or trace-error-rate > 1%.
 - **PII policy.** Real PII scrubber (current `redactPII` is a floor); audit logging; configurable retention.
 - **Live-traffic faithfulness.** Sample 1% of production turns into the (LLM-upgraded) checker; compare drift vs golden-set baseline; flag distribution shift.
 
@@ -388,3 +393,4 @@ The three decisions in this spec where I'd most expect a reviewer to push back, 
 - Do we want a per-bucket gate (synonym ≥ 0.85, ambiguous-routing ≥ 0.70)? Defer until per-bucket scores stabilize.
 - Should the heuristic also score *citation correctness* (i.e., the answer mentions a product that didn't actually score in the top-5)? Useful, but redundant with the answer-attribution telemetry once §3's `picked.productIds` are logged. Defer.
 - When (if ever) to flip `FAITHFULNESS_BACKEND=llm`? Trigger: heuristic plateaus at >0.95 for 2+ weeks despite real production complaints. Until then, no.
+- Cost defense for the deployed Sonnet chatbot. Existing protections (Clerk auth required + 20 req/min/user via `lib/ai/rate-limit.ts`) cap burst abuse; the residual gap is a single authenticated user sustaining 20 RPM for hours (~$24/hour). A per-user daily cap (~100 turns/day) closes the sustained-abuse window for ~15 lines on top of `chatRateLimiter`. Out of scope for Phase 1.6; tracked as a separate small spec (`rag-cost-defense`).
