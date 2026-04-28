@@ -454,5 +454,59 @@
     "expectedFilters": {},
     "expectedRefusal": true,
     "notes": "Outdoor utility. Probe: catalog has 'outdoor' category but it's furniture — agent should refuse rather than reach."
+  },
+  {
+    "id": "g_amb_01",
+    "bucket": "ambiguous-routing",
+    "query": "oak coffee tables under $400",
+    "expectedProductIds": ["c67c2079-95c1-4b10-b070-d5e16a610e18"],
+    "expectedFilters": { "color": "oak", "maxPrice": 400 },
+    "expectedRefusal": false,
+    "notes": "Pure-filter wording but Blair Round Nesting Coffee Tables - Oak ($349.99) is stored as color=natural — filterSearch with strict color=oak would miss; semanticSearch matches 'oak' in the name. Either tool acceptable but the routing matters."
+  },
+  {
+    "id": "g_amb_02",
+    "bucket": "ambiguous-routing",
+    "query": "natural wood dining table for 4 people",
+    "expectedProductIds": [
+      "product-avalon-dining-table",
+      "90f1be95-f86a-4587-8b2a-0414fc868437"
+    ],
+    "expectedFilters": { "category": "dining-room", "color": "natural", "material": "wood" },
+    "expectedRefusal": false,
+    "notes": "Filter-friendly wording with seat-count hint. Avalon 4-Seater ($199.99) and Ora 4-Seater Round ($449.99) both natural wood. Routing could go either way."
+  },
+  {
+    "id": "g_amb_03",
+    "bucket": "ambiguous-routing",
+    "query": "show me white desks under $300",
+    "expectedProductIds": [
+      "43a175bf-0805-4c81-bdf6-e03828a5342b",
+      "product-maisie-desk-white"
+    ],
+    "expectedFilters": { "color": "white", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "'show me X' pattern — could be filterSearch (price+color) or semanticSearch (style discovery). Urban ($249.99) and Maisie White ($269.99) qualify."
+  },
+  {
+    "id": "g_amb_04",
+    "bucket": "ambiguous-routing",
+    "query": "warm walnut buffet around $500",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut" },
+    "expectedRefusal": false,
+    "notes": "'warm' = style hint, 'around $500' = fuzzy price (no hard cap expected). Deven ($499.99) and Osaka Walnut ($469.99) both qualify. Routing question: does the agent treat 'around' as a maxPrice or skip it?"
+  },
+  {
+    "id": "g_amb_05",
+    "bucket": "ambiguous-routing",
+    "query": "outdoor dining set with a metal frame",
+    "expectedProductIds": ["f1e63d21-0edc-4c74-b11e-84635da145a3"],
+    "expectedFilters": { "category": "outdoor", "material": "metal" },
+    "expectedRefusal": false,
+    "notes": "'set' implies multiple pieces but only Ravello matches outdoor+metal+dining. Filter-friendly but 'set' has stylistic weight too."
   }
 ]
