@@ -2,7 +2,10 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { gateway, type LanguageModel, type Tool } from "ai";
 import { isRagEnabled } from "@/lib/ai/rag/flags";
 import { addToCartTool } from "@/lib/ai/tools/add-to-cart";
-import { filterSearchTool } from "@/lib/ai/tools/filter-search";
+import {
+  filterSearchTool,
+  filterSearchToolGemini,
+} from "@/lib/ai/tools/filter-search";
 import { createGetMyOrdersTool } from "@/lib/ai/tools/get-my-orders";
 import { getProductDetailsTool } from "@/lib/ai/tools/get-product-details";
 import { searchProductsTool } from "@/lib/ai/tools/search-products";
@@ -369,6 +372,10 @@ export function buildAgentConfig({
   const instructions =
     baseInstructions + authInstructions + (ragOn ? ragInstructions : "");
 
+  const modelId =
+    modelOverride ?? process.env.RAG_EVAL_AGENT_MODEL ?? DEFAULT_MODEL_ID;
+  const isGemini = modelId.startsWith("google/");
+
   // Build the tools map. In RAG mode the legacy searchProducts is removed
   // entirely — filterSearch is the keyword-search replacement and returns
   // a stripped payload to keep numeric truth flowing only through
@@ -377,9 +384,14 @@ export function buildAgentConfig({
   // execute signature for stronger callsite typing, which is narrower than
   // the AI SDK's general Tool union — cast at registration to satisfy the
   // Record<string, Tool> shape.
+  // Gemini path swaps in a Gemini-compatible filterSearch variant — the
+  // production schema uses "" as a no-filter sentinel in enum fields,
+  // which Google's API rejects. Same execute handler, narrower schema.
   const tools: Record<string, Tool> = ragOn
     ? {
-        filterSearch: filterSearchTool as unknown as Tool,
+        filterSearch: (isGemini
+          ? filterSearchToolGemini
+          : filterSearchTool) as unknown as Tool,
         semanticSearch: semanticSearchTool as unknown as Tool,
         getProductDetails: getProductDetailsTool,
         addToCart: addToCartTool,
@@ -391,9 +403,6 @@ export function buildAgentConfig({
 
   const getMyOrders = createGetMyOrdersTool(userId);
   if (getMyOrders) tools.getMyOrders = getMyOrders;
-
-  const modelId =
-    modelOverride ?? process.env.RAG_EVAL_AGENT_MODEL ?? DEFAULT_MODEL_ID;
 
   return { modelId, model: resolveModel(modelId), instructions, tools };
 }
