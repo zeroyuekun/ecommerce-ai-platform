@@ -152,3 +152,28 @@ export function checkFaithfulnessHeuristic(
     reasoning,
   };
 }
+
+/**
+ * LLM-as-judge implementation. Stubbed in v1 — see Phase 1.6 spec §4.5
+ * for the upgrade path. The flag exists so a CI smoke test can fail
+ * fast and visibly if anyone tries to enable the upgrade prematurely.
+ */
+export async function checkFaithfulnessLLM(
+  _input: CheckFaithfulnessInput,
+): Promise<FaithfulnessResult> {
+  throw new Error("LLM judge not implemented; see Phase 1.6 spec §4.5");
+}
+
+/**
+ * Default-export: dispatches to heuristic or LLM based on
+ * FAITHFULNESS_BACKEND. The async signature is preserved so call sites
+ * (eval harness) stay identical across the upgrade.
+ */
+export async function checkFaithfulness(
+  input: CheckFaithfulnessInput,
+): Promise<FaithfulnessResult> {
+  if (process.env.FAITHFULNESS_BACKEND === "llm") {
+    return checkFaithfulnessLLM(input);
+  }
+  return checkFaithfulnessHeuristic(input);
+}

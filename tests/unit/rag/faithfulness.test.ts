@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, afterEach } from "vitest";
 import {
   checkFaithfulnessHeuristic,
+  checkFaithfulness,
+  checkFaithfulnessLLM,
   type FaithfulnessCandidate,
 } from "@/lib/ai/rag/faithfulness";
 
@@ -120,5 +122,37 @@ describe("checkFaithfulnessHeuristic — edge cases", () => {
       answer: 'This stand supports a 45" TV.',
     });
     expect(r.supportedClaims.some((c) => c.startsWith("dim"))).toBe(true);
+  });
+});
+
+describe("checkFaithfulness — backend switch", () => {
+  afterEach(() => {
+    delete process.env.FAITHFULNESS_BACKEND;
+  });
+
+  it("uses heuristic by default", async () => {
+    const r = await checkFaithfulness({
+      query: "oak bedside",
+      candidates: blairChunks,
+      answer: "The Blair Bedside Table is $399 in oak. It's in stock.",
+    });
+    expect(r.score).toBe(1);
+  });
+
+  it("routes to LLM stub when FAITHFULNESS_BACKEND=llm", async () => {
+    process.env.FAITHFULNESS_BACKEND = "llm";
+    await expect(
+      checkFaithfulness({
+        query: "x",
+        candidates: blairChunks,
+        answer: "x",
+      }),
+    ).rejects.toThrow(/LLM judge not implemented/);
+  });
+
+  it("checkFaithfulnessLLM throws the spec-mandated error", async () => {
+    await expect(
+      checkFaithfulnessLLM({ query: "x", candidates: [], answer: "x" }),
+    ).rejects.toThrow(/§4\.5/);
   });
 });
