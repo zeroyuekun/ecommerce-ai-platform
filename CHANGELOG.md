@@ -4,6 +4,43 @@ All notable changes to this project are documented here, in reverse chronologica
 
 ---
 
+## 2026-04-28
+
+### RAG Phase 1.6 — design + initial implementation
+- Phase 1.6 design spec at `docs/superpowers/specs/2026-04-27-rag-telemetry-faithfulness-design.md` and 18-task implementation plan at `docs/superpowers/plans/2026-04-28-rag-phase-1-6-implementation.md` — closes the two named gaps from Phase 1: per-query retrieval traces and answer-faithfulness measurement
+- Trace recorder (`lib/ai/rag/trace.ts`) shipped: emits one structured record per `semanticSearch` call to stdout (Vercel Logs in prod), opt-in `.tmp/rag-traces.jsonl` via `RAG_TRACE_FILE=1`, and PostHog (`rag.retrieval.completed`) alongside the existing turn-level events
+- Heuristic faithfulness checker shipped (`lib/ai/rag/faithfulness.ts`) — regex + catalog-vocab matching for price/dim/material/color/name/stock/shipping claims; zero recurring cost. LLM-as-judge upgrade is a one-line `FAITHFULNESS_BACKEND=llm` flag flip; current LLM path is a stub
+- Shared agent config factory (`lib/ai/agent/config.ts`) and non-streaming `runAgentTurn` (`lib/ai/agent/run-turn.ts`) extracted so the eval harness exercises the real prompt + tool loop without going through the streaming chat route
+- Trace-tail CLI (`pnpm trace:tail`) reads `.tmp/rag-traces.jsonl` with `--bucket` / `--since` filters
+- Eval harness extended with agent-driven runs, faithfulness gate (≥ 0.85), per-bucket rollup, and a `--yes` cost banner (~$0.15/run, on-demand only)
+- PII redactor (`redactPII` in `lib/monitoring/index.ts`) — emails + phone-like patterns stripped before traces emit
+- Pre-rollback git tag `pre-phase-1-6` set; CI hygiene + Phase 1 spec amendments + golden-set growth (15 → 50) + baseline appendix still pending
+
+## 2026-04-25
+
+### RAG Phase 1 — shipped to production
+- Replaced the keyword-only `searchProducts` tool with semantic retrieval over Pinecone (Pinecone Inference `multilingual-e5-large` embeddings @ 1024d)
+- Query understanding pass: Haiku rewrites the user query, generates a hypothetical answer (HyDE), and extracts structured filters (category, material, color, price range)
+- Optional Cohere reranker — pipeline auto-skips when `COHERE_API_KEY` is missing and preserves Pinecone's native similarity scores
+- Conversation compaction: Haiku compacts older turns into a summary when input exceeds the soft token cap, so the user-facing Sonnet model never blows past its budget
+- Each product is chunked into 4–9 pieces (parent summary, description, specs, care instructions, plus optional synthetic Q&A pairs)
+- Behind feature flag `RAG_ENABLED` — instant rollback via `vercel env rm RAG_ENABLED production`. Hard revert via `git tag pre-rag`
+- Per-turn telemetry to PostHog: `rag.turn.input_tokens`, `rag.compaction.triggered`
+- Smoke tools in `tools/` (`smoke-rag`, `smoke-agent`, `smoke-filters`, `smoke-understand`, `list-products`, `rag-eval`); `pnpm` scripts: `eval:rag`, `reindex:rag`
+- Cost profile: Sonnet 4.5 for the user-facing chatbot (~$0.01–0.03 per turn); Haiku 4.5 for query understanding, conversation compaction, synthetic Q&A indexing; Pinecone Inference + Cohere are free-tier
+- Post-cutover P0–P3 audit sweep landed in commit `4472977`
+
+## 2026-04-20
+
+### Production hardening
+- Performance and robustness audit across data layer, API routes, hot-path components — see README "Performance & Robustness Hardening" section for the full breakdown
+- Sanity read-only client switched to `useCdn: true` for edge-cached published reads
+- `/api/chat` gained zod validation, 256KB body cap, per-user rate limiter (20 req/min), explicit `runtime: "nodejs"`, `maxDuration: 60`
+- Stripe webhook decoupled from `lineItems` ordering — now matches by `productId` in `product_data.metadata`
+- Admin insights route fused inventory passes into one and replaced greedy-regex JSON extraction with a balanced-brace parser
+- Cart-stock hook gained debounce, `AbortController` cancellation, and an O(1) Map lookup
+- Production hardening v2 (later): Playwright e2e suite, Lighthouse CI, Upstash Redis swap for the rate limiter, PostHog scaffold
+
 ## 2026-03-11
 
 ### Animations
