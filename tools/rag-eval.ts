@@ -79,7 +79,9 @@ async function confirmCostBanner(skipPrompt: boolean): Promise<void> {
     ? `
 RAG eval — direct-Gemini mode (RAG_EVAL_AGENT_MODEL=${override}).
 Routes through @ai-sdk/google directly, bypassing Vercel AI Gateway.
-Cost: $0 within Google's free tier (15 RPM, 1M tokens/day).
+Cost: $0 within Google's free tier.
+Free-tier RPM is tight (gemini-2.5-flash = 5 RPM). Set
+RAG_EVAL_THROTTLE_MS=13000 to stay under the limit (~12 minutes total).
 Press Enter to continue, Ctrl+C to abort.
 `
     : `
@@ -112,14 +114,30 @@ async function main() {
   const skipPrompt = args.includes("--yes");
   await confirmCostBanner(skipPrompt);
 
+  // Optional per-case throttle, set via RAG_EVAL_THROTTLE_MS. Free-tier
+  // Gemini 2.5 Flash is 5 RPM — set this to ~13000 to stay inside the
+  // budget. Default 0 (no throttle) for the paid Sonnet/gateway path.
+  const throttleMs = Number(process.env.RAG_EVAL_THROTTLE_MS ?? 0);
+
   const goldenPath = path.resolve("tests/rag/golden.json");
   const golden: GoldenEntry[] = JSON.parse(await readFile(goldenPath, "utf8"));
   const results: Row[] = [];
 
-  for (const entry of golden) {
+  for (const [i, entry] of golden.entries()) {
+    if (i > 0 && throttleMs > 0) {
+      await new Promise((r) => setTimeout(r, throttleMs));
+    }
     const start = Date.now();
-    const turn = await runAgentTurn({ query: entry.query });
+    process.stdout.write(`[${i + 1}/${golden.length}] ${entry.id}... `);
+    let turn: Awaited<ReturnType<typeof runAgentTurn>>;
+    try {
+      turn = await runAgentTurn({ query: entry.query });
+    } catch (err) {
+      console.log(`FAIL (${err instanceof Error ? err.message.slice(0, 80) : err})`);
+      throw err;
+    }
     const latencyMs = Date.now() - start;
+    console.log(`ok (${latencyMs}ms)`);
 
     const productIdsByCall = turn.candidatesByCall.map((c) =>
       c.map((x) => x.productId),
