@@ -91,7 +91,7 @@ const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 // Phone: optional +, then a digit, then 6+ digit/space/parens/dot/dash chars,
 // then a final digit. Anchored on word boundaries so prices like $399.00
 // don't match (no leading digit-context).
-const PHONE_RE = /(?<!\$)(?<![\d.])\+?\d[\d\s().-]{6,}\d/g;
+const PHONE_RE = /(?<!\$)(?<![\d.#])\+?\d[\d\s().-]{6,}\d/g;
 
 /**
  * Conservative PII scrubber for trace `query.raw` and similar free-text

@@ -27,4 +27,14 @@ describe("redactPII", () => {
   it("does not mistake a price for a phone", () => {
     expect(redactPII("the price is $399.00")).toBe("the price is $399.00");
   });
+
+  it("does not redact order numbers prefixed with #", () => {
+    expect(redactPII("order #12345678 shipped")).toBe("order #12345678 shipped");
+  });
+
+  it("redacts multiple PII items in one string", () => {
+    expect(redactPII("email a@b.co or call 555-0100")).toBe(
+      "email [EMAIL] or call [PHONE]",
+    );
+  });
 });
