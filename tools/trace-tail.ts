@@ -7,6 +7,9 @@
  *   pnpm trace:tail --bucket synonym
  *
  * Trace file is opt-in via RAG_TRACE_FILE=1; this CLI is read-only.
+ * Note: --bucket relies on a tracer-side `bucket` annotation that's not
+ * emitted yet — the filter is forward-looking and will return no
+ * matches against current traces.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { argv } from "node:process";
@@ -15,7 +18,13 @@ const args = argv.slice(2);
 
 function flagValue(name: string, fallback: string | null = null): string | null {
   const idx = args.indexOf(name);
-  return idx >= 0 ? args[idx + 1] ?? fallback : fallback;
+  if (idx < 0) return fallback;
+  const next = args[idx + 1];
+  if (next === undefined || next.startsWith("--")) {
+    console.error(`Flag ${name} requires a value.`);
+    process.exit(1);
+  }
+  return next;
 }
 
 const last = Number(flagValue("--last", "50")) || 50;
