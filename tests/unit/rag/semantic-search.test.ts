@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   retrieve: vi.fn(),
   rerank: vi.fn(),
   hydrate: vi.fn(),
+  emitTrace: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/lib/ai/rag/query/understand", () => ({
@@ -16,6 +17,13 @@ vi.mock("@/lib/ai/rag/query/rerank", () => ({ rerankAndDedupe: mocks.rerank }));
 vi.mock("@/lib/ai/tools/semantic-search-hydrate", () => ({
   hydrateProductSummaries: mocks.hydrate,
 }));
+vi.mock("@/lib/analytics/server", () => ({
+  captureServerEvent: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("@/lib/ai/rag/trace", async (orig) => {
+  const actual = await orig<typeof import("@/lib/ai/rag/trace")>();
+  return { ...actual, emitTrace: mocks.emitTrace };
+});
 
 import { semanticSearchTool } from "@/lib/ai/tools/semantic-search";
 
@@ -25,6 +33,7 @@ describe("semanticSearchTool", () => {
       rewritten: "x",
       filters: { maxPrice: 500 },
       hyde: null,
+      fellBack: false,
     });
     mocks.retrieve.mockReset().mockResolvedValue([
       {
@@ -187,5 +196,41 @@ describe("semanticSearchTool", () => {
     expect(rerankArgs.candidateTexts["p9#description"]).toMatch(
       /^description:p9#description$/,
     );
+  });
+});
+
+describe("semanticSearch trace emission", () => {
+  beforeEach(() => {
+    mocks.emitTrace.mockClear();
+  });
+
+  it("emits exactly one trace per execute call, with full pipeline fields", async () => {
+    await semanticSearchTool.execute(
+      { query: "oak bedside table" },
+      { toolCallId: "t1", messages: [] } as never,
+    );
+    expect(mocks.emitTrace).toHaveBeenCalledTimes(1);
+    const [trace] = mocks.emitTrace.mock.calls[0];
+    expect(trace).toMatchObject({
+      query: { raw: "oak bedside table" },
+      understand: expect.objectContaining({ rewritten: expect.any(String) }),
+      retrieve: expect.objectContaining({ topK: 30 }),
+      rerank: expect.objectContaining({ backend: expect.stringMatching(/cohere|fallback/) }),
+      picked: expect.objectContaining({ productIds: expect.any(Array) }),
+    });
+  });
+
+  it("emits a trace with error.stage='retrieve' when retrieve throws", async () => {
+    mocks.retrieve.mockRejectedValueOnce(new Error("Pinecone timeout"));
+    await expect(
+      semanticSearchTool.execute(
+        { query: "x" },
+        { toolCallId: "t2", messages: [] } as never,
+      ),
+    ).rejects.toThrow();
+    const last = mocks.emitTrace.mock.calls.at(-1);
+    expect(last?.[0]).toMatchObject({
+      error: { stage: "retrieve", message: "Pinecone timeout" },
+    });
   });
 });

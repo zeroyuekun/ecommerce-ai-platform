@@ -11,6 +11,11 @@ vi.mock("@/lib/ai/rag/query/rerank", () => ({ rerankAndDedupe: vi.fn() }));
 vi.mock("@/lib/ai/tools/semantic-search-hydrate", () => ({
   hydrateProductSummaries: vi.fn(),
 }));
+// semantic-search.ts now imports trace.ts which imports analytics/server.ts
+// (a Next.js server-only module). Mock it so Vite/Vitest can resolve the graph.
+vi.mock("@/lib/analytics/server", () => ({
+  captureServerEvent: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { createShoppingAgent } from "@/lib/ai/shopping-agent";
 
