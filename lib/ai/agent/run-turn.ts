@@ -25,6 +25,16 @@ export interface RunTurnResult {
   candidatesByCall: RetrievalTrace["retrieve"]["candidates"][];
 }
 
+/**
+ * Non-streaming agent turn used by the eval harness (Task 10) and any
+ * future test suite that needs to grade an agent's full response.
+ *
+ * NOT concurrent-safe: the in-process trace collector at `lib/ai/rag/trace.ts`
+ * is module-global and sequential-only. A parallel eval harness must
+ * serialize calls to this function — calling it twice in parallel will
+ * conflate or drop traces. AsyncLocalStorage is the rigorous fix and is
+ * deferred to §8 of the Phase 1.6 spec.
+ */
 export async function runAgentTurn({
   query,
   history = [],
@@ -50,7 +60,7 @@ export async function runAgentTurn({
     });
 
     return {
-      answer: typeof result.text === "string" ? result.text : "",
+      answer: result.text,
       candidatesByCall: stopCollecting().map((t) => t.retrieve.candidates),
     };
   } catch (err) {
