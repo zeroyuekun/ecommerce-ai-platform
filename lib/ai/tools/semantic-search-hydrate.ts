@@ -6,11 +6,14 @@
  */
 import type { ProductSummary } from "@/lib/ai/rag/query/format";
 import { getStockStatus } from "@/lib/constants/stock";
-import { formatPrice } from "@/lib/utils";
 import { client as sanityClient } from "@/sanity/lib/client";
 
+// Price is intentionally NOT projected here. The system prompt promises
+// SUMMARIES ONLY for semanticSearch — getProductDetails is the authoritative
+// source for any number the agent quotes. Keeping price out of this query
+// keeps the LLM context clean and the guardrail honest.
 const SUMMARY_QUERY = `*[_type == "product" && _id in $ids]{
-  _id, name, slug, description, price, material, color, stock,
+  _id, name, slug, description, material, color, stock,
   "image": images[0]{ asset->{ url } }
 }`;
 
@@ -19,7 +22,6 @@ interface SanityRow {
   name: string;
   slug: { current: string };
   description: string;
-  price: number;
   material: string | null;
   color: string | null;
   stock: number;
@@ -54,8 +56,6 @@ export async function hydrateProductSummaries(
       slug: r.slug.current,
       name: r.name,
       oneLine: oneLineDescription(r.description),
-      price: r.price,
-      priceFormatted: formatPrice(r.price),
       keyMaterials: keyMaterials(r.material, r.color),
       stockStatus,
       imageUrl: r.image?.asset?.url ?? null,

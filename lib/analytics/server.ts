@@ -39,8 +39,16 @@ export function getServerAnalytics(): PostHog | null {
 }
 
 /**
- * Helper that captures an event and immediately flushes. Safe to call
- * when analytics is disabled (returns a resolved promise).
+ * Helper that captures an event and flushes pending events without tearing
+ * down the client. Safe to call when analytics is disabled (returns a
+ * resolved promise).
+ *
+ * Why `flush()` and not `shutdown()`: shutdown closes the client for good,
+ * which forced the previous implementation to also clear the singleton —
+ * meaning every event paid the cost of constructing a fresh PostHog client.
+ * `flush()` ships pending events but keeps the cached client alive for
+ * reuse across the lifetime of the serverless container. The container's
+ * own exit semantics drain anything still in flight.
  */
 export async function captureServerEvent(params: {
   distinctId: string;
@@ -50,6 +58,5 @@ export async function captureServerEvent(params: {
   const client = getServerAnalytics();
   if (!client) return;
   client.capture(params);
-  await client.shutdown();
-  cached = undefined;
+  await client.flush();
 }

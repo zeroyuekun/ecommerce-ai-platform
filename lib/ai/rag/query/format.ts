@@ -12,8 +12,6 @@ export interface ProductSummary {
   slug: string;
   name: string;
   oneLine: string;
-  price: number;
-  priceFormatted: string;
   keyMaterials: string;
   stockStatus: StockStatus;
   imageUrl: string | null;

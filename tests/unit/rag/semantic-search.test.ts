@@ -67,8 +67,6 @@ describe("semanticSearchTool", () => {
         slug: "x",
         name: "X",
         oneLine: "x.",
-        price: 100,
-        priceFormatted: "$100",
         keyMaterials: "oak",
         stockStatus: "in_stock",
         imageUrl: null,
@@ -85,6 +83,19 @@ describe("semanticSearchTool", () => {
     expect(out.found).toBe(true);
     expect(out.products[0].id).toBe("p1");
     expect(out.products[0].relevanceScore).toBe(0.95);
+  });
+
+  it("does NOT include price or priceFormatted in the LLM payload", async () => {
+    // The system prompt promises SUMMARIES ONLY for semanticSearch; the
+    // authoritative source for any number quoted to the customer is
+    // getProductDetails. Pin that contract so a future hydrate refactor
+    // can't silently re-leak price into the agent's context.
+    const out = await semanticSearchTool.execute(
+      { query: "cozy reading chair" },
+      { messages: [], toolCallId: "t1" } as never,
+    );
+    expect(out.products[0]).not.toHaveProperty("price");
+    expect(out.products[0]).not.toHaveProperty("priceFormatted");
   });
 
   it("respects user-supplied filters by merging with extracted ones", async () => {
@@ -179,8 +190,6 @@ describe("semanticSearchTool", () => {
         slug: "x",
         name: "X",
         oneLine: "x.",
-        price: 100,
-        priceFormatted: "$100",
         keyMaterials: "oak",
         stockStatus: "in_stock",
         imageUrl: null,
