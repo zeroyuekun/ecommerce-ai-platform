@@ -208,12 +208,15 @@ const _semanticSearchTool = tool({
       const rerankBackend: "cohere" | "fallback" = process.env.COHERE_API_KEY
         ? "cohere"
         : "fallback";
-      const rerankResults = reranked.map((r) => {
-        const id =
-          (r as { chunkId?: string; productId?: string }).chunkId ??
-          (r as { productId: string }).productId;
-        return { id, score: r.score };
-      });
+      // Record chunk id (`r.id` is the chunk id on QueryMatch) so this matches
+      // the id format in `trace.retrieve.candidates[].id` and the format
+      // verify-phase-1-6.ts writes. The earlier `chunkId ?? productId` cast
+      // dance fell back to productId every time because QueryMatch has no
+      // `chunkId` field — silently producing inconsistent traces.
+      const rerankResults = reranked.map((r) => ({
+        id: r.id,
+        score: r.score,
+      }));
       builder.setRerank({
         backend: rerankBackend,
         topN: TOP_N_RERANK,

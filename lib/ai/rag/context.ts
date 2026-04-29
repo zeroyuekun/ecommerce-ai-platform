@@ -43,6 +43,23 @@ export interface AssembleResult {
 
 const DEFAULT_PRESERVE_RECENT = 6;
 
+/**
+ * 1.5× safety multiplier on top of the 4-chars-per-token heuristic. Real
+ * tokenizers diverge from the heuristic, especially for multi-turn
+ * conversations with formatting overhead. This conservative budget avoids
+ * hitting the provider hard cap mid-request.
+ *
+ * Centralized here so pre- and post-compaction branches use the same unit —
+ * an earlier version applied the multiplier only to the pre-compaction
+ * estimate, which made the hard-cap check inconsistent and the
+ * `inputTokens` telemetry asymmetric.
+ */
+const TOKEN_SAFETY_MULTIPLIER = 1.5;
+
+function projectTokens(messages: ContextMessage[]): number {
+  return Math.ceil(estimateMessageTokens(messages) * TOKEN_SAFETY_MULTIPLIER);
+}
+
 export async function assembleContext(
   args: AssembleArgs,
 ): Promise<AssembleResult> {
@@ -54,11 +71,7 @@ export async function assembleContext(
     compactor,
   } = args;
 
-  // Apply a 1.5× safety multiplier: real tokenizers diverge from the
-  // 4-chars-per-token heuristic, especially for multi-turn conversations
-  // with formatting overhead. This conservative budget avoids hitting the
-  // provider hard cap mid-request.
-  const projected = Math.ceil(estimateMessageTokens(messages) * 1.5);
+  const projected = projectTokens(messages);
   if (projected <= softCapTokens) {
     return { messages, compacted: false, inputTokens: projected };
   }
@@ -84,7 +97,7 @@ export async function assembleContext(
   // owns the summary. This avoids a class of bugs where the compactor returns
   // the wrong slice (e.g. last-N-of-head instead of last-N-of-original).
   const next = [summaryMessage, ...tail];
-  const nextTokens = estimateMessageTokens(next);
+  const nextTokens = projectTokens(next);
 
   if (nextTokens > hardCapTokens) {
     throw new Error(
