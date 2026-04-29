@@ -64,8 +64,12 @@ jobs:
     env:
       # Placeholder values so `next build` succeeds without real credentials.
       # Real secrets belong in repo/environment secrets, not here.
-      NEXT_PUBLIC_SANITY_PROJECT_ID: placeholder
+      # Sanity values are NEXT_PUBLIC_* — they ship in the client bundle
+      # and are required by sanity.cli.ts + `pnpm typegen` (which hits the
+      # real Sanity API to fetch the published schema).
+      NEXT_PUBLIC_SANITY_PROJECT_ID: 8oups9cq
       NEXT_PUBLIC_SANITY_DATASET: production
+      NEXT_PUBLIC_SANITY_ORG_ID: oFFRqa2hW
       SANITY_API_WRITE_TOKEN: placeholder
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
       CLERK_SECRET_KEY: sk_test_placeholder
