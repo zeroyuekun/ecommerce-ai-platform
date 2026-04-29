@@ -231,6 +231,23 @@ describe("semanticSearch trace emission", () => {
     });
   });
 
+  it("records the chunk id (not productId) in rerank.results[].id (Bug C)", async () => {
+    // Regression guard: the earlier code did a `chunkId ?? productId` cast
+    // dance on the rerank result, but QueryMatch has no `chunkId` field —
+    // so it always fell back to productId. Trace consumers expect chunk id
+    // here (matches retrieve.candidates[].id and verify-phase-1-6.ts).
+    await semanticSearchTool.execute({ query: "anything" }, {
+      toolCallId: "tBugC",
+      messages: [],
+    } as never);
+    const last = mocks.emitTrace.mock.calls.at(-1);
+    const trace = last?.[0] as {
+      rerank: { results: Array<{ id: string; score: number }> };
+    };
+    expect(trace.rerank.results[0].id).toBe("p1#parent");
+    expect(trace.rerank.results[0].id).not.toBe("p1");
+  });
+
   it("emits a trace with error.stage='retrieve' when retrieve throws", async () => {
     mocks.retrieve.mockRejectedValueOnce(new Error("Pinecone timeout"));
     await expect(

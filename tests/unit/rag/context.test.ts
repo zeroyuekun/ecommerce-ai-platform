@@ -68,6 +68,42 @@ describe("assembleContext", () => {
     expect(out.messages.at(-1)?.content).toContain("position=29");
   });
 
+  it("reports inputTokens with the same safety multiplier on both branches (Bug B)", async () => {
+    // Regression guard: the pre-compaction branch projected with a 1.5×
+    // safety multiplier while the post-compaction branch returned the raw
+    // estimate. Telemetry was inconsistent and the post-compaction hard-cap
+    // check could pass at projection but exceed the provider cap once the
+    // real tokenizer ran. Both branches must use the same unit now.
+    //
+    // We exercise the no-compaction branch and the compaction branch in
+    // turn and confirm inputTokens for each has the multiplier baked in
+    // (i.e. is > the raw 4-chars-per-token estimate).
+    const small = makeMessages(4, 100); // ~104 raw tokens incl. overhead
+    const noCompact = await assembleContext({
+      messages: small,
+      hardCapTokens: 32_000,
+      softCapTokens: 16_000,
+      compactor: noopCompactor,
+    });
+    expect(noCompact.compacted).toBe(false);
+    // 100 chars × 4 messages / 4 chars-per-token + 4 × overhead = 116 raw.
+    // With 1.5×: 174. Pin >= 150 to avoid coupling to the exact constant.
+    expect(noCompact.inputTokens).toBeGreaterThanOrEqual(150);
+
+    const big = makeMessages(40, 600);
+    const compacted = await assembleContext({
+      messages: big,
+      hardCapTokens: 32_000,
+      softCapTokens: 8_000,
+      compactor: noopCompactor,
+    });
+    expect(compacted.compacted).toBe(true);
+    // The compacted result is summary + 6-tail × 600 chars ≈ 924 raw tokens.
+    // With 1.5× we should see > 1000; without, < 1000. Pin > 1000 to lock
+    // the multiplier in.
+    expect(compacted.inputTokens).toBeGreaterThan(1000);
+  });
+
   it("hard-rejects when even compaction cannot fit", async () => {
     const msgs = makeMessages(200, 800);
     const tinyCompactor: Compactor = vi.fn(async () => ({
