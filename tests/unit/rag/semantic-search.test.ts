@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   retrieve: vi.fn(),
   rerank: vi.fn(),
   hydrate: vi.fn(),
+  emitTrace: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/lib/ai/rag/query/understand", () => ({
@@ -16,6 +17,13 @@ vi.mock("@/lib/ai/rag/query/rerank", () => ({ rerankAndDedupe: mocks.rerank }));
 vi.mock("@/lib/ai/tools/semantic-search-hydrate", () => ({
   hydrateProductSummaries: mocks.hydrate,
 }));
+vi.mock("@/lib/analytics/server", () => ({
+  captureServerEvent: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("@/lib/ai/rag/trace", async (orig) => {
+  const actual = await orig<typeof import("@/lib/ai/rag/trace")>();
+  return { ...actual, emitTrace: mocks.emitTrace };
+});
 
 import { semanticSearchTool } from "@/lib/ai/tools/semantic-search";
 
@@ -25,6 +33,7 @@ describe("semanticSearchTool", () => {
       rewritten: "x",
       filters: { maxPrice: 500 },
       hyde: null,
+      fellBack: false,
     });
     mocks.retrieve.mockReset().mockResolvedValue([
       {
@@ -58,8 +67,6 @@ describe("semanticSearchTool", () => {
         slug: "x",
         name: "X",
         oneLine: "x.",
-        price: 100,
-        priceFormatted: "$100",
         keyMaterials: "oak",
         stockStatus: "in_stock",
         imageUrl: null,
@@ -76,6 +83,19 @@ describe("semanticSearchTool", () => {
     expect(out.found).toBe(true);
     expect(out.products[0].id).toBe("p1");
     expect(out.products[0].relevanceScore).toBe(0.95);
+  });
+
+  it("does NOT include price or priceFormatted in the LLM payload", async () => {
+    // The system prompt promises SUMMARIES ONLY for semanticSearch; the
+    // authoritative source for any number quoted to the customer is
+    // getProductDetails. Pin that contract so a future hydrate refactor
+    // can't silently re-leak price into the agent's context.
+    const out = await semanticSearchTool.execute(
+      { query: "cozy reading chair" },
+      { messages: [], toolCallId: "t1" } as never,
+    );
+    expect(out.products[0]).not.toHaveProperty("price");
+    expect(out.products[0]).not.toHaveProperty("priceFormatted");
   });
 
   it("respects user-supplied filters by merging with extracted ones", async () => {
@@ -170,8 +190,6 @@ describe("semanticSearchTool", () => {
         slug: "x",
         name: "X",
         oneLine: "x.",
-        price: 100,
-        priceFormatted: "$100",
         keyMaterials: "oak",
         stockStatus: "in_stock",
         imageUrl: null,
@@ -187,5 +205,43 @@ describe("semanticSearchTool", () => {
     expect(rerankArgs.candidateTexts["p9#description"]).toMatch(
       /^description:p9#description$/,
     );
+  });
+});
+
+describe("semanticSearch trace emission", () => {
+  beforeEach(() => {
+    mocks.emitTrace.mockClear();
+  });
+
+  it("emits exactly one trace per execute call, with full pipeline fields", async () => {
+    await semanticSearchTool.execute({ query: "oak bedside table" }, {
+      toolCallId: "t1",
+      messages: [],
+    } as never);
+    expect(mocks.emitTrace).toHaveBeenCalledTimes(1);
+    const [trace] = mocks.emitTrace.mock.calls[0];
+    expect(trace).toMatchObject({
+      query: { raw: "oak bedside table" },
+      understand: expect.objectContaining({ rewritten: expect.any(String) }),
+      retrieve: expect.objectContaining({ topK: 30 }),
+      rerank: expect.objectContaining({
+        backend: expect.stringMatching(/cohere|fallback/),
+      }),
+      picked: expect.objectContaining({ productIds: expect.any(Array) }),
+    });
+  });
+
+  it("emits a trace with error.stage='retrieve' when retrieve throws", async () => {
+    mocks.retrieve.mockRejectedValueOnce(new Error("Pinecone timeout"));
+    await expect(
+      semanticSearchTool.execute({ query: "x" }, {
+        toolCallId: "t2",
+        messages: [],
+      } as never),
+    ).rejects.toThrow();
+    const last = mocks.emitTrace.mock.calls.at(-1);
+    expect(last?.[0]).toMatchObject({
+      error: { stage: "retrieve", message: "Pinecone timeout" },
+    });
   });
 });

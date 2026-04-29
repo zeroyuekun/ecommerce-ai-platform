@@ -26,6 +26,7 @@ export interface Understanding {
   rewritten: string;
   filters: QueryFilters;
   hyde: string | null;
+  fellBack: boolean;
 }
 
 export interface ConversationTurn {
@@ -126,12 +127,13 @@ export async function understandQuery(
       rewritten: parsed.rewritten,
       filters: sanitizeFilters(parsed.filters),
       hyde: parsed.hyde,
+      fellBack: false,
     };
   } catch (err) {
     captureException(err, {
       extra: { context: "query-understand", query: args.query },
     });
-    return { rewritten: args.query, filters: {}, hyde: null };
+    return { rewritten: args.query, filters: {}, hyde: null, fellBack: true };
   }
 }
 
@@ -167,5 +169,5 @@ Tasks:
 
 Return strict JSON matching the schema.`,
   });
-  return result.object;
+  return { ...result.object, fellBack: false };
 };

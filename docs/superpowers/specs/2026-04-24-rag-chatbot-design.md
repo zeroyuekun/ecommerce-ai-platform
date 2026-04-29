@@ -18,7 +18,7 @@ The existing storefront keyword search is unchanged. The chat UI shell, image up
 | Metric | Target | Measured by |
 |---|---|---|
 | recall@5 on golden set | ≥ 0.85 | `pnpm test:rag` (CI nightly + on PR) |
-| Faithfulness (LLM-judge) | ≥ 0.90 | same |
+| Heuristic faithfulness mean | ≥ 0.85 (initial floor; LLM-judge upgrade documented in Phase 1.6 §4.5) | `pnpm eval:rag` (on-demand — see Phase 1.6 §5) |
 | p95 first-token latency | < 2.0 s | k6 load test + AI Gateway logs |
 | p95 end-to-end response | < 3.5 s | same |
 | Cost per query | ≤ $0.02 | nightly budget assertion |
@@ -279,8 +279,8 @@ Pinecone returns top-30 → Cohere reranks to top-10 → **only top-5 enter the 
 
 - Per-turn input token count → PostHog (event `rag.turn.input_tokens`).
 - Compaction events → PostHog (event `rag.compaction.triggered` with payload `{turn, input_tokens, summary_tokens}`).
-- Alert: p95 turn input tokens > 24K over a 24 h window.
-- Alert: compaction failure rate > 1%.
+- Alert: p95 turn input tokens > 24K over a 24 h window. (deferred to Phase 1.7 — Phase 1.6 delivers retrieval-stage observability instead)
+- Alert: compaction failure rate > 1%. (deferred to Phase 1.7 — Phase 1.6 delivers retrieval-stage observability instead)
 
 ---
 
@@ -288,7 +288,7 @@ Pinecone returns top-30 → Cohere reranks to top-10 → **only top-5 enter the 
 
 ### Golden set
 
-`tests/rag/golden.json` — 200 queries hand-curated across 6 buckets (~33 each):
+`tests/rag/golden.json` — 50 in Phase 1.6, target 200 by Phase 2; hand-curated across 6 buckets:
 
 | Bucket | Examples |
 |---|---|
@@ -314,15 +314,14 @@ Additional 20 multi-turn dialogues (5-15 turns each) covering aesthetic discover
 
 - recall@1, recall@5, recall@10
 - MRR, NDCG@10
-- LLM-judge faithfulness (Sonnet 4.5 grades the agent's answer against the retrieved context + ground truth)
+- Heuristic faithfulness (regex + catalog-vocab lookup; LLM-judge available via env flag — see Phase 1.6 §4.5)
 - Filter extraction F1
 - p50 / p95 latency
 - $/query (computed from token usage × published model pricing)
 
 ### CI gates
 
-- `pnpm test:rag` runs nightly + on PRs that touch `lib/ai/rag/**` or any agent tool.
-- Block merge on:
+- Manual `pnpm eval:rag` run before any merge that touches `lib/ai/rag/**` (eval is on-demand only — see Phase 1.6 §5). The eval runs the full agent loop locally; engineer reviews output and proceeds (or blocks) on:
   - recall@5 drop > 2%
   - faithfulness drop > 2%
   - faithfulness degradation across 15 turns > 5%
@@ -390,7 +389,7 @@ Recently-viewed bias in retrieval, cart-aware "complete the look" via Wayfair-Vi
 | Pinecone outage | `semanticSearch` falls back to existing `filterSearch`; agent system prompt covers the degraded mode (still useful, just less semantic). |
 | Voyage outage | Adapter behind interface; can swap to Cohere `embed-v4` (1024d) with one env-var change + full re-index (~$0.50, ~30 min for low-thousands of products). |
 | Cohere Rerank outage | Skip rerank step; pass top-10 from hybrid retrieval directly to LLM. Quality drop ~15-20% but functional. |
-| Hallucinated specs slip through | Tool-mediated truth (no spec/price/stock ever leaves the LLM without a fresh `getProductDetails` call); LLM-judge faithfulness gate in CI. |
+| Hallucinated specs slip through | Tool-mediated truth (no spec/price/stock ever leaves the LLM without a fresh `getProductDetails` call); heuristic faithfulness gate via on-demand `pnpm eval:rag` (see Phase 1.6 §4–5). |
 | Cost runaway | Per-user 20 req/min limit retained; `$/query` budget assertion in nightly eval; alert if 7-day rolling p95 > $0.025. |
 | Bad re-index corrupts the index | Double-buffer pattern: write to `products-v{N+1}` namespace, swap pointer in Edge Config when verified; old namespace kept 24 h. |
 | Sanity webhook flakes | QStash retries with exponential backoff; nightly reconciliation job diffs Sanity vs Pinecone product IDs. |

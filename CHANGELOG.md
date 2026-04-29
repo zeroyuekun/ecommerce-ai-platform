@@ -4,6 +4,55 @@ All notable changes to this project are documented here, in reverse chronologica
 
 ---
 
+## 2026-04-28
+
+### RAG Phase 1.6 — 17 of 18 implementation tasks shipped
+- Phase 1.6 design spec at `docs/superpowers/specs/2026-04-27-rag-telemetry-faithfulness-design.md` and 18-task implementation plan at `docs/superpowers/plans/2026-04-28-rag-phase-1-6-implementation.md` — closes the two named gaps from Phase 1: per-query retrieval traces and answer-faithfulness measurement
+- Trace recorder (`lib/ai/rag/trace.ts`) shipped: emits one structured record per `semanticSearch` call to stdout (Vercel Logs in prod), opt-in `.tmp/rag-traces.jsonl` via `RAG_TRACE_FILE=1`, and PostHog (`rag.retrieval.completed`) alongside the existing turn-level events
+- Heuristic faithfulness checker shipped (`lib/ai/rag/faithfulness.ts`) — regex + catalog-vocab matching for price/dim/material/color/name/stock/shipping claims; zero recurring cost. LLM-as-judge upgrade is a one-line `FAITHFULNESS_BACKEND=llm` flag flip; current LLM path is a stub
+- Shared agent config factory (`lib/ai/agent/config.ts`) and non-streaming `runAgentTurn` (`lib/ai/agent/run-turn.ts`) extracted so the eval harness exercises the real prompt + tool loop without going through the streaming chat route
+- Trace-tail CLI (`pnpm trace:tail`) reads `.tmp/rag-traces.jsonl` with `--bucket` / `--since` filters
+- Eval harness extended with agent-driven runs, faithfulness gate (≥ 0.85), per-bucket rollup, and a `--yes` cost banner (~$0.15/run, on-demand only)
+- PII redactor (`redactPII` in `lib/monitoring/index.ts`) — emails + phone-like patterns stripped before traces emit
+- CI hygiene: `eval-rag.yml` workflow dropped (eval is on-demand only); Phase 1 spec amended to match shipped reality (LLM-judge ship gate walked back to heuristic 0.85 floor; nightly CI gate replaced with manual `pnpm eval:rag` before merges into `lib/ai/rag/**`; turn-level token *alerts* deferred to Phase 1.7 — events themselves shipped in Phase 1)
+- Golden set grew 15 → 50 across 7 buckets — synonym (10), multi-constraint (10), vague-style (5), out-of-vocabulary (5), ambiguous-routing (5) — every product ID grounded in the live Sanity catalog (no fabrication)
+- Pre-rollback git tag `pre-phase-1-6` set
+- **Cost-free verification path** (`pnpm verify:rag` → `tools/verify-phase-1-6.ts`): drives the real Pinecone + Cohere pipeline with a stub query-understanding function, so trace + faithfulness checker code paths can be exercised end-to-end without burning AI Gateway credits. Surfaces a per-claim `score / supported / unsupported / reasoning` block over real catalog data.
+- **Heuristic checker fix** (surfaced by the verification): price comparator no longer false-matches embedded substrings — `$99.99` no longer matches inside `$179.99`, `$200` no longer matches inside `$2,000.00`. Now uses canonical numeric form (integer + optional `.NN`) with non-digit/non-dot boundaries.
+- **Reindex `--no-qa` mode**: `pnpm reindex:rag --no-qa` refreshes the 4 base chunks per product (parent/description/specs/care) using only Pinecone Inference (free). Skips the Haiku-backed synthetic Q&A pass. Useful for picking up the 2026-04-25 C3 chunk-text fix without paying for Q&A regeneration.
+- **Production Pinecone refreshed (2026-04-28)** via `pnpm reindex:rag --no-qa` — all 57 products × 4 base chunks. The pre-2026-04-25 chunks (which lacked `metadata.text`) are gone; trace candidates now carry real chunk text. `pnpm verify:rag` confirms — heuristic faithfulness on the truthful test case jumped from 0.000 to 0.750 after the refresh. Synthetic-Q&A chunks will be backfilled on the next full re-index.
+- **No-LLM eval baseline** (`pnpm eval:rag-cheap` → `tools/rag-eval-cheap.ts`): runs all 50 golden cases through real Pinecone retrieve + rerank with a stub query-understanding function. Zero cost, ~30s. Reports recall@1/5/10, MRR, NDCG@10, per-bucket breakdown, plus a "lowest-recall non-refusal cases" diagnostic. Faithfulness in this mode is a wiring check (synthesizes an answer from the top chunks → score ≈ 1.0 by construction); real faithfulness still needs the agent. Recall metrics are real on the full 50-case set.
+- **Baseline numbers (2026-04-28, 41 non-refusal cases)** — recall@1 = 0.669, recall@5 = 0.894, recall@10 = 0.894, MRR = 0.884, NDCG@10 = 0.855, p50 latency 581 ms, p95 latency 843 ms. Per-bucket: `specific` / `aesthetic` / `multi-constraint` / `ambiguous-routing` all at perfect 1.000; the harder buckets are `synonym` 0.722 and `vague-style` 0.467 — exactly where HyDE would help. Captured as Appendix A in the Phase 1.6 spec.
+- **Direct-Gemini escape hatch for the eval CLI**: wired `@ai-sdk/google@3.0.0-beta.65` (peer-dep-matched to `ai@6.0.0-beta.137`) so `RAG_EVAL_AGENT_MODEL=google/gemini-2.5-flash` bypasses Vercel AI Gateway entirely. Production paths untouched (chat route doesn't pass `modelOverride`). Same code resolves the model — `lib/ai/agent/config.ts:resolveModel` branches on the `google/` prefix. Includes a Gemini-compatible `filterSearchToolGemini` variant (Google's API rejects the empty-string enum sentinel that the production schema uses).
+- **Eval CLI throttle + stratified subset**: `RAG_EVAL_THROTTLE_MS=N` paces requests for tight free-tier RPM; `--per-bucket=N` runs a stratified subset when daily quotas can't fit 50 cases. Per-case progress now prints (`[12/50] case-id... ok (8421ms)`) so long throttled runs show life.
+- **Direct-Gemini agent proof-of-life (n=6 cases)**: 2 manual smokes + 4 eval-harness cases ran end-to-end on Gemini 2.5 Flash / Flash-Lite. Trace recorder fired correctly, tool routing was correct (filterSearch for hard-constraint, semanticSearch for vibe queries), agent answers cited the right products from the right slugs. Captured as Appendix B.
+- **Carry-forward (T18 not closed):** Google's newly-minted free-tier keys are capped at **20 RPD per model**; a single eval case fires 2-4 Gemini calls (incl. AI SDK retry bursts on 503s), so the daily cap fits ~5-7 cases per Google project per day. Four paths to a complete 50-case Appendix B baseline are documented in the spec — none requires the original Vercel AI Gateway top-up. Cheapest cleanest is `pnpm eval:rag --yes --per-bucket=2` distributed across 4 days. The Appendix A retrieval baseline (recall@5 = 0.894 on the full set) carries the retrieval story without requiring an agent-driven run.
+
+## 2026-04-25
+
+### RAG Phase 1 — shipped to production
+- Replaced the keyword-only `searchProducts` tool with semantic retrieval over Pinecone (Pinecone Inference `multilingual-e5-large` embeddings @ 1024d)
+- Query understanding pass: Haiku rewrites the user query, generates a hypothetical answer (HyDE), and extracts structured filters (category, material, color, price range)
+- Optional Cohere reranker — pipeline auto-skips when `COHERE_API_KEY` is missing and preserves Pinecone's native similarity scores
+- Conversation compaction: Haiku compacts older turns into a summary when input exceeds the soft token cap, so the user-facing Sonnet model never blows past its budget
+- Each product is chunked into 4–9 pieces (parent summary, description, specs, care instructions, plus optional synthetic Q&A pairs)
+- Behind feature flag `RAG_ENABLED` — instant rollback via `vercel env rm RAG_ENABLED production`. Hard revert via `git tag pre-rag`
+- Per-turn telemetry to PostHog: `rag.turn.input_tokens`, `rag.compaction.triggered`
+- Smoke tools in `tools/` (`smoke-rag`, `smoke-agent`, `smoke-filters`, `smoke-understand`, `list-products`, `rag-eval`); `pnpm` scripts: `eval:rag`, `reindex:rag`
+- Cost profile: Sonnet 4.5 for the user-facing chatbot (~$0.01–0.03 per turn); Haiku 4.5 for query understanding, conversation compaction, synthetic Q&A indexing; Pinecone Inference + Cohere are free-tier
+- Post-cutover P0–P3 audit sweep landed in commit `4472977`
+
+## 2026-04-20
+
+### Production hardening
+- Performance and robustness audit across data layer, API routes, hot-path components — see README "Performance & Robustness Hardening" section for the full breakdown
+- Sanity read-only client switched to `useCdn: true` for edge-cached published reads
+- `/api/chat` gained zod validation, 256KB body cap, per-user rate limiter (20 req/min), explicit `runtime: "nodejs"`, `maxDuration: 60`
+- Stripe webhook decoupled from `lineItems` ordering — now matches by `productId` in `product_data.metadata`
+- Admin insights route fused inventory passes into one and replaced greedy-regex JSON extraction with a balanced-brace parser
+- Cart-stock hook gained debounce, `AbortController` cancellation, and an O(1) Map lookup
+- Production hardening v2 (later): Playwright e2e suite, Lighthouse CI, Upstash Redis swap for the rate limiter, PostHog scaffold
+
 ## 2026-03-11
 
 ### Animations

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"],
+      "@/sanity/lib/live": ["./sanity/lib/live-shim.ts"],
+      "@/lib/analytics/server": ["./lib/analytics/server-shim.ts"]
+    }
+  }
+}

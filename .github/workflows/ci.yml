@@ -15,6 +15,15 @@ jobs:
     name: Typecheck, lint, test
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # `pnpm typegen` runs `sanity schema extract`, which hits the Sanity
+      # API to fetch the published schema (not just local source). It also
+      # loads sanity.cli.ts which requires all three of project / dataset /
+      # org. These are NEXT_PUBLIC_* values — they ship in the client bundle
+      # anyway, so embedding them here is not a secret leak.
+      NEXT_PUBLIC_SANITY_PROJECT_ID: 8oups9cq
+      NEXT_PUBLIC_SANITY_DATASET: production
+      NEXT_PUBLIC_SANITY_ORG_ID: oFFRqa2hW
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,10 +64,18 @@ jobs:
     env:
       # Placeholder values so `next build` succeeds without real credentials.
       # Real secrets belong in repo/environment secrets, not here.
-      NEXT_PUBLIC_SANITY_PROJECT_ID: placeholder
+      # Sanity values are NEXT_PUBLIC_* — they ship in the client bundle
+      # and are required by sanity.cli.ts + `pnpm typegen` (which hits the
+      # real Sanity API to fetch the published schema).
+      NEXT_PUBLIC_SANITY_PROJECT_ID: 8oups9cq
       NEXT_PUBLIC_SANITY_DATASET: production
+      NEXT_PUBLIC_SANITY_ORG_ID: oFFRqa2hW
       SANITY_API_WRITE_TOKEN: placeholder
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+      # Clerk's React SDK runs format validation on the publishable key at
+      # module init — the key must be `pk_test_<base64(domain$)>` shaped or
+      # ClerkProvider throws during static prerender. The base64 here is
+      # `clerk.example.com$` (Clerk's own example placeholder).
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS5jb20k
       CLERK_SECRET_KEY: sk_test_placeholder
       STRIPE_SECRET_KEY: sk_test_placeholder
       STRIPE_WEBHOOK_SECRET: whsec_placeholder

@@ -136,5 +136,399 @@
     "expectedFilters": { "category": "living-room", "material": "fabric" },
     "expectedRefusal": false,
     "notes": "Boucle Occasional Chair - Beige"
+  },
+  {
+    "id": "g_synonym_01",
+    "bucket": "synonym",
+    "query": "nightstand for a small bedroom",
+    "expectedProductIds": [
+      "product-blair-bedside-table",
+      "product-osaka-bedside-table",
+      "product-maisie-bedside-table",
+      "product-maisie-bedside-table-pink",
+      "b7a174ce-064c-42ab-a1bf-6d90169d3efe",
+      "5ec1acd4-dcc4-441e-8329-06bd8bbee69c"
+    ],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'bedside table'; query uses synonym 'nightstand'. Six bedsides available."
+  },
+  {
+    "id": "g_synonym_02",
+    "bucket": "synonym",
+    "query": "comfy couch for the patio",
+    "expectedProductIds": ["0dcced62-6073-45d4-b11c-211ded717b8a"],
+    "expectedFilters": { "category": "outdoor" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'sofa'; query uses synonym 'couch'. Sorrento Outdoor 3-seater is the only patio sofa."
+  },
+  {
+    "id": "g_synonym_03",
+    "bucket": "synonym",
+    "query": "carpet for the living room",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "living-room" },
+    "expectedRefusal": true,
+    "notes": "Catalog uses 'rug' as a category but stocks none — and 'carpet' is the synonym probe. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_04",
+    "bucket": "synonym",
+    "query": "task lamp for my desk",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "lighting-decor" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'desk lamp'. Catalog has no lamps in lighting-decor — only Lena mirror. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_05",
+    "bucket": "synonym",
+    "query": "loveseat in beige",
+    "expectedProductIds": ["6252e463-7b7a-4ef3-86a9-9b9b09dc3d13"],
+    "expectedFilters": {},
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'two-seater'; 'loveseat' is the synonym. Mini Roo Two Seater is the only match. 'beige' is out-of-vocab for COLOR_VALUES so no filter extraction expected."
+  },
+  {
+    "id": "g_synonym_06",
+    "bucket": "synonym",
+    "query": "wardrobe for hanging clothes",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'armoire'. Catalog has no wardrobes (Aspen 3-piece is storage, not a wardrobe). Agent should refuse."
+  },
+  {
+    "id": "g_synonym_07",
+    "bucket": "synonym",
+    "query": "ottoman for the living room",
+    "expectedProductIds": [],
+    "expectedFilters": { "category": "living-room" },
+    "expectedRefusal": true,
+    "notes": "Synonym for 'footstool'. No ottomans in catalog. Agent should refuse."
+  },
+  {
+    "id": "g_synonym_08",
+    "bucket": "synonym",
+    "query": "drinks cabinet in walnut",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut" },
+    "expectedRefusal": false,
+    "notes": "Catalog uses 'buffet'; query uses synonym 'cabinet'. Two walnut buffets available."
+  },
+  {
+    "id": "g_synonym_09",
+    "bucket": "synonym",
+    "query": "study chair for a teenage room",
+    "expectedProductIds": [
+      "product-amour-desk-chair",
+      "product-asher-rattan-chair",
+      "product-luca-chrome-chair",
+      "product-nolan-chair-olive"
+    ],
+    "expectedFilters": { "category": "office-storage" },
+    "expectedRefusal": false,
+    "notes": "'study chair' is a synonym for 'office chair'. Four office chairs available."
+  },
+  {
+    "id": "g_synonym_10",
+    "bucket": "synonym",
+    "query": "dresser for the bedroom",
+    "expectedProductIds": [
+      "product-blair-six-drawer",
+      "product-osaka-six-drawer-natural",
+      "product-osaka-six-drawer"
+    ],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": false,
+    "notes": "'dresser' is a synonym for 'six drawer'. Three available."
+  },
+  {
+    "id": "g_multi_01",
+    "bucket": "multi-constraint",
+    "query": "natural wood queen bed under $700",
+    "expectedProductIds": ["dd845ff5-be1c-4be0-add9-6cf33b5b5776"],
+    "expectedFilters": {
+      "category": "bedroom",
+      "color": "natural",
+      "material": "wood",
+      "maxPrice": 700
+    },
+    "expectedRefusal": false,
+    "notes": "Four constraints: category, color, material, price ceiling. Quinn Queen Bed - Natural at $699.99 is the only match."
+  },
+  {
+    "id": "g_multi_02",
+    "bucket": "multi-constraint",
+    "query": "outdoor dining table for 4 under $300",
+    "expectedProductIds": ["f1e63d21-0edc-4c74-b11e-84635da145a3"],
+    "expectedFilters": { "category": "outdoor", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "Category + price + seat-count. Ravello Outdoor Four Seater Dining Table - Beige at $249.99."
+  },
+  {
+    "id": "g_multi_03",
+    "bucket": "multi-constraint",
+    "query": "walnut buffet under $500",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut", "maxPrice": 500 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Deven ($499.99) and Osaka Walnut ($469.99) both qualify."
+  },
+  {
+    "id": "g_multi_04",
+    "bucket": "multi-constraint",
+    "query": "white desk under $300",
+    "expectedProductIds": [
+      "43a175bf-0805-4c81-bdf6-e03828a5342b",
+      "product-maisie-desk-white"
+    ],
+    "expectedFilters": { "color": "white", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Urban Desk ($249.99) and Maisie White Desk ($269.99) qualify; Aspen Desk ($314.99) is over."
+  },
+  {
+    "id": "g_multi_05",
+    "bucket": "multi-constraint",
+    "query": "round dining table in natural wood under $500",
+    "expectedProductIds": [
+      "product-kyoto-dining-table",
+      "90f1be95-f86a-4587-8b2a-0414fc868437"
+    ],
+    "expectedFilters": {
+      "category": "dining-room",
+      "color": "natural",
+      "material": "wood",
+      "maxPrice": 500
+    },
+    "expectedRefusal": false,
+    "notes": "Category + color + material + price + shape ('round'). Kyoto ($249.99) and Ora ($449.99) both round and natural wood."
+  },
+  {
+    "id": "g_multi_06",
+    "bucket": "multi-constraint",
+    "query": "fabric office chair under $150",
+    "expectedProductIds": [
+      "product-amour-desk-chair",
+      "product-nolan-chair-olive"
+    ],
+    "expectedFilters": {
+      "category": "office-storage",
+      "material": "fabric",
+      "maxPrice": 150
+    },
+    "expectedRefusal": false,
+    "notes": "Category + material + price. Amour ($74.99) and Nolan Olive ($139.99) qualify."
+  },
+  {
+    "id": "g_multi_07",
+    "bucket": "multi-constraint",
+    "query": "outdoor sofa with metal frame",
+    "expectedProductIds": ["0dcced62-6073-45d4-b11c-211ded717b8a"],
+    "expectedFilters": { "category": "outdoor", "material": "metal" },
+    "expectedRefusal": false,
+    "notes": "Category + material. Sorrento Outdoor 3-Seater Sofa is the only outdoor sofa, and it's metal."
+  },
+  {
+    "id": "g_multi_08",
+    "bucket": "multi-constraint",
+    "query": "white entertainment unit under $400",
+    "expectedProductIds": ["product-sadie-entertainment-unit"],
+    "expectedFilters": {
+      "category": "living-room",
+      "color": "white",
+      "maxPrice": 400
+    },
+    "expectedRefusal": false,
+    "notes": "Category + color + price + product-class. Sadie ($373.99) qualifies; Canyon Large is natural and over $500."
+  },
+  {
+    "id": "g_multi_09",
+    "bucket": "multi-constraint",
+    "query": "leather two seater for kids",
+    "expectedProductIds": ["6252e463-7b7a-4ef3-86a9-9b9b09dc3d13"],
+    "expectedFilters": { "material": "leather" },
+    "expectedRefusal": false,
+    "notes": "Material + audience hint. Mini Roo + Mini Moo Two Seater is the only leather product. Category not added (Mini Roo is in furniture-sets, agent might extract 'kids' which would over-filter)."
+  },
+  {
+    "id": "g_multi_10",
+    "bucket": "multi-constraint",
+    "query": "oak shelf under $200",
+    "expectedProductIds": ["product-eden-corner-shelf"],
+    "expectedFilters": { "color": "oak", "maxPrice": 200 },
+    "expectedRefusal": false,
+    "notes": "Color + price + product-class. Eden Corner Shelf ($149.99) qualifies; Eden Tall ($249.99) is over."
+  },
+  {
+    "id": "g_vague_01",
+    "bucket": "vague-style",
+    "query": "cozy reading nook",
+    "expectedProductIds": ["03aaea63-95a0-4d42-9bf3-69f7a38d249b"],
+    "expectedFilters": {},
+    "expectedRefusal": false,
+    "notes": "No keyword match; tests embedding semantics. Boucle Occasional Chair (single beige fabric chair) is the most defensible 'reading nook' piece — no armchairs/floor lamps in catalog."
+  },
+  {
+    "id": "g_vague_02",
+    "bucket": "vague-style",
+    "query": "minimalist Japandi small bedroom",
+    "expectedProductIds": [
+      "5ec1acd4-dcc4-441e-8329-06bd8bbee69c",
+      "product-maisie-bedside-table",
+      "dd845ff5-be1c-4be0-add9-6cf33b5b5776"
+    ],
+    "expectedFilters": { "category": "bedroom" },
+    "expectedRefusal": false,
+    "notes": "Cove Bedside (white/wood, simple), Maisie White Bedside, Quinn Queen Bed (natural wood) — pieces compatible with white/natural minimalist aesthetic."
+  },
+  {
+    "id": "g_vague_03",
+    "bucket": "vague-style",
+    "query": "warm scandi for a rental",
+    "expectedProductIds": [
+      "dd845ff5-be1c-4be0-add9-6cf33b5b5776",
+      "product-blair-bedside-table",
+      "product-eden-tall-shelf",
+      "product-blair-six-drawer"
+    ],
+    "expectedFilters": {},
+    "expectedRefusal": false,
+    "notes": "Warm = oak/natural wood. Scandi = simple lines. Rental-friendly = mid-tier price. Quinn Queen, Blair Bedside (oak), Eden Tall Shelf (oak), Blair Six Drawer."
+  },
+  {
+    "id": "g_vague_04",
+    "bucket": "vague-style",
+    "query": "calming workspace",
+    "expectedProductIds": [
+      "product-aspen-desk",
+      "product-amour-desk-chair",
+      "product-maisie-desk-white"
+    ],
+    "expectedFilters": { "category": "office-storage" },
+    "expectedRefusal": false,
+    "notes": "Aspen Desk (white/wood), Amour Cream Chair (soft fabric), Maisie White Desk — light/calm palette."
+  },
+  {
+    "id": "g_vague_05",
+    "bucket": "vague-style",
+    "query": "statement piece for a hallway",
+    "expectedProductIds": [
+      "product-eve-console-table",
+      "5f59a25e-5abd-4ac6-abc5-96c0920caabf",
+      "product-eros-buffet-sage"
+    ],
+    "expectedFilters": {},
+    "expectedRefusal": false,
+    "notes": "Eve Console Table (entryway-staple), Lena Arch Mirror (visual focal point), Eros Sage Buffet (statement color)."
+  },
+  {
+    "id": "g_oov_01",
+    "bucket": "out-of-vocabulary",
+    "query": "treadmill",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Furniture-only catalog; agent should refuse rather than surface the closest furniture."
+  },
+  {
+    "id": "g_oov_02",
+    "bucket": "out-of-vocabulary",
+    "query": "blender for the kitchen",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Small appliance, not furniture. Agent should refuse."
+  },
+  {
+    "id": "g_oov_03",
+    "bucket": "out-of-vocabulary",
+    "query": "PS5 stand",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Probe: agent might be tempted to surface entertainment units. Tests refusal discipline — Kozy doesn't sell gaming-specific furniture."
+  },
+  {
+    "id": "g_oov_04",
+    "bucket": "out-of-vocabulary",
+    "query": "smartwatch",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Wearable electronics. Agent should refuse."
+  },
+  {
+    "id": "g_oov_05",
+    "bucket": "out-of-vocabulary",
+    "query": "garden hose",
+    "expectedProductIds": [],
+    "expectedFilters": {},
+    "expectedRefusal": true,
+    "notes": "Outdoor utility. Probe: catalog has 'outdoor' category but it's furniture — agent should refuse rather than reach."
+  },
+  {
+    "id": "g_amb_01",
+    "bucket": "ambiguous-routing",
+    "query": "oak coffee tables under $400",
+    "expectedProductIds": ["c67c2079-95c1-4b10-b070-d5e16a610e18"],
+    "expectedFilters": { "color": "oak", "maxPrice": 400 },
+    "expectedRefusal": false,
+    "notes": "Pure-filter wording but Blair Round Nesting Coffee Tables - Oak ($349.99) is stored as color=natural — filterSearch with strict color=oak would miss; semanticSearch matches 'oak' in the name. Either tool acceptable but the routing matters."
+  },
+  {
+    "id": "g_amb_02",
+    "bucket": "ambiguous-routing",
+    "query": "natural wood dining table for 4 people",
+    "expectedProductIds": [
+      "product-avalon-dining-table",
+      "90f1be95-f86a-4587-8b2a-0414fc868437"
+    ],
+    "expectedFilters": {
+      "category": "dining-room",
+      "color": "natural",
+      "material": "wood"
+    },
+    "expectedRefusal": false,
+    "notes": "Filter-friendly wording with seat-count hint. Avalon 4-Seater ($199.99) and Ora 4-Seater Round ($449.99) both natural wood. Routing could go either way."
+  },
+  {
+    "id": "g_amb_03",
+    "bucket": "ambiguous-routing",
+    "query": "show me white desks under $300",
+    "expectedProductIds": [
+      "43a175bf-0805-4c81-bdf6-e03828a5342b",
+      "product-maisie-desk-white"
+    ],
+    "expectedFilters": { "color": "white", "maxPrice": 300 },
+    "expectedRefusal": false,
+    "notes": "'show me X' pattern — could be filterSearch (price+color) or semanticSearch (style discovery). Urban ($249.99) and Maisie White ($269.99) qualify."
+  },
+  {
+    "id": "g_amb_04",
+    "bucket": "ambiguous-routing",
+    "query": "warm walnut buffet around $500",
+    "expectedProductIds": [
+      "product-deven-buffet",
+      "product-osaka-buffet-walnut"
+    ],
+    "expectedFilters": { "color": "walnut" },
+    "expectedRefusal": false,
+    "notes": "'warm' = style hint, 'around $500' = fuzzy price (no hard cap expected). Deven ($499.99) and Osaka Walnut ($469.99) both qualify. Routing question: does the agent treat 'around' as a maxPrice or skip it?"
+  },
+  {
+    "id": "g_amb_05",
+    "bucket": "ambiguous-routing",
+    "query": "outdoor dining set with a metal frame",
+    "expectedProductIds": ["f1e63d21-0edc-4c74-b11e-84635da145a3"],
+    "expectedFilters": { "category": "outdoor", "material": "metal" },
+    "expectedRefusal": false,
+    "notes": "'set' implies multiple pieces but only Ravello matches outdoor+metal+dining. Filter-friendly but 'set' has stylistic weight too."
   }
 ]

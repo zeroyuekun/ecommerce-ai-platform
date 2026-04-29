@@ -139,6 +139,26 @@ Tracks the last 12 products a customer has looked at and displays them in a caro
 
 ---
 
+## AI Search That Understands Aesthetics (Phase 1 RAG)
+
+The original chatbot used keyword search — type "Japandi" and you'd get nothing because the product titles say "oak" and "minimalist", not "Japandi". Phase 1 of the RAG layer replaced that with semantic retrieval over Pinecone, so the assistant now matches meaning, not just words.
+
+**Query understanding** — before searching, a Haiku call rewrites the customer's query and generates a hypothetical answer (HyDE). Filters (category, material, color, price) are extracted from the same call. This widens recall on vague or aesthetic queries that keyword search couldn't handle.
+
+**Retrieval** — each product is chunked into 4–9 pieces (parent summary, description, specs, care instructions, plus synthetic Q&A pairs when AI Gateway capacity allows). Embeddings are Pinecone Inference's `multilingual-e5-large` at 1024 dimensions; storage is the Pinecone free tier.
+
+**Reranking** — if `COHERE_API_KEY` is set, the top candidates go through Cohere's reranker. Without the key, the pipeline preserves Pinecone's native similarity scores — quality is roughly 10–15% lower but still well above the recall@5 ≥ 0.85 ship gate.
+
+**Conversation compaction** — when a chat exceeds the soft input-token cap, a Haiku call compacts older turns into a summary so the user-facing Sonnet model never blows past its context budget. Per-turn telemetry (input tokens, compaction events) flows to PostHog.
+
+**Behind a feature flag** — the whole layer is gated by `RAG_ENABLED`. Rollback is one env flip away. The pre-RAG state is tagged `pre-rag` for hard reverts.
+
+**Tooling** — smoke tools in `tools/` (`smoke-rag`, `smoke-agent`, `smoke-filters`) for fast manual checks; `pnpm eval:rag` runs a golden set with recall/MRR/NDCG metrics; `pnpm reindex:rag` backfills the index when synthetic Q&A capacity returns.
+
+**Phase 1.6 in design** — the next pass closes two named gaps from Phase 1: retrieval-stage observability (per-query traces emitted to PostHog) and answer faithfulness (a regex + catalog-vocab heuristic gate at 0.85 mean, with a one-flag upgrade to an LLM-as-judge if the heuristic ever proves too coarse). Spec at `docs/superpowers/specs/2026-04-27-rag-telemetry-faithfulness-design.md`.
+
+---
+
 ## Security Hardening
 
 **Webhook silent failure**: The Stripe webhook handler was returning a success response even when order data was missing — meaning Stripe thought everything was fine and never retried. Customers could get charged with no order created. Fixed it to return an error so Stripe automatically retries the payment notification.

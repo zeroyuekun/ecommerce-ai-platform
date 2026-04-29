@@ -41,13 +41,17 @@ ${toCompact.map((m) => `${m.role}: ${typeof m.content === "string" ? m.content :
   };
 };
 
+// Roles accepted from the client. We deliberately exclude `"system"` so
+// a malicious client cannot stack a forged system prompt onto the agent's
+// real instructions. The agent's own system prompt is set via
+// buildAgentConfig; legitimate UI message roles are user / assistant only.
 const chatRequestSchema = z.object({
   messages: z
     .array(
       z
         .object({
           id: z.string().optional(),
-          role: z.enum(["user", "assistant", "system"]),
+          role: z.enum(["user", "assistant"]),
         })
         .passthrough(),
     )

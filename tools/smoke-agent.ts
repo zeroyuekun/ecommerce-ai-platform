@@ -19,8 +19,6 @@ interface FormattedProduct {
   id: string;
   slug: string;
   name: string;
-  price: number;
-  priceFormatted: string;
   relevanceScore?: number;
   stockStatus: string;
   keyMaterials: string;
@@ -56,7 +54,7 @@ async function runQuery(
   for (const p of out.products) {
     const score = (p.relevanceScore ?? 0).toFixed(3);
     console.log(
-      `    ${score}  ${p.name.padEnd(50)}  ${p.priceFormatted.padEnd(10)}  ${p.keyMaterials}`,
+      `    ${score}  ${p.name.padEnd(50)}  ${p.stockStatus.padEnd(12)}  ${p.keyMaterials}`,
     );
   }
   if (out.message) console.log(`  notice: ${out.message}`);

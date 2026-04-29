@@ -85,6 +85,52 @@ type ConcreteFilterSearchTool = Omit<ReturnType<typeof tool>, "execute"> & {
   ) => Promise<FilterSearchResult>;
 };
 
+/**
+ * Gemini-compatible variant of the input schema. Google's Generative
+ * Language API rejects empty-string enum values (`material: ""` etc.),
+ * which the production schema uses as a "no filter" sentinel. This
+ * variant drops the empty literal and lets the field be truly optional;
+ * the execute handler already coerces undefined to "" via `material || ""`.
+ *
+ * Used only by the eval CLI's direct-Gemini escape hatch. Production
+ * Sonnet path (via Vercel AI Gateway) keeps the original `inputSchema`
+ * with the empty-string default — no behaviour change for users.
+ */
+const inputSchemaGemini = z.object({
+  query: z
+    .string()
+    .optional()
+    .default("")
+    .describe(
+      "Search term to match product name, description, or category (e.g., 'oak table', 'leather sofa', 'dining').",
+    ),
+  category: z
+    .string()
+    .optional()
+    .default("")
+    .describe(
+      "Filter by category slug: living-room, bedroom, dining-room, office-storage, outdoor, kids, baby, lighting-decor, youth, furniture-sets.",
+    ),
+  material: z
+    .enum(MATERIAL_VALUES)
+    .optional()
+    .describe("Filter by material type. Omit if no preference."),
+  color: z
+    .enum(COLOR_VALUES)
+    .optional()
+    .describe("Filter by color. Omit if no preference."),
+  minPrice: z
+    .number()
+    .optional()
+    .default(0)
+    .describe("Minimum price in AUD (0 = no minimum)."),
+  maxPrice: z
+    .number()
+    .optional()
+    .default(0)
+    .describe("Maximum price in AUD (0 = no maximum)."),
+});
+
 const _filterSearchTool = tool({
   description:
     "Filter the catalog by hard constraints (category, material, color, price range). Returns SUMMARIES ONLY — no price, dimensions, or stock counts. For those, call getProductDetails(slug). Use this for queries like 'all oak coffee tables' or 'sofas under $1000'. For open-ended style/vibe queries, use semanticSearch instead.",
@@ -145,3 +191,16 @@ const _filterSearchTool = tool({
 }) as unknown as ConcreteFilterSearchTool;
 
 export const filterSearchTool = _filterSearchTool;
+
+/**
+ * Gemini-compatible variant of `filterSearchTool`. Reuses the production
+ * tool's execute handler verbatim; the only delta is `inputSchemaGemini`,
+ * which drops the empty-string enum literal that Google's API rejects.
+ */
+const _filterSearchToolGemini = tool({
+  description: _filterSearchTool.description,
+  inputSchema: inputSchemaGemini,
+  execute: _filterSearchTool.execute as never,
+}) as unknown as ConcreteFilterSearchTool;
+
+export const filterSearchToolGemini = _filterSearchToolGemini;

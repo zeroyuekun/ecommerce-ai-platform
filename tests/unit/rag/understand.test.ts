@@ -8,6 +8,7 @@ const goodFn: UnderstandingFn = vi.fn(async (args) => ({
   rewritten: `${args.query} (rewritten)`,
   filters: { maxPrice: 400, color: "oak" },
   hyde: args.query.length < 30 ? "Hypothetical product description" : null,
+  fellBack: false,
 }));
 
 describe("understandQuery", () => {
@@ -20,6 +21,7 @@ describe("understandQuery", () => {
     expect(out.rewritten).toMatch(/rewritten/);
     expect(out.filters.maxPrice).toBe(400);
     expect(out.hyde).toBeTruthy();
+    expect(out.fellBack).toBe(false);
   });
 
   it("falls back to identity rewrite + empty filters on failure", async () => {
@@ -34,6 +36,7 @@ describe("understandQuery", () => {
     expect(out.rewritten).toBe("anything");
     expect(out.filters).toEqual({});
     expect(out.hyde).toBeNull();
+    expect(out.fellBack).toBe(true);
   });
 
   it("clamps invalid filter values (e.g. negative price)", async () => {
@@ -41,6 +44,7 @@ describe("understandQuery", () => {
       rewritten: "x",
       filters: { maxPrice: -1, minPrice: -10 },
       hyde: null,
+      fellBack: false,
     }));
     const out = await understandQuery({
       query: "x",

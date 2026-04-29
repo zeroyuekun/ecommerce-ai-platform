@@ -6,9 +6,16 @@
  * Phase 1: dense-only (sparse encoding deferred to Phase 1.5).
  *
  * Usage:
- *   pnpm reindex:rag                # all products
+ *   pnpm reindex:rag                # all products (Haiku Q&A enabled)
  *   pnpm reindex:rag --slug=foo-bar # single product by slug
  *   pnpm reindex:rag --since=2026-04-01  # touched since date
+ *   pnpm reindex:rag --no-qa        # skip synthetic Q&A (no LLM/gateway)
+ *
+ * --no-qa is the cost-free path: refreshes the 4 base chunks
+ * (parent/description/specs/care) per product without burning any
+ * Haiku credits. Useful for picking up chunker fixes — e.g. the C3
+ * metadata.text fix landed 2026-04-25 — without paying for Q&A
+ * regeneration on a fresh-credits day.
  */
 // Env loading is handled by `dotenv-cli` in the package.json script
 // (`dotenv -e .env.local -- tsx ...`). We don't import dotenv here because
@@ -16,6 +23,7 @@
 // top-level loadEnv() call, which would crash on missing env vars.
 import type { ChunkableProduct } from "@/lib/ai/rag/indexer/chunk";
 import { indexProduct } from "@/lib/ai/rag/indexer/index-product";
+import type { QaGenerator } from "@/lib/ai/rag/indexer/synthetic-qa";
 import { client } from "@/sanity/lib/client";
 
 interface SanityProduct {
@@ -43,6 +51,7 @@ const QUERY = `*[_type == "product" $extra]{
 interface CliArgs {
   slug?: string;
   since?: string;
+  noQa?: boolean;
 }
 
 interface ExtrasResult {
@@ -76,9 +85,13 @@ function parseArgs(): CliArgs {
   for (const arg of process.argv.slice(2)) {
     if (arg.startsWith("--slug=")) args.slug = arg.slice("--slug=".length);
     if (arg.startsWith("--since=")) args.since = arg.slice("--since=".length);
+    if (arg === "--no-qa") args.noQa = true;
   }
   return args;
 }
+
+/** No-op QA generator — emits zero Q&A items, makes no LLM call. */
+const noQaGenerator: QaGenerator = async () => [];
 
 function toChunkable(p: SanityProduct): ChunkableProduct {
   return {
@@ -107,17 +120,22 @@ async function main(): Promise<void> {
   const query = QUERY.replace("$extra", clause);
   const products = (await client.fetch<SanityProduct[]>(query, params)) ?? [];
   console.log(`[reindex] fetched ${products.length} product(s)`);
+  if (args.noQa) {
+    console.log("[reindex] --no-qa: skipping synthetic Q&A (no LLM cost)");
+  }
 
   if (products.length === 0) {
     console.log("[reindex] nothing to do");
     return;
   }
 
+  const indexOpts = args.noQa ? { qaGenerator: noQaGenerator } : undefined;
+
   let ok = 0;
   let fail = 0;
   for (const p of products) {
     try {
-      const result = await indexProduct(toChunkable(p));
+      const result = await indexProduct(toChunkable(p), indexOpts);
       console.log(
         `[reindex] ✓ ${p.slug.current} → ${result.chunksIndexed} chunks`,
       );

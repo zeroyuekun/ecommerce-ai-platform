@@ -19,7 +19,9 @@ import {
   haikuUnderstandingFn,
   understandQuery,
 } from "@/lib/ai/rag/query/understand";
+import { emitTrace, TraceBuilder } from "@/lib/ai/rag/trace";
 import { hydrateProductSummaries } from "@/lib/ai/tools/semantic-search-hydrate";
+import { redactPII } from "@/lib/monitoring";
 
 export type SemanticSearchResult = {
   found: boolean;
@@ -112,72 +114,140 @@ const _semanticSearchTool = tool({
     const history = extractHistory(
       (options as SemanticSearchToolOptions | undefined)?.messages,
     );
-    const understanding = await understandQuery({
-      query,
-      history,
-      understandingFn: haikuUnderstandingFn,
-    });
+    const builder = new TraceBuilder(redactPII(query), history.length);
 
-    const mergedFilters = {
-      ...understanding.filters,
-      ...(filters?.material ? { material: filters.material } : {}),
-      ...(filters?.color ? { color: filters.color } : {}),
-      ...(filters?.category ? { category: filters.category } : {}),
-      ...(filters?.maxPrice ? { maxPrice: filters.maxPrice } : {}),
-      ...(filters?.minPrice ? { minPrice: filters.minPrice } : {}),
-    };
+    try {
+      const tUnderstand = Date.now();
+      const understanding = await understandQuery({
+        query,
+        history,
+        understandingFn: haikuUnderstandingFn,
+      });
+      builder.setUnderstand({
+        rewritten: understanding.rewritten,
+        hyde: understanding.hyde,
+        // QueryFilters is a narrow concrete type; trace.understand.filters is
+        // deliberately wide (Record<string, unknown>) for forward compatibility.
+        filters: understanding.filters as Record<string, unknown>,
+        fellBack: understanding.fellBack,
+        durationMs: Date.now() - tUnderstand,
+      });
 
-    const candidates = await retrieve({
-      rewritten: understanding.rewritten,
-      hyde: understanding.hyde,
-      filters: mergedFilters,
-      topK: TOP_K_RETRIEVE,
-    });
-
-    if (candidates.length === 0) {
-      return {
-        found: false,
-        totalResults: 0,
-        products: [],
-        message: "No products matched. Try different terms or relax filters.",
+      const mergedFilters = {
+        ...understanding.filters,
+        ...(filters?.material ? { material: filters.material } : {}),
+        ...(filters?.color ? { color: filters.color } : {}),
+        ...(filters?.category ? { category: filters.category } : {}),
+        ...(filters?.maxPrice ? { maxPrice: filters.maxPrice } : {}),
+        ...(filters?.minPrice ? { minPrice: filters.minPrice } : {}),
       };
+
+      const tRetrieve = Date.now();
+      const candidates = await retrieve({
+        rewritten: understanding.rewritten,
+        hyde: understanding.hyde,
+        filters: mergedFilters,
+        topK: TOP_K_RETRIEVE,
+      }).catch((err: unknown) => {
+        builder.setError(
+          "retrieve",
+          err instanceof Error ? err.message : String(err),
+        );
+        throw err;
+      });
+      builder.setRetrieve({
+        topK: TOP_K_RETRIEVE,
+        candidateCount: candidates.length,
+        candidates: candidates.map((c) => ({
+          id: c.id,
+          productId: c.productId,
+          score: c.score,
+          chunkType: c.chunkType,
+          text: c.metadata.text ?? `${c.chunkType}:${c.id}`,
+        })),
+        durationMs: Date.now() - tRetrieve,
+      });
+
+      if (candidates.length === 0) {
+        builder.setRerank({
+          backend: "fallback",
+          topN: 0,
+          results: [],
+          durationMs: 0,
+        });
+        builder.setPicked({ productIds: [] });
+        return {
+          found: false,
+          totalResults: 0,
+          products: [],
+          message: "No products matched. Try different terms or relax filters.",
+        };
+      }
+
+      const candidateTexts: Record<string, string> = Object.fromEntries(
+        candidates.map((c) => [
+          c.id,
+          c.metadata.text ?? `${c.metadata.chunk_type}:${c.id}`,
+        ]),
+      );
+
+      const tRerank = Date.now();
+      const reranked = await rerankAndDedupe({
+        query: understanding.rewritten,
+        candidates,
+        candidateTexts,
+        topNAfterRerank: TOP_N_RERANK,
+        topProducts: TOP_PRODUCTS,
+      }).catch((err: unknown) => {
+        builder.setError(
+          "rerank",
+          err instanceof Error ? err.message : String(err),
+        );
+        throw err;
+      });
+      const rerankBackend: "cohere" | "fallback" = process.env.COHERE_API_KEY
+        ? "cohere"
+        : "fallback";
+      const rerankResults = reranked.map((r) => {
+        const id =
+          (r as { chunkId?: string; productId?: string }).chunkId ??
+          (r as { productId: string }).productId;
+        return { id, score: r.score };
+      });
+      builder.setRerank({
+        backend: rerankBackend,
+        topN: TOP_N_RERANK,
+        results: rerankResults,
+        durationMs: Date.now() - tRerank,
+      });
+
+      const summaries = await hydrateProductSummaries(
+        reranked.map((r) => r.productId),
+      );
+      const formatted = formatPipelineResults({
+        matches: reranked,
+        products: summaries,
+      });
+      const capped = formatToolResult({
+        toolName: "semanticSearch",
+        payload: formatted as unknown as Record<string, unknown>,
+        capTokens: RESULT_TOKEN_CAP,
+        arrayKey: "products",
+      });
+
+      builder.setPicked({
+        productIds: reranked.map((r) => r.productId),
+      });
+
+      return {
+        ...(capped.payload as unknown as Omit<SemanticSearchResult, "message">),
+        message: capped.notice ?? null,
+      };
+    } finally {
+      // Fire-and-forget by design: emitTrace handles its own errors via
+      // captureException, so trace failures never surface to the chat path.
+      void emitTrace(builder.build());
     }
-
-    // Use the actual chunk text persisted in metadata (C3 fix, 2026-04-25).
-    // Pre-fix records may not carry `text` — fall back to the chunk-id stub
-    // so the pipeline still functions before the next reindex completes.
-    const candidateTexts: Record<string, string> = Object.fromEntries(
-      candidates.map((c) => [
-        c.id,
-        c.metadata.text ?? `${c.metadata.chunk_type}:${c.id}`,
-      ]),
-    );
-
-    const reranked = await rerankAndDedupe({
-      query: understanding.rewritten,
-      candidates,
-      candidateTexts,
-      topNAfterRerank: TOP_N_RERANK,
-      topProducts: TOP_PRODUCTS,
-    });
-
-    const summaries = await hydrateProductSummaries(
-      reranked.map((r) => r.productId),
-    );
-    const formatted = formatPipelineResults({
-      matches: reranked,
-      products: summaries,
-    });
-    const capped = formatToolResult({
-      toolName: "semanticSearch",
-      payload: formatted as unknown as Record<string, unknown>,
-      capTokens: RESULT_TOKEN_CAP,
-      arrayKey: "products",
-    });
-    return {
-      ...(capped.payload as unknown as Omit<SemanticSearchResult, "message">),
-      message: capped.notice ?? null,
-    };
   },
 }) as unknown as ConcreteSemanticSearchTool;
 
