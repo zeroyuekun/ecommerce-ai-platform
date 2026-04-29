@@ -15,6 +15,15 @@ jobs:
     name: Typecheck, lint, test
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # `pnpm typegen` runs `sanity schema extract`, which hits the Sanity
+      # API to fetch the published schema (not just local source). It also
+      # loads sanity.cli.ts which requires all three of project / dataset /
+      # org. These are NEXT_PUBLIC_* values — they ship in the client bundle
+      # anyway, so embedding them here is not a secret leak.
+      NEXT_PUBLIC_SANITY_PROJECT_ID: 8oups9cq
+      NEXT_PUBLIC_SANITY_DATASET: production
+      NEXT_PUBLIC_SANITY_ORG_ID: oFFRqa2hW
     steps:
       - name: Checkout
         uses: actions/checkout@v4
