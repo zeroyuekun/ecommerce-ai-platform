@@ -52,3 +52,6 @@ schema.json
 # Disposable processing files (CLAUDE.md §"File Structure"): scraped data,
 # intermediate exports, RAG trace logs, agent session transcripts.
 .tmp/
+
+# Claude Code machine-local state (scheduler lock, etc.)
+.claude/scheduled_tasks.lock
